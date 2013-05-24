@@ -3,7 +3,6 @@
 
 Full details of the Educational Visualization Framework can be found at http://epe.marine.rutgers.edu/visualization
 
-
 ##License
 - 
 

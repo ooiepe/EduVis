@@ -251,9 +251,6 @@
         // retrieve track information for the default deployment
         this.getTrack( this.settings.deployment, this.settings.profile_id );
 
-
-        return ;
-
     },
 
     tool.init = function() {
@@ -370,22 +367,21 @@
         // PROFILE CHARTS
         //
 
-        var props = ui.container.properties;
-
-        var charts = ui.charts;
+        var props = ui.container.properties,
+            charts = ui.charts,
 
         // Chart A.. Profile Chart on left
         // chart B.. Profile Chart in middle
         // Chart C.. Scatterplot chart
 
-        var profiles = charts.profiles,
+            profiles = charts.profiles,
             scatterplots = charts.scatterplot,
             chartA = profiles.a = {},
             chartB = profiles.b = {},
-            chartC = scatterplots.a = {};
+            chartC = scatterplots.a = {},
 
         // get ui placeholder div for profile charts at left
-        var chartProfiles = d3.select("#" + id + "-chart-profiles");
+            chartProfiles = d3.select("#" + id + "-chart-profiles");
 
         // Profile Chart A containers for svg, svg:path, svg:g, svg:g.axisX, svg:g.axisY, and svg:rect
 
@@ -1515,4 +1511,3 @@ Developers  To DO:
  Notes:
 
 */
-

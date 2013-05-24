@@ -1,6 +1,7 @@
-/*
+/*  *  *  *  *  *  *  
+*
 * EduVis.configuration
-
+*
 */
 
 (function (eduVis) {
