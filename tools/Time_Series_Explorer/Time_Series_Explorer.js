@@ -29,6 +29,8 @@
         
         "resources" : {
 
+        	"local_resource_path" : "",
+
             "scripts_local" : [
 
 				{
@@ -269,8 +271,6 @@
 	        context: d3.time.scale().tickFormat("%m-%d")
 
 	    }
-
-	  
 
 	    chart_layout.legend.margin.left = container.width / 2 - (container.width / 8);
 
@@ -1536,7 +1536,8 @@
 
 	    //var num = (param == "param1" ? "1" : "2");
 
-	    alert("No data was returned for the Station, Parameter, and Date Range you selected.\n\n" + "Please adjust the Station, Parameters, or Date Range to request new data.");
+	    alert("No data was returned for the Station, Parameter, and Date Range you selected.\n\n" + 
+	    	"Please adjust the Station, Parameters, or Date Range to request new data.");
 
 	    //    alert(
 	    //            "No " + 'self.data.parameters[config_custom["param"+num]].name' + " data is available for " + self.stations["station"+num].name + "\n for the date range provided.\n\n" +

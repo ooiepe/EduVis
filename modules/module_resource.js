@@ -17,10 +17,10 @@
     */
     
     var _resource_version = "0.0.1",
-        _resource_path = "resources/js/", // path to javascript resources
+        _resource_path = "resources/", // path to javascript resources
+        _resource_path_js = _resource_path + "/js/",
         _version_jquery = "1.9.1", // latest tested and supported version of jquery
         _version_d3 = "3.0.8";
-
 
     /** 
     * Original funciton to test if base javascript libs were loaded. 
@@ -196,7 +196,7 @@
         // test if local resource is available
         _resource_inject({
             "name" : obj_resource.name,
-            "url" : ( obj_resource.resource_path || _resource_path ) + obj_resource.resource_file_name,
+            "url" : ( obj_resource.resource_path || _resource_path_js ) + obj_resource.resource_file_name,
             "validation": obj_resource.validation || obj_resource.name,
             "global_reference" : obj_resource.global_reference,
             "attributes" : obj_resource.attributes
@@ -328,8 +328,8 @@
     },
     _resource_is_loaded = function(_resource_name){
 
-        console.log("IS resource loaded? ", _resource_name);
-        console.lg("typeof _resources_loaded[_resource_name] === object", typeof _resources_loaded[_resource_name] === "object");
+        console.log("..IS resource loaded? ", _resource_name);
+        console.lg("....typeof _resources_loaded[_resource_name] === object", typeof _resources_loaded[_resource_name] === "object");
 
         return typeof _resources_loaded[_resource_name] === "object" ? true : false;
 
@@ -355,6 +355,9 @@
     eduVis.resource = {
 
         // resource loading for scripts
+        resource_path : _resource_path,
+        resource_path_js : _resource_path_js,
+
         load : _resource_load_local,
         load_external : _resource_load_external,
         loaded : (function(){return _resources_loaded;})(),        

@@ -11,7 +11,12 @@ var EduVis = (function () {
 
     "use strict";
 
-	var eduVis = {version : "0.0.1"};
+	var eduVis = {
+		"version" : "0.0.1",
+		"parameters":{
+			"local_resource_url" : "http://ooi.dev/epe/EduVis/"
+		}
+	};
 
 	eduVis.test = function () {
 
@@ -27,7 +32,7 @@ var cE = function(el){return document.createElement(el);}
 var gE = function(el){return document.getElementById(el);}
 
 /* 
-* Last Revision: 05/07/13
+* Last Revision: 06/03/13
 * Version 1.0.3
 * Notes:
 *

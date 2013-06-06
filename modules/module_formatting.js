@@ -73,13 +73,12 @@
                 "days" : d3.time.scale().tickFormat("%d"),
                 "months" : d3.time.scale().tickFormat("%m/%y")
             }
-        };
+        }
 
     },
     _formatting_scales = function (){
 
     };
-
 
     eduVis.formats = {
         lat: _formatting_format_lat,

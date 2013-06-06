@@ -81,21 +81,16 @@
             }
         },
         "data" : {},
-        "target_div" : "Template_1",
+        "target_div" : "Template",
         "tools" : {}
 
     };
 
     tool.Template = function( _target_div ){
 
-        // reference data here
-        var target_div = "#" + _target_div || tool.target_div;
-
-      	$("#" + _target_div).html("TEMPLATE TOOL LOADED");
+      	document.getElementById(_target_div).innerHTML = "TEMPLATE TOOL LOADED";
 
       	alert(tool.configuration.alertMessage);
-
-        return ;
 
     },
 

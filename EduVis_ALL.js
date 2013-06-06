@@ -11,7 +11,12 @@ var EduVis = (function () {
 
     "use strict";
 
-	var eduVis = {version : "0.0.1"};
+	var eduVis = {
+		"version" : "0.0.1",
+		"parameters":{
+			"local_resource_url" : "http://ooi.dev/epe/EduVis/"
+		}
+	};
 
 	eduVis.test = function () {
 
@@ -27,7 +32,7 @@ var cE = function(el){return document.createElement(el);}
 var gE = function(el){return document.getElementById(el);}
 
 /* 
-* Last Revision: 05/07/13
+* Last Revision: 06/03/13
 * Version 1.0.3
 * Notes:
 *
@@ -42,27 +47,114 @@ var gE = function(el){return document.getElementById(el);}
 
     "use strict";
 
-    /** * Reverse a string 
+    /** * Parse a configuration. 
     * 
-    * @param {String} input String to reverse 
+    * @param {String} tool name for reference
+    * @param {String} tool instance ID for reference
     * @return {String} The reversed string 
     */
 
-    var _config_parse = function( ) {
+    var _config_instance_ws = "custom_instance.php",
 
-        // Load a control
+    _config_parse = function( tool_reference ) {
+
+        // Load a configuration
+        var self = this,
+            ref = EduVis.tool.tools[tool_reference].configuration;
+
+        console.log("...Tool Reference...");
+        console.log(tool_reference);
+        console.log(ref);
 
     },
 
     _config_validate = function( ) {
 
-        // Preview a control
-    }
+        // Preview a configuration in new window?.. in div?
 
+
+
+    },
+
+    _config_parse_instance_config = function(obj_tool){
+
+        // get reference to instance..
+        // overide instance "settings" with configuration.
+        var tool_name = obj_tool.name,
+            tool_instance = obj_tool.instance_id,
+            instance_configuration;
+
+        instance_configuration = JSON.parse(obj_tool.str_instance_configuration);
+
+        obj_tool.instance_configuration = instance_configuration;
+
+
+        console.log("...instance configuration...");
+        console.log(instance_configuration);
+
+        //var EduVis.tool.instances[instance_id] = EduVis.tool.tools[]
+
+        // now init tool w/ custom instance configuraiton
+        EduVis.tool.init( obj_tool, instance_configuration );
+
+        //EduVis.tool.instances[tool_name][tool_instance].init();
+
+        //EduVis.tool.instance_init( obj_tool );
+
+    },
+    _config_export = function( tool_reference, instance_reference ){
+
+        // 
+        console.log(EduVis.tool.tools[tool_reference].configuration);
+
+
+    },
+    _config_settings_update = function(){
+
+    },
+    _config_request_instance = function(obj_tool){
+
+        var xmlhttp,
+            tool_name = obj_tool.name,
+            tool_instance = obj_tool.instance_id;
+
+        if (window.XMLHttpRequest){
+            // IE7+, FF, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        }
+        else{
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        
+        xmlhttp.onreadystatechange = function(){
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
+                
+                console.log(".. Instance Requested ...");
+                console.log(".. Instance Configuration: " + xmlhttp.responseText);
+                obj_tool.str_instance_configuration = xmlhttp.responseText;
+
+                _config_parse_instance_config(obj_tool);
+                //tool_reference, instance_id, xmlhttp.responseText);
+
+                //now call tool load
+                //EduVis.tool.init( obj_tool );
+
+            }else{
+
+                console.log(".. Error with Instance Request..");
+            }
+        }
+        xmlhttp.open("GET", _config_instance_ws + "?iid=" + tool_instance, true);
+        xmlhttp.send();
+    };
 
     eduVis.configuration = {
         parse: _config_parse,
-        validate: _config_validate
+        validate: _config_validate,
+        tool: _config_parse,
+        instance: _config_parse_instance_config,
+        request_instance : _config_request_instance
     };
 
 
@@ -508,13 +600,12 @@ var gE = function(el){return document.getElementById(el);}
                 "days" : d3.time.scale().tickFormat("%d"),
                 "months" : d3.time.scale().tickFormat("%m/%y")
             }
-        };
+        }
 
     },
     _formatting_scales = function (){
 
     };
-
 
     eduVis.formats = {
         lat: _formatting_format_lat,
@@ -544,10 +635,10 @@ var gE = function(el){return document.getElementById(el);}
     */
     
     var _resource_version = "0.0.1",
-        _resource_path = "resources/js/", // path to javascript resources
+        _resource_path = "resources/", // path to javascript resources
+        _resource_path_js = _resource_path + "/js/",
         _version_jquery = "1.9.1", // latest tested and supported version of jquery
         _version_d3 = "3.0.8";
-
 
     /** 
     * Original funciton to test if base javascript libs were loaded. 
@@ -723,7 +814,7 @@ var gE = function(el){return document.getElementById(el);}
         // test if local resource is available
         _resource_inject({
             "name" : obj_resource.name,
-            "url" : ( obj_resource.resource_path || _resource_path ) + obj_resource.resource_file_name,
+            "url" : ( obj_resource.resource_path || _resource_path_js ) + obj_resource.resource_file_name,
             "validation": obj_resource.validation || obj_resource.name,
             "global_reference" : obj_resource.global_reference,
             "attributes" : obj_resource.attributes
@@ -855,8 +946,8 @@ var gE = function(el){return document.getElementById(el);}
     },
     _resource_is_loaded = function(_resource_name){
 
-        console.log("IS resource loaded? ", _resource_name);
-        console.lg("typeof _resources_loaded[_resource_name] === object", typeof _resources_loaded[_resource_name] === "object");
+        console.log("..IS resource loaded? ", _resource_name);
+        console.lg("....typeof _resources_loaded[_resource_name] === object", typeof _resources_loaded[_resource_name] === "object");
 
         return typeof _resources_loaded[_resource_name] === "object" ? true : false;
 
@@ -882,6 +973,9 @@ var gE = function(el){return document.getElementById(el);}
     eduVis.resource = {
 
         // resource loading for scripts
+        resource_path : _resource_path,
+        resource_path_js : _resource_path_js,
+
         load : _resource_load_local,
         load_external : _resource_load_external,
         loaded : (function(){return _resources_loaded;})(),        
@@ -924,10 +1018,10 @@ var gE = function(el){return document.getElementById(el);}
     "use strict";
 
     var _tools_version = "0.01",
-        _tools_path = "tools/",
+        _tools_path = "tools/", // full url can be used
+        _tools_resource_path = "",
 
     _tool_load = function(obj_tool) {
-
 
         var tools = typeof eduVis.tools === "object" ? eduVis.tools : {};
 
@@ -935,7 +1029,6 @@ var gE = function(el){return document.getElementById(el);}
         // SET LOADING SPINNER..
 
         _tool_loading(obj_tool);
-
         
         // supports all recent browsers, ie7,8,9
         var script = document.createElement("script")
@@ -951,7 +1044,7 @@ var gE = function(el){return document.getElementById(el);}
 
                     setTimeout((function(){
 
-                        alert("put code here");
+                        alert("put code here for old browsers");
 
                     }));
                 }
@@ -960,18 +1053,28 @@ var gE = function(el){return document.getElementById(el);}
             script.onload = function(){
                 
                 // todo: look for better alternative to lazy call
-               // setTimeout(EduVis.dependencies.notify(obj_tool.name));
 
                 setTimeout((function(){
                 
+                    console.log("....tool notify....")
                     EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
                     
                     //EduVis.resource.queued();
-                    console.log(".. now queue all tool resources ..");
+                    console.log("....tool queue....");
 
                     EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
 
-                    EduVis.tool.init( obj_tool.name );
+                    console.log("....tool instance....");
+                    if(typeof obj_tool.instance_id !== "undefined"){
+                        
+                        console.log("....tool instance request....");
+                        EduVis.configuration.request_instance(obj_tool);
+
+                    }else{
+
+                        console.log("....tool instance init default....");
+                        EduVis.tool.init( obj_tool );
+                    }
 
                 }));
             };
@@ -1018,7 +1121,8 @@ var gE = function(el){return document.getElementById(el);}
     },
     _tool_notify = function ( _obj_notify){
 
-        console.log("tool notify", _obj_notify)
+        console.log("tool notify", _obj_notify);
+        
     },
 
     _tool_is_ready = function( _obj_tool ){
@@ -1048,7 +1152,9 @@ var gE = function(el){return document.getElementById(el);}
         for (;i<stylesheets_length; i++) {
 
             if(typeof EduVis.resource.loaded[stylesheets[i]] !== "object"){
+
                 console.log("returned FALSE! -> ", stylesheets[i])
+
                 return false;
             }
         }
@@ -1089,7 +1195,6 @@ var gE = function(el){return document.getElementById(el);}
 
             scripts[script_count] = scr_ext[i].name;
             script_count+=1;
-
         }
 
         for(; j<scr_local_length; j++){
@@ -1112,28 +1217,60 @@ var gE = function(el){return document.getElementById(el);}
 
     },
 
-    _tool_init = function(_tool_name) {
+    _tool_init = function(obj_tool, instance_config) {
 
-        console.log("Tool Name", _tool_name);
-        console.log(typeof EduVis.tool.tools[_tool_name]);
-        
-        var Tool = EduVis.tool.tools[_tool_name];
+        var name = obj_tool.name,
+            Tool = EduVis.tool.tools[name];
 
-        console.log("_tool_init on Tool: " + Tool.name, Tool)
+        console.log("Tool Name", name);
+        console.log(typeof EduVis.tool.tools[name]);
+        console.log("_tool_init on Tool: " + Tool.name, Tool);
         
         if(typeof Tool === "object"){
 
-
             if( _tool_is_ready(Tool) ){
 
-                //Tool.resources.loaded = true;
+                var instance_id = obj_tool.instance_id;
 
+                //Tool.resources.loaded = true;
+                if(typeof EduVis.tool.instances[name] === "object" ){
+
+                    EduVis.tool.instances[name][instance_id] = Tool;
+
+                }
+                else{
+                
+                    EduVis.tool.instances[name] = {};
+                    EduVis.tool.instances[name][instance_id] = Tool;
+
+//EduVis.utility.extend({alertMessage: "nope", "mike" : "This is mike!"}, EduVis.tool.instances.Template.Template_1.configuration )
+
+                }
+
+                EduVis.utility.extend(
+                    instance_config,
+                    EduVis.tool.instances[name][instance_id].configuration
+                );
+
+                console.log("Instance!");
+                console.log(EduVis.tool.instances[name][instance_id]);
+               
                 console.log("Tool Initialization >> Tool:" + Tool.name );
 
-                EduVis.tool.tools[_tool_name].init();
+                console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", instance_config);
+                EduVis.tool.instances[name][instance_id].init();
+
+              
+                //or name instance here..
+                
+                // override configuration
+
+                //EduVis.tool.tools[name].init();
+                //_tool_init(obj_tool);
 
             }
             else{
+                
                 console.log("Tool Not ready to load. Still waiting on some dependencies..");
 
                 setTimeout((function(){
@@ -1144,19 +1281,17 @@ var gE = function(el){return document.getElementById(el);}
                         console.log("..EduVis Haulted..");
                     }else{
 
-                        _tool_init(_tool_name);
+                        _tool_init(obj_tool, instance_config);
+                        //_tool_init(Tool.name);
+
                     }
 
                 }),2000);
             }
         }
         else{
-            alert("no tool object..")
+            alert("..no tool object..")
         }
-
-        //?  : false;
-
-        return;
     },
 
     _tool_version = function(){
@@ -1182,7 +1317,6 @@ var gE = function(el){return document.getElementById(el);}
                 "stylesheets_local" : [],
                 "stylesheets_external" : [],
                 "datasets" : [] 
-                
             },
 
             "configuration" : {},
@@ -1196,14 +1330,16 @@ var gE = function(el){return document.getElementById(el);}
     };
 
     eduVis.tool = {
-        load: _tool_load,
-        init: _tool_init,
-        version: _tool_version,
-        notify: _tool_notify,
-        is_ready: _tool_is_ready,
-        find_resources: _tool_find_resources,
-        template: _tool_base_template,
-        tools: {}
+        resource_path : _tools_resource_path,
+        load : _tool_load,
+        init : _tool_init,
+        version : _tool_version,
+        notify : _tool_notify,
+        is_ready : _tool_is_ready,
+        find_resources : _tool_find_resources,
+        template : _tool_base_template,
+        tools : {},
+        instances : {}
     };
 
 }(EduVis));

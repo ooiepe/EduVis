@@ -35,7 +35,6 @@
                     "resource_file_name" : "jquery-1.9.1.min.js",
                     "dependsOn" : []
                 },
-
                 {
                     "name" : "jquery-ui",
                     "resource_path" : "resources/js/",
