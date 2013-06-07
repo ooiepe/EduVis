@@ -27,12 +27,8 @@ var EduVis = (function () {
 
 }());
 
-// some simple helper functions
-var cE = function(el){return document.createElement(el);}
-var gE = function(el){return document.getElementById(el);}
-
 /* 
-* Last Revision: 06/03/13
+* Last Revision: 06/07/13
 * Version 1.0.3
 * Notes:
 *

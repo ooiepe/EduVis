@@ -12,7 +12,7 @@
     var _control_load = function () {
     },
 
-    _control_create = function (tool, id, _obj_control) {
+    _control_create = function (tool, id, obj_control) {
 
         // tool type - ie. textbox, colorpicker, etc - must exist in switch
 
@@ -20,8 +20,10 @@
 
         // todo: editor,viewer should both reference this function
 
-        var control = _obj_control,
-        lbl, input, ctrl;
+        var control = obj_control,
+            lbl,
+            input, 
+            ctrl;
 
         switch (control.type) {
 
@@ -111,7 +113,6 @@
                 // set the default value based on the controls default value element
                 // todo: override with custom config value
                 select.val( control.default_value );
-
 
                 ctrl = $('<div></div>');
                 //.addClass("control");

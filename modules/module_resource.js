@@ -19,7 +19,7 @@
     var _resource_version = "0.0.1",
         _resource_path = "resources/", // path to javascript resources
         _resource_path_js = _resource_path + "/js/",
-        _version_jquery = "1.9.1", // latest tested and supported version of jquery
+        _version_jquery = "1.10.1", // latest tested and supported version of jquery
         _version_d3 = "3.0.8";
 
     /** 

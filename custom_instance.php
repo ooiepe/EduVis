@@ -29,7 +29,7 @@ $json =
 break;
 case "Time_Series_Explorer_1" : 
 $json =
-'{"date_start" : "2010-01-01", "date_end" : "2010-01-14"}';
+'{"date_end" : "2010-01-10", "date_start" : "2010-01-06"}';
 break;
 
 

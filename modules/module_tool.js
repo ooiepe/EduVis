@@ -11,7 +11,7 @@
 
     "use strict";
 
-    var _tools_version = "0.01",
+    var _tools_version = "0.02",
         _tools_path = "tools/", // full url can be used
         _tools_resource_path = "",
 
@@ -24,58 +24,81 @@
 
         _tool_loading(obj_tool);
         
-        // supports all recent browsers, ie7,8,9
-        var script = document.createElement("script")
-        script.type = "text/javascript";
+        // // supports all recent browsers, ie7,8,9
+        // var script = document.createElement("script")
+        // script.type = "text/javascript";
 
-        if (script.readyState){  //internet explorer
-            script.onreadystatechange = function(){
-                if (script.readyState == "loaded" || script.readyState == "complete"){
-                    script.onreadystatechange = null;
+        // if (script.readyState){  //internet explorer
+        //     script.onreadystatechange = function(){
+        //         if (script.readyState == "loaded" || script.readyState == "complete"){
+        //             script.onreadystatechange = null;
                     
-                    // todo: look for better alternative to lazy call
-                    // now load dependencies
+        //             // todo: look for better alternative to lazy call
+        //             // now load dependencies
 
-                    setTimeout((function(){
+        //             setTimeout((function(){
 
-                        alert("put code here for old browsers");
+        //                 alert("put code here for old browsers");
 
-                    }));
-                }
-            };
-        } else {  // other browsers
-            script.onload = function(){
+        //             }));
+        //         }
+        //     };
+        // } else {  // other browsers
+        //     script.onload = function(){
                 
-                // todo: look for better alternative to lazy call
+        //         // todo: look for better alternative to lazy call
 
-                setTimeout((function(){
+        //         setTimeout((function(){
                 
-                    console.log("....tool notify....")
-                    EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
-                    
-                    //EduVis.resource.queued();
-                    console.log("....tool queue....");
+        //             console.log("....tool notify....")
+        //             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
 
-                    EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
+        //             console.log("....tool queue....");
+        //             EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
 
-                    console.log("....tool instance....");
-                    if(typeof obj_tool.instance_id !== "undefined"){
+        //             console.log("....tool instance....");
+        //             if(typeof obj_tool.instance_id !== "undefined"){
                         
-                        console.log("....tool instance request....");
-                        EduVis.configuration.request_instance(obj_tool);
+        //                 console.log("....tool instance request....");
+        //                 EduVis.configuration.request_instance(obj_tool);
 
-                    }else{
+        //             }else{
 
-                        console.log("....tool instance init default....");
-                        EduVis.tool.init( obj_tool );
-                    }
+        //                 console.log("....tool instance init default....");
+        //                 EduVis.tool.init( obj_tool );
+        //             }
 
-                }));
-            };
-        }
+        //         }));
+        //     };
+        // }
 
-        script.src = _tools_path + obj_tool.name + "/" + obj_tool.name + '.js';
-        document.body.appendChild(script);
+        // script.src = _tools_path + obj_tool.name + "/" + obj_tool.name + '.js';
+        // document.body.appendChild(script);
+
+        // converted to jquery get script..
+
+        $.getScript( _tools_path + obj_tool.name + "/" + obj_tool.name + '.js', function() {
+            
+            console.log("....tool notify....")
+            EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
+
+            console.log("....tool queue....");
+            EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
+
+            console.log("....tool instance....");
+            if(typeof obj_tool.instance_id !== "undefined"){
+                
+                console.log("....tool instance request....");
+                EduVis.configuration.request_instance(obj_tool);
+
+            }else{
+
+                console.log("....tool instance init default....");
+                EduVis.tool.init( obj_tool );
+            }
+
+
+        });
     
     },
 
@@ -216,9 +239,7 @@
         var name = obj_tool.name,
             Tool = EduVis.tool.tools[name];
 
-        console.log("Tool Name", name);
-        console.log(typeof EduVis.tool.tools[name]);
-        console.log("_tool_init on Tool: " + Tool.name, Tool);
+        console.log("Tool Name", name, "tool object", obj_tool);
         
         if(typeof Tool === "object"){
 
@@ -226,7 +247,6 @@
 
                 var instance_id = obj_tool.instance_id;
 
-                //Tool.resources.loaded = true;
                 if(typeof EduVis.tool.instances[name] === "object" ){
 
                     EduVis.tool.instances[name][instance_id] = Tool;
@@ -237,30 +257,22 @@
                     EduVis.tool.instances[name] = {};
                     EduVis.tool.instances[name][instance_id] = Tool;
 
-//EduVis.utility.extend({alertMessage: "nope", "mike" : "This is mike!"}, EduVis.tool.instances.Template.Template_1.configuration )
-
                 }
 
-                EduVis.utility.extend(
-                    instance_config,
-                    EduVis.tool.instances[name][instance_id].configuration
-                );
+                // override configuration parts with saved settings
+                $.extend(EduVis.tool.instances[name][instance_id].configuration, instance_config);
+
+                // EduVis.utility.extend(
+                //     instance_config,
+                //     EduVis.tool.instances[name][instance_id].configuration
+                // );
 
                 console.log("Instance!");
                 console.log(EduVis.tool.instances[name][instance_id]);
-               
                 console.log("Tool Initialization >> Tool:" + Tool.name );
-
                 console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", instance_config);
+
                 EduVis.tool.instances[name][instance_id].init();
-
-              
-                //or name instance here..
-                
-                // override configuration
-
-                //EduVis.tool.tools[name].init();
-                //_tool_init(obj_tool);
 
             }
             else{
@@ -269,18 +281,15 @@
 
                 setTimeout((function(){
 
-                    // rescursive delayed call.. 2 seconds.. to tool initiation
-
+                    // rescursive delayed call.. 1 seconds.. to tool initiation
                     if(EduVis.utility.hault){
                         console.log("..EduVis Haulted..");
                     }else{
 
                         _tool_init(obj_tool, instance_config);
-                        //_tool_init(Tool.name);
-
                     }
 
-                }),2000);
+                }),1000);
             }
         }
         else{

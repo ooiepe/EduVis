@@ -15,8 +15,9 @@
     * @return {Object} parent object is returned if needed
     */
 
-    var _utility_version = "0.0.1", 
+    var _utility_version = "0.0.2", 
     
+    // will be replaced with jquery extend
     _utility_extend_deep = function (parent, child) {
         var i,
             toStr = Object.prototype.toString,
@@ -33,8 +34,10 @@
                     child[i] = parent[i];
                 }
             }
-            return child;
+            //return child;
+            // conditionally return object, if third param is true?
         }
+        return child;//?
     },
 
     /** 
@@ -88,6 +91,7 @@
 
         return stddev;
     },
+
     linearRegression = function( x, y ){
 
         var lr = {}, n = y.length, sum_x = 0, sum_y = 0, sum_xy = 0, sum_xx = 0, sum_yy = 0;
@@ -114,10 +118,11 @@
     **/
 
     eduVis.utility = {
-        extend: _utility_extend_deep,
+        extend : _utility_extend_deep,
         obj_empty : _utility_is_object_empty,
         stdev : _utility_standard_deviation,
-        linReg:linearRegression
+        linReg : linearRegression
     };
 
 }(EduVis));
+
