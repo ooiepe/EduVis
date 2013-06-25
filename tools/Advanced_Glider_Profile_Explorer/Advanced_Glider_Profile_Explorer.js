@@ -1424,7 +1424,10 @@
     };
 
     tool.chartMousemove = function () {
-        return this.settings.ui.tooltips
+
+        var self = this;
+
+        return self.settings.ui.tooltips
             .css("top", (d3.event.pageY - 10) + "px")
             .css("left", (d3.event.pageX + 10) + "px");
 
@@ -1433,7 +1436,10 @@
     };
 
     tool.chartMouseout = function () {
-        return this.settings.ui.tooltips
+
+        var self = this;
+
+        return self.settings.ui.tooltips
             .css("visibility", "hidden");
     };
 

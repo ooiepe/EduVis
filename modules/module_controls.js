@@ -17,8 +17,10 @@
         // tool type - ie. textbox, colorpicker, etc - must exist in switch
 
         // standarization of tool controls, including advanced tools ie. datepicker
-
         // todo: editor,viewer should both reference this function
+
+        console.log("...CONTROLS...");
+        console.log( tool, id, obj_control);
 
         var control = obj_control,
             lbl,
@@ -33,7 +35,7 @@
                     .attr({
                         'for': id
                     })
-                    .html(control.description);
+                    .html(control.label);
 
                 input = $("<input />")
                     .attr({
@@ -64,10 +66,10 @@
                     .attr({
                         'id':id,
                         'type':'textarea',
-                        'value':control.default_value,
-                        //'title':control.tooltip,
+                        'title':control.tooltip,
                         'rows':5
                     })
+                    .html(control.default_value)
                     .change(function(){
                         self.customization_update();
                     });
@@ -81,6 +83,12 @@
 
             case "dropdown":
 
+                // test control object for appropriate parts
+                // control.options
+                // control.tooltip
+                // control.description
+                // control.default_value
+                // control.nolabel
 
                 lbl = $("<label />")
                     .attr({
@@ -98,7 +106,7 @@
                         tool.customization_update();
                     });
 
-                console.log("control dropdown: options:",control.options);
+                console.log("control dropdown: options:", control.options);
                 // add drop down names and value pair options from contols "options" object
                 $.each(control.options, function (option) {
 
@@ -203,6 +211,8 @@
 
             case "colorpicker":
 
+                // test for dependency of colorpicker? this really should be controlled by the tool.
+                // but with test, we could fall back to less desireable color picker
 
                 // find the textbox in the control and init colorpicker
                 lbl = $("<label />")
@@ -237,7 +247,8 @@
                         "data-color": control.default_value,
                         "data-color-format": "hex"
                     })
-                    .append(input).append(el_span);
+                    .append(input)
+                        .append(el_span);
 
                 $(el_div).colorpicker()
                     .on("changeColor", function (cp) {
@@ -256,6 +267,7 @@
 
 
             case "selection": 
+                
                 console.log("tool control.. SELECTION");
 
                 lbl = $("<label />")

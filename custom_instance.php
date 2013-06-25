@@ -1,6 +1,7 @@
 <?php
 
-
+// this is a very basic web service that will return hard coded tool configuration objects.
+// request returns json object
 
 $instanceId = $_GET['iid'];
 
@@ -25,7 +26,7 @@ break;
 
 case "Template_1" : 
 $json = 
-'{"alertMessage" : "This is a configuration setting over ride. \n Yay! Custom Instances actually work!"}';
+'{"alertMessage" : "This is an alert from the tool instance configuration."}';
 break;
 case "Time_Series_Explorer_1" : 
 $json =

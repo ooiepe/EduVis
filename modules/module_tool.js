@@ -19,64 +19,51 @@
 
         var tools = typeof eduVis.tools === "object" ? eduVis.tools : {};
 
-        //todo: move to function.. 
-        // SET LOADING SPINNER..
+        obj_tool.instance_id = typeof obj_tool.instance_id === "undefined" ? "default" : obj_tool.instance_id;
+        obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
-        _tool_loading(obj_tool);
-        
-        // // supports all recent browsers, ie7,8,9
-        // var script = document.createElement("script")
-        // script.type = "text/javascript";
 
-        // if (script.readyState){  //internet explorer
-        //     script.onreadystatechange = function(){
-        //         if (script.readyState == "loaded" || script.readyState == "complete"){
-        //             script.onreadystatechange = null;
-                    
-        //             // todo: look for better alternative to lazy call
-        //             // now load dependencies
 
-        //             setTimeout((function(){
+        console.log("----Tool target --> ", obj_tool.dom_target);
 
-        //                 alert("put code here for old browsers");
+        var dom_target = $("#" + obj_tool.dom_target);
 
-        //             }));
-        //         }
-        //     };
-        // } else {  // other browsers
-        //     script.onload = function(){
-                
-        //         // todo: look for better alternative to lazy call
+        // creat tool container at dom_target
+        if(dom_target.length == 0){
 
-        //         setTimeout((function(){
-                
-        //             console.log("....tool notify....")
-        //             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
+            $('body').append(
+                $("<div></div>")
+                    .addClass("tool-container")
+                    .append("<div></div>")
+                        .attr("id", obj_tool.dom_target)
+            )
+        }
+        else{
 
-        //             console.log("....tool queue....");
-        //             EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
 
-        //             console.log("....tool instance....");
-        //             if(typeof obj_tool.instance_id !== "undefined"){
-                        
-        //                 console.log("....tool instance request....");
-        //                 EduVis.configuration.request_instance(obj_tool);
+        }
 
-        //             }else{
+        // create loading div
 
-        //                 console.log("....tool instance init default....");
-        //                 EduVis.tool.init( obj_tool );
-        //             }
-
-        //         }));
-        //     };
-        // }
-
-        // script.src = _tools_path + obj_tool.name + "/" + obj_tool.name + '.js';
-        // document.body.appendChild(script);
+        var loading_div = $("<div></div>")
+            .addClass("loading")
+            .attr("id", obj_tool.dom_target + "_loading")
+            .append(
+                $("<div></div>")
+                    .html(
+                        "<h1>Educational Visualization</h1>"+
+                        "<h2>"+ obj_tool.name+"</h2>"
+                    )
+            )
+            .append(
+                $('<img src="resources/img/loading_small.gif" />')
+            )
+            .appendTo(
+                $("#"+obj_tool.dom_target)
+            )
 
         // converted to jquery get script..
-
+        // load the tool source... further tool initilization will 
         $.getScript( _tools_path + obj_tool.name + "/" + obj_tool.name + '.js', function() {
             
             console.log("....tool notify....")
@@ -86,17 +73,19 @@
             EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
 
             console.log("....tool instance....");
-            if(typeof obj_tool.instance_id !== "undefined"){
+            
+            //if(typeof obj_tool.instance_id !== "undefined"){
+            if(obj_tool.instance_id !== "default"){
                 
                 console.log("....tool instance request....");
                 EduVis.configuration.request_instance(obj_tool);
 
+                // note: tool initialized in request_instance function.
             }else{
 
                 console.log("....tool instance init default....");
                 EduVis.tool.init( obj_tool );
             }
-
 
         });
     
@@ -104,36 +93,18 @@
 
     _tool_loading = function(_obj_tool){
 
-        //alert(obj_tool div_target);
-        var div_name = _obj_tool.name + "_" + _obj_tool.instance + "_loading";
 
-        var div_loading = document.createElement("div");
-        div_loading.setAttribute("id", div_name);
-
-        var img_loading = document.createElement("img");
-        img_loading.src = "resources/img/loading_small.gif";
-
-        var div_title = document.createElement("div");
-        div_title.innerHTML = "<h1>Educational Visualization</h1><h2>"+_obj_tool.name+"</h2>";
-
-        var div_target = document.getElementById(_obj_tool.target_div);
-        // a.style.height = "300px";
-        // a.style.width = "300px";
-        // a.style.backgroundColor = "red";
-
-        div_loading.appendChild(div_title);
-        div_loading.appendChild(img_loading);
-        div_target.appendChild(div_loading);
 
     },
-    _tool_loading_complete = function(_obj_tool){
+    _tool_loading_complete = function(tool){
+
 
         //remove loading div
-        var div_name = _obj_tool.name + "_" + _obj_tool.instance + "_loading";
-        var loading_div = document.getElementById(_obj_tool.div_target);
+        var div_loading = tool.dom_target + "_loading";
+        
+        $('#' + div_loading).fadeOut();
 
-        console.log("Name:",div_name, _obj_tool)
-        loading_div.removeChild(document.getElementById(div_name));
+        //loading_div.removeChild(document.getElementById(div_name));
 
     },
     _tool_notify = function ( _obj_notify){
@@ -231,15 +202,21 @@
         }
 
         return _tool_resources;
-
     },
 
-    _tool_init = function(obj_tool, instance_config) {
+    _tool_init = function(obj_tool){ //, instance_config) {
+
+        // need to set new target div here....
 
         var name = obj_tool.name,
             Tool = EduVis.tool.tools[name];
 
-        console.log("Tool Name", name, "tool object", obj_tool);
+            Tool.objDef = obj_tool;
+
+        console.log("--> Tool", Tool);
+        console.log("--> Tool Name", name, "tool object", obj_tool);
+
+        Tool.dom_target = obj_tool.dom_target;
         
         if(typeof Tool === "object"){
 
@@ -247,33 +224,37 @@
 
                 var instance_id = obj_tool.instance_id;
 
+                // not a very elegant solution to dealing with multiple instances with the same instances configuration
                 if(typeof EduVis.tool.instances[name] === "object" ){
 
-                    EduVis.tool.instances[name][instance_id] = Tool;
+                    if(typeof EduVis.tool.instances[name][instance_id] === "object"){
 
+                        instance_id = instance_id + "_" + ($(EduVis.tool.instances[name]).length + 1);
+
+                        obj_tool.instance_id = instance_id;
+
+                        EduVis.tool.instances[name][instance_id] = Tool;
+
+                    }
+                    else{
+                        EduVis.tool.instances[name][instance_id] = Tool;
+                    }
                 }
                 else{
                 
                     EduVis.tool.instances[name] = {};
                     EduVis.tool.instances[name][instance_id] = Tool;
-
                 }
 
-                // override configuration parts with saved settings
-                $.extend(EduVis.tool.instances[name][instance_id].configuration, instance_config);
+                // update instance configuration 
+                $.extend(EduVis.tool.instances[name][instance_id].configuration, obj_tool.instance_config);
 
-                // EduVis.utility.extend(
-                //     instance_config,
-                //     EduVis.tool.instances[name][instance_id].configuration
-                // );
-
-                console.log("Instance!");
+                console.log(" .... Instance! ....");
                 console.log(EduVis.tool.instances[name][instance_id]);
-                console.log("Tool Initialization >> Tool:" + Tool.name );
-                console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", instance_config);
+                console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", obj_tool.instance_config);
 
+                // initialize tool instance
                 EduVis.tool.instances[name][instance_id].init();
-
             }
             else{
                 
@@ -286,7 +267,7 @@
                         console.log("..EduVis Haulted..");
                     }else{
 
-                        _tool_init(obj_tool, instance_config);
+                        _tool_init(obj_tool);
                     }
 
                 }),1000);
@@ -295,6 +276,61 @@
         else{
             alert("..no tool object..")
         }
+    },
+
+    _tool_customize = function( tool_name, instance_id, target_div ){
+
+        var tool = EduVis.tool.instances[tool_name][instance_id],
+            divToolEditor,
+            divControls
+            el_btn;
+
+
+            divToolEditor = $("<div></div>").addClass("ToolEditor");
+            divControls = $("<div></div>").addClass("tool-control")
+
+            console.log("...TOOL CUSTOMIZE....")
+            console.log("tool->",tool);
+        // get target div
+
+        // create a div and write out all controls for editing a specific tool configuration file
+        // the tool does not need to be loaded as an instance, but must be loaded into object
+
+
+        // a button will be clicked and it will refresh the tool.. 
+        // div with controls will be refreshed on tool updates or when "refresh" is clicked.
+
+        // test if tool has any controls
+        if(typeof tool.controls !== "object"){
+
+            divToolEditor.append("<p>This tool does not have an configurable properties..</p>")
+
+        }
+        else{
+
+            // Add each control to the specified div
+            $.each(tool.controls, function (index, control) {
+                
+                divControls.append(
+                    EduVis.controls.create(tool,"config-"+index, control)
+                    //instance.evtool.toolControl(instance,"config-"+index, control)
+                );
+
+            });
+
+            divToolEditor.append(divControls);
+
+             // Now draw an update button that will redraw the instance
+            el_btn = $('<button type="button">Redraw Visualization</button>')
+                .addClass("btn pull-right")
+                .click( function () { _tool_redraw(tool_name, instance_id); })
+                .appendTo(divToolEditor);
+        }
+                
+        // todo: add instance 
+
+        $("#" + target_div).append(divToolEditor);
+
     },
 
     _tool_version = function(){
@@ -327,7 +363,8 @@
             "controls" : {},
             "data" : {},
             "div_target" : "__undefined_target__",
-            "tools" : {}
+            "tools" : {},
+            "instances" : {}
 
         };
     };
@@ -341,6 +378,8 @@
         is_ready : _tool_is_ready,
         find_resources : _tool_find_resources,
         template : _tool_base_template,
+        customize : _tool_customize,
+        load_complete : _tool_loading_complete,
         tools : {},
         instances : {}
     };

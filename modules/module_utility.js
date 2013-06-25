@@ -111,9 +111,8 @@
         return lr;
     };
 
-
     /** 
-    * Utility object functions exposed to EduVis
+    * Utility object functions exposed in EduVis
     * 
     **/
 

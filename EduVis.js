@@ -18,10 +18,7 @@ var EduVis = (function () {
 		}
 	};
 
-	eduVis.test = function () {
-
-
-	};
+	eduVis.test = function () {	};
 
 	return eduVis;
 

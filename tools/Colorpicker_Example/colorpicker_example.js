@@ -9,12 +9,10 @@
     "use strict";
     //var tool = EduVis.tool.template;
 
-    //console.log("tool template", tool);
-
     var tool = {
 
-        "name" : "Template",
-        "description" : "A Tool Template.",
+        "name" : "Colorpicker_Example",
+        "description" : "An example tool with a color picker.",
         "url" : "??__url_to_tool_help_file__?",
 
         "version" : "0.0.1",
@@ -41,8 +39,8 @@
 
             "stylesheets_local" : [
                 {
-                    "name" : "toolstyle",
-                    "src" : "tools/Template/Template.css"
+                    "name" : "toolstyle2",
+                    "src" : "tools/colorpicker_example/colorpicker_example.css"
                 }
             ],
 
@@ -58,19 +56,12 @@
         },
 
         "configuration" : {
-        	"alertMessage" : "this is an Alert Message.",
-            "data" : "Seven, 7\nEight, 8\nNine, 9"
+
         },
 
         "controls" : {
 
-            "data": {
-                "type" : "textarea",
-                "label" : "Data Array",
-                "description" : "This text area represents the bar chart data.",
-                "tooltip" : "Enter data in the following format:<br><br><em>label, value<br>label, value</em><br><br>Enter each pair of data on its own line.",
-                "default_value" : "One, 1\nTwo, 2\nThree, 3\nFour, 4\nFive, 5"
-            },
+
             "temp" : {
 
                 "type" : "textbox",
@@ -78,30 +69,30 @@
                 "tooltip": "What is a tooltip?",
                 "default_value" : "This is a test",
                 "description" : "this control is for testing the text box of template.js"
-            }
+            },
             //,
 
-            // "color" : {
-            //     "type" : "colorpicker",
-            //     "label" : "Bar Color",
-            //     "tooltip" : "Select a hexidecimal color for your graph.",
-            //     "default_value" : "#4682B4",
-            //     "validation" : {
-            //         "type" : "hexcolor"
-            //     }
-            // }
+            "color" : {
+                "type" : "colorpicker",
+                "label" : "Bar Color",
+                "tooltip" : "Select a hexidecimal color for your graph.",
+                "default_value" : "#4682B4",
+                "validation" : {
+                    "type" : "hexcolor"
+                }
+            }
         },
         "data" : {},
-        "target_div" : "Template",
+        "target_div" : "Colorpicker_Example",
         "tools" : {}
 
     };
 
-    tool.Template = function( _target ){
+    tool.Colorpicker_Example = function(  ){
 
       	//document.getElementById(_target_div).innerHTML = "TEMPLATE TOOL LOADED";
 
-      	alert(tool.configuration.alertMessage);
+        $("#" + this.dom_target).append($("<div>TEST</div>"));
 
         EduVis.tool.load_complete(this);
 
@@ -111,7 +102,7 @@
 
         // todo: include instance in call
         //console.log(" ... template init..... ", this)
-        this.Template(this.dom_target);
+        this.Colorpicker_Example();
 
     };
 

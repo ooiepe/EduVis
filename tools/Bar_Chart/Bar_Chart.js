@@ -141,7 +141,7 @@
             .orient("left")
             .tickPadding(8);
 
-        var svg = d3.select( target_div).append("svg")
+        var svg = d3.select( "#" + this.dom_target).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .attr("class", "bar chart")
@@ -170,6 +170,9 @@
           .selectAll("text")
             .text(function(d) { return barlabels[d]; });
 
+        
+        EduVis.tool.load_complete(this);
+
         return ;
 
     },
@@ -177,10 +180,8 @@
     tool.init = function() {
 
         // todo: include instance in call
-        var target = this.target_div;
-        console.log("Bar Chart Initialization",this);
-
-        this.Bar_Chart(target);
+     
+        this.Bar_Chart(this.dom_target);
 
     };
 

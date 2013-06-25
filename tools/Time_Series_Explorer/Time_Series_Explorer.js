@@ -34,13 +34,6 @@
             "scripts_local" : [
 
 				{
-					"name" : "jquery-1.9.1",
-					"resource_path" : "resources/js/",
-				    "resource_file_name" : "jquery-1.9.1.min.js",
-				    "dependsOn" : []
-				},
-
-				{
 					"name" : "jquery-ui",
 					"resource_path" : "resources/js/",
 				    "resource_file_name" : "jquery-ui-1.10.1.custom.min.js",
@@ -128,17 +121,13 @@
         },
         "target_div" : "Time_Series_Explorer",
         "tools" : {},
-		
 
     };
 
-    tool.Time_Series_Explorer = function( _target_div ){
+    tool.Time_Series_Explorer = function(){
 
         // reference data here
-        //var target_div = "#" + _target_div || tool.target_div;
-
-      	//$("#" + _target_div).html("TEMPLATE TOOL LOADED");
-      	
+      	      	
       	this.setup_parameters();
 
       	this.interface();
@@ -167,9 +156,10 @@
 
     tool.interface = function(){
 
-    	var id = this.target_div;
+    	var self = this, 
+    		id = self.dom_target;
 
-    	this.chart = {
+    	self.chart = {
 	        layout: {
 	            container: {
 	                margin: {
@@ -218,25 +208,23 @@
 	            .addClass("row-fluid")
 	            .append(
 	                $("<div></div>").addClass("span12 kill-margin")
-	                    .attr("id",id + "-tool-container")
-
+	                    .attr("id", id + "-tool-container")
 	            )
 	        );
 
 	    // add tool container to obtain  dimensions
 	    $("#" + id).append( uiContainer );
 
-	    this.chart.layout.container.width = $("#" + id + "-tool-container").width();
+	    self.chart.layout.container.width = $("#" + id + "-tool-container").width();
 
 
     },
 
     tool.draw = function(){
 
-		var self = this;
-
-	    var configCustom = self.configuration, 
-	    	id = self.target_div,
+		var self = this,
+			configCustom = self.configuration, 
+	    	id = self.dom_target,
 	    	stations = self.data.stations,
 	    	chart_layout = self.chart.layout,
 	    	container = chart_layout.container;
@@ -253,7 +241,7 @@
 	        stations[station_id].label = station_name + " (" + station_id + ")";
 	    });
 
-	    this.dateFormats = {
+	    self.dateFormats = {
 	        hours: d3.time.format("%H:M"),
 	        days: d3.time.format("%d"),
 	        months: d3.time.format("%m/%y"),
@@ -262,7 +250,7 @@
 	        data_source: d3.time.format("%Y-%m-%dT%H:%M:%SZ")
 	    }
 
-	    this.dateScales = {
+	    self.dateScales = {
 	        // ticks(d3.time.minutes, 15)
 	        hours: d3.time.scale().tickFormat("%H:M"),
 	        days: d3.time.scale().tickFormat("%d"),
@@ -283,7 +271,7 @@
 	    chart_layout.focus.height = container.height_m - chart_layout.focus.margin.top - chart_layout.focus.margin.bottom;
 	    chart_layout.focus.width = container.width_m - chart_layout.focus.margin.left - chart_layout.focus.margin.right;
 
-	    this.chart.focus = {
+	    self.chart.focus = {
 
 	        param1: {
 	            x: d3.time.scale().range([0, self.chart.layout.focus.width]),
@@ -295,7 +283,7 @@
 	        }
 	    };
 
-	    this.chart.context = {
+	    self.chart.context = {
 	        param1: {
 	            x: d3.time.scale().range([0, self.chart.layout.context.width]),
 	            y: d3.scale.linear().range([self.chart.layout.context.height, 0])
@@ -306,7 +294,7 @@
 	        }
 	    };
 
-	    this.chart.context.axis = {
+	    self.chart.context.axis = {
 	        param1: {
 	            x: d3.svg.axis().scale(self.chart.context.param1.x).orient("bottom"),
 	            y: d3.svg.axis().scale(self.chart.context.param1.y).orient("left")
@@ -317,7 +305,7 @@
 	        }
 	    };
 
-	    this.chart.focus.axis = {
+	    self.chart.focus.axis = {
 	        param1: {
 	            x: d3.svg.axis().scale(self.chart.focus.param1.x).orient("bottom"),
 	            //.tickFormat(d3.time.format("%m/%d")
@@ -329,7 +317,7 @@
 	        }
 	    };
 
-	    this.chart.timeseries = {
+	    self.chart.timeseries = {
 	        datasets: {
 	            param1: {
 	                isDrawReady: false,
@@ -359,16 +347,18 @@
 
 	    // set the defaults based on the configuration provided
 
-	    this.chart.timeseries.datasets.param1.column = configCustom.param1;
-	    this.chart.timeseries.datasets.param2.column = configCustom.param2;
+	    self.chart.timeseries.datasets.param1.column = configCustom.param1;
+	    self.chart.timeseries.datasets.param2.column = configCustom.param2;
 
-	    this.chart.timeseries.datasets.param1.visible = true;
-	    this.chart.timeseries.datasets.param2.visible = true;
+	    self.chart.timeseries.datasets.param1.visible = true;
+	    self.chart.timeseries.datasets.param2.visible = true;
 
 	    // create the brush function event handler for the one of the parameters in the context.
-	    this.chart.brush = d3.svg.brush().x(self.chart.context.param1.x).on("brush", brush);
+	    self.chart.brush = d3.svg.brush()
+	    	.x(self.chart.context.param1.x)
+	    	.on("brush", brush);
 
-	    this.chart.tooltip = d3.select("#"+this.target_div)
+	    self.chart.tooltip = d3.select("#"+self.dom_target)
 	        .append("div").style("position", "absolute")
 	        .style("z-index", "10")
 	        .style("visibility", "hidden")
@@ -377,7 +367,7 @@
 	        .style("border", "1px solid #333333")
 	        .text("");
 
-	    this.chart.tooltip2 = d3.select("#"+this.target_div)
+	    self.chart.tooltip2 = d3.select("#"+self.dom_target)
 	        .append("div")
 	        .style("position", "absolute")
 	        .style("z-index", "10")
@@ -387,7 +377,7 @@
 	        .style("border", "1px solid #333333")
 	        .text("");
 
-	    this.controls.ctrl_dd_station1 = EduVis.controls.create(this, "-ctrl-dataset-dropdown-station1",
+	    var ctrl_dd_station1 = EduVis.controls.create(this, "-ctrl-dataset-dropdown-station1",
 	        {
 	            "type": "dropdown",
 	            "label": "Station",
@@ -411,32 +401,32 @@
 
 
 	    // needs references to cols by parameter here
-	    this.chart.context.param1.path = d3.svg.line()
+	    self.chart.context.param1.path = d3.svg.line()
 	        .interpolate("linear")
 	        .x(function (d) {return self.chart.context.param1.x(d["date_time"]);})
 	        .y(function (d) {return self.chart.context.param1.y(d[self.chart.timeseries.datasets.param1.column]);});
 
-	    this.chart.context.param2.path = d3.svg.line()
+	    self.chart.context.param2.path = d3.svg.line()
 	        .interpolate("linear")
 	        .x(function (d) {return self.chart.context.param2.x(d["date_time"]);})
 	        .y(function (d) {return self.chart.context.param2.y(d[self.chart.timeseries.datasets.param2.column]);});
 
-	    this.chart.focus.param1.path = d3.svg.line()
+	    self.chart.focus.param1.path = d3.svg.line()
 	        .interpolate("linear")
 	        .x(function (d) {return self.chart.focus.param1.x(d.date_time);})
 	        .y(function (d) {return self.chart.focus.param1.y(d[self.chart.timeseries.datasets.param1.column]);});
 
-	    this.chart.focus.param2.path = d3.svg.line()
+	    self.chart.focus.param2.path = d3.svg.line()
 	        .interpolate("linear")
 	        .x(function (d) {return self.chart.focus.param2.x(d.date_time);})
 	        .y(function (d) {return self.chart.focus.param2.y(d[self.chart.timeseries.datasets.param2.column]);});
 
 
-	    var tool_container = d3.select("#" + id + "-tool-container");
+	    self.tool_container = d3.select("#" + id + "-tool-container");
 
 	    // loading div.. append it to the tool container
-	    this.d_loading = tool_container.append("div")
-	        .attr("id", "div-loading")
+	    self.d_loading = self.tool_container.append("div")
+	        .attr("id", id + "-div-loading")
 	        .style("z-index", "100")
 	        .style("float", "left")
 	        .style("position", "absolute")
@@ -454,41 +444,43 @@
 	    //TODO: set dimensions for modal to appear centered on chart, not on container div
 
 	    // add modal div for dates
-	    tool_container.append("div")
-	        .attr("id", "modal-dates")
+	    self.tool_container.append("div")
+	        .attr("id", id + "-modal-dates")
 	        .attr("class", "modal hide fade").html('<div class="modal-header">' +
 	        '        <button class="close" data-dismiss="modal">×</button>' +
-	        '        <h3>Date Selection</h3>' + '</div>' + '<div id="modal-body-dates" class="modal-body">' +
-	        '        </div>' + '<div id="modal-footer-dates" class="modal-footer">' +
+	        '        <h3>Date Selection</h3>' + '</div>' + '<div id="'+id+'-modal-body-dates" class="modal-body">' +
+	        '        </div>' + '<div id="'+id+'-modal-footer-dates" class="modal-footer">' +
 	        '       <a class="btn btn-primary vis_update">Update Visualization</a>' + '</div>');
 
 	    // add modal div for params
-	    tool_container.append("div")
-	        .attr("id", "modal-params")
+	    self.tool_container.append("div")
+	        .attr("id", id + "-modal-params")
 	        .attr("class", "modal hide fade").html('<div class="modal-header">' +
 	        '        <button class="close" data-dismiss="modal">×</button>' +
 	        '        <h3>Parameter Selection</h3>' +
-	        '        </div>' + '<div id="modal-body-params" class="modal-body">' +
+	        '        </div>' + '<div id="'+id+'-modal-body-params" class="modal-body">' +
 	        '        <p>Select Stations and Parameters.</p>' +
-	        '        </div>' + '<div id="modal-footer-params" class="modal-footer">' +
+	        '        </div>' + '<div id="'+id+'-modal-footer-params" class="modal-footer">' +
 	        '       <a class="btn btn-primary vis_update">Update Visualization</a>' + '</div>');
 
 	    // add the dom elements
-	    this.svg = tool_container.append("svg")
-	        .attr("id", "svg_main")
+	    self.svg = self.tool_container.append("svg")
+	        .attr("id", id + "-svg_main")
 	        .attr("width", self.chart.layout.container.width + self.chart.layout.container.margin.left + self.chart.layout.container.margin.right)
 	        .attr("height", self.chart.layout.container.height + self.chart.layout.container.margin.top + self.chart.layout.container.margin.bottom);
 
-	    this.svg.append("defs")
-	        .append("clipPath").attr("id", "clip")
-	        .append("rect").attr("width", self.chart.layout.focus.width)
+	    self.svg.append("defs")
+	        .append("clipPath")
+	        	.attr("id", id + "-clip")
+	        .append("rect")
+	        	.attr("width", self.chart.layout.focus.width)
 	        .attr("height", self.chart.layout.focus.height);
 
-	    this.d_legend = this.svg.append("g")
+	    self.d_legend = self.svg.append("g")
 	        .attr("id", id + "-legend")
 	        .attr("transform", "translate(" + self.chart.layout.legend.margin.left + "," + self.chart.layout.legend.margin.top + ")");
 
-	    this.d_legend_station1 = this.d_legend
+	    self.d_legend_station1 = self.d_legend
 	        .append("svg:g")
 	        .attr("id", id + "-legend-g1")
 	        .attr("class", "legend")
@@ -498,18 +490,18 @@
 	            $("#" + id + "-legend-station1-edit").show();
 	        })
 	        .on("click", function (d) {
-	            self.station_toggle(this, "station1")
+	            self.station_toggle(id, "station1")
 	        })
 
-	    this.d_legend_station1.append("svg:rect")
+	    self.d_legend_station1.append("svg:rect")
 	        .attr("width", 220)
 	        .attr("height", 20)
 	        .attr("x", 70)
 	        .attr("y", -18)
 	        .attr("fill","#F8F8F8")
 
-	    this.d_legend_station1.append("svg:circle")
-	        .attr("id", "legend-station1-circle")
+	    self.d_legend_station1.append("svg:circle")
+	        .attr("id", id + "-legend-station1-circle")
 	        .attr("class", "legend_station")
 	        .style("stroke", "red")
 	        .style("fill", "red")
@@ -517,54 +509,27 @@
 	        .attr("cy", "0")
 	        .attr("r", "6")
 
-	    this.d_legend_station1.append("svg:text")
-	        .attr("id", "legend-station1-text")
+	    self.d_legend_station1.append("svg:text")
+	        .attr("id", id + "-legend-station1-text")
 	        .style("fill", "#000")
 	        .text(self.data.stations[self.configuration.station1].name)
 	        .attr("x", "115")
 	        .attr("y", "2")
 
-	//    this.d_legend_station1.append("svg:image")
-	//        .attr("id", id + "-legend-station1-edit")
-	//        .attr("xlink:href","../../img/icon-settings.png")
-	//        .attr("width",24)
-	//        .attr("height",24)
-	//        .attr("x", "225")
-	//        .attr("y", "-12")
-
-	    /*
-	    $("#" + id + "-legend-station1-edit")
-	        .popover(
-	            {
-	                title    : 'Select a Station',
-	                content     : '',
-	                placement : "bottom",
-	                trigger  : "manual",
-	                //template: '<div class="popover"><div class="arrow"></div><div class="popover-inner"><div><h3 class="popover-title"><i class="icon icon-close"></i></div></h3><div class="popover-content"><p></p></div></div></div>'
-	                template: '<div class="popover" onmouseover="$(this).mouseleave(function() {$(this).hide(); });"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><div id="' + id + '-legend-station1-popover' +'"></div></div></div></div>'
-
-	            }
-	        )
-	        .on("click",function(evt){
-
-	            $(this).popover('show');
-	            $("#" + self.tool.domID + "-legend-station1-popover")
-
-	                .html(self.tool.controls.ctrl_dd_station1);
-
-	             evt.stopPropagation();
-
-	        })
-	    */
-
-	    this.d_legend_station2 = this.d_legend.append("g")
+	    self.d_legend_station2 = self.d_legend
+	    	.append("g")
+			.attr("id", id + "-legend-g2")
 	        .attr("class", "legend")
-	        .attr("fill", "#FFF").on("click", function (d) {
-	            self.station_toggle(this, "station2")
-	        })
+	        .attr("fill", "#FFF")
+	        .on("click", function (d) {
+	            self.station_toggle(id, "station2")
 
-	    this.d_legend_station2.append("svg:circle")
-	        .attr("id", "legend-station2-circle")
+	            // station toggle with id?
+	        });
+
+
+	    self.d_legend_station2.append("svg:circle")
+	        .attr("id", id + "-legend-station2-circle")
 	        .attr("class", "legend_station")
 	        .style("stroke", "steelblue")
 	        .style("fill", "steelblue")
@@ -572,43 +537,41 @@
 	        .attr("cy", "0")
 	        .attr("r", "6")
 
-	    this.d_legend_station2.append("g").append("svg:text")
-	        .attr("id", "legend-station2-text")
+	    self.d_legend_station2.append("g").append("svg:text")
+	        .attr("id", id + "-legend-station2-text")
 	        .attr("fill", "#000")
 	        .text(self.data.stations[self.configuration.station2].name)
 	        .attr("x", "315")
 	        .attr("y", "2")
 
 	    // Y AXIS LABELS
-	    this.d_label_y_left = this.svg.append("g")
-	        .attr("id", "label-y-left")
+	    self.d_label_y_left = self.svg.append("g")
+	        .attr("id", id + "-label-y-left")
 	        .attr("transform", " translate(10," + (self.chart.layout.container.height / 2) + ") rotate(-90 0 0) ");
 
-	    console.log("LABEL", self.data.parameters.param1,configCustom );
-
-	    this.d_label_y_left.append("svg:text")
-	        .attr("id", "label-y-left-text")
+	    self.d_label_y_left.append("svg:text")
+	        .attr("id", id + "-label-y-left-text")
 	        .attr("fill", "red")
 	        .attr("x", "0")
 	        .attr("y", "4")
 	        .text(self.data.parameters[configCustom.param1].label);
 
-	    this.d_label_y_right = this.svg.append("g")
-	        .attr("id", "label-y-right")
+	    self.d_label_y_right = self.svg.append("g")
+	        .attr("id", id + "-label-y-right")
 	        .attr("transform", " translate(" + (+(self.chart.layout.container.width) - 20) + "," + (self.chart.layout.container.height / 2) + ") rotate(-90 0 0) ");
 
-	    this.d_label_y_right.append("svg:text")
-	        .attr("id", "label-y-right-text")
+	    self.d_label_y_right.append("svg:text")
+	        .attr("id", id + "-label-y-right-text")
 	        .attr("fill", "steelblue")
 	        .attr("x", "0")
 	        .attr("y", "4")
 	        .text(self.data.parameters[configCustom.param2].label);
 
-	    this.d_context = this.svg.append("g")
-	        .attr("id", "context-g")
+	    self.d_context = self.svg.append("g")
+	        .attr("id", id + "-context-g")
 	        .attr("transform", "translate(" + self.chart.layout.context.margin.left + "," + self.chart.layout.context.margin.top + ")")
 
-	    this.d_context.append("line")
+	    self.d_context.append("line")
 	        .attr("x1", "0")
 	        .attr("y1", "-7")
 	        .attr("x2", "0")
@@ -617,48 +580,13 @@
 	        .attr("stroke-width", "1")
 	        .attr("shape-rendering", "crispEdges");
 
-	    this.d_focus = this.svg.append("g")
-	        .attr("id", "-focus-g")
+	    self.d_focus = self.svg.append("g")
+	        .attr("id", id + "-focus-g")
 	        .attr("transform", "translate(" + self.chart.layout.focus.margin.left + "," + self.chart.layout.focus.margin.top + ")");
 
-	//    this.g_dateStart = this.svg.append("g")
-	//        .attr("id", "-g-ctrl-dateStart")
-	//        .attr("transform", "translate(" + 0 + "," + self.chart.layout.context.margin.top + ")");
 
-	//    this.g_dateStart
-	//        .append("svg:text")
-	//        .text("Start Date")
-	//        .attr("font-weight","bold")
-	//        .attr("x",2)
-	//        .attr("y",2);
-	//
-	//    this.g_dateStart
-	//        .append("svg:text")
-	//        .text(self.tool.configuration.custom.date_start)
-	//        .attr("font-weight","bold")
-	//        .attr("x",2)
-	//        .attr("y",20);
-
-	//    this.g_dateEnd = this.svg.append("g")
-	//        .attr("id", "-g-ctrl-dateEnd")
-	//        .attr("transform", "translate(" + (self.chart.layout.context.margin.left + self.chart.layout.context.width) + "," + self.chart.layout.context.margin.top + ")");
-	//
-	//    this.g_dateEnd
-	//        .append("svg:text")
-	//        .text("End Date")
-	//        .attr("font-weight","bold")
-	//        .attr("x",2)
-	//        .attr("y",2);
-	//
-	//    this.g_dateEnd
-	//        .append("svg:text")
-	//        .text( self.tool.configuration.custom.date_end)
-	//        .attr("font-weight","bold")
-	//        .attr("x",2)
-	//        .attr("y",20);
-
-	    tool_container.append("div")
-	        .attr("id", "controls-div")
+	    self.tool_container.append("div")
+	        .attr("id", id + "-controls-div")
 	        .style("width", self.chart.layout.container.width + "px")
 
 	    var url1 = EduVis.ioos.requestUrlTimeseriesDate(
@@ -737,25 +665,28 @@
 
 	    //TODO: body will be replaced controls div id
 	    var ctrl_dates_btn = $("<a></a>").attr({
-	        id: "btn_dates"
+	        id: id + "-btn_dates"
 	    })
 	        .addClass("btn btn-primary")
 	        .css("margin-right", "20px")
 	        .attr("data-toggle", "modal")
-	        .attr("href", "#modal-dates")
+	        .attr("href", "#" + id + "-modal-dates")
 	        .html("Change Date Range");
 
 	    var ctrl_datasets_btn = $("<a></a>").attr({
-	        id: "btn_datasets"
+	        id: id + "-btn_datasets"
 	    }).addClass("btn btn-primary")
 	        .attr("data-toggle", "modal")
-	        .attr("href", "#modal-params")
+	        .attr("href", "#" + id + "-modal-params")
 	        .html("Change Datasets");
 
 	    var controls_div = $("<div></div>").attr({
-	        id: "control_buttons",
+	        id: id + "-control_buttons",
 	        "align": "center"
-	    }).append(ctrl_dates_btn).append(ctrl_datasets_btn).appendTo("#controls-div");
+	    })
+	    	.append(ctrl_dates_btn)
+	    	.append(ctrl_datasets_btn)
+	    	.appendTo("#" + id + "-controls-div");
 
 	    var ctrl_date_start = EduVis.controls.create(self,"ctrl-datepicker-date-start", {
 	        "type": "datepicker",
@@ -784,9 +715,10 @@
 	    var ctrl_window_dates = $("<div></div>")
 	        .append(ctrl_date_start)
 	        .append(ctrl_date_end)
-	        .appendTo("#modal-body-dates");
+	        .appendTo("#" + id + "-modal-body-dates");
 
-	    this.controls.ctrl_dd_station1 = EduVis.controls.create(self,"ctrl-dataset-dropdown-station1",
+	    //this.controls.ctrl_dd_station1 = EduVis.controls.create(self,"ctrl-dataset-dropdown-station1",
+	    var ctrl_dd_station1 = EduVis.controls.create(self,"ctrl-dataset-dropdown-station1",
 
 	        {
 	            "type": "dropdown",
@@ -831,29 +763,32 @@
 	            "nolabel": true
 	        });
 
-	    var ctrl_window_datasets = $("<div></div>").addClass('container-fluid').append(
+	    var ctrl_window_datasets = $("<div></div>").addClass('container-fluid')
 
-	        $('<div class="row-fluid"></div>')
-	            .attr({
-	                id: "param1"
-	            })
-	            .append($(this.controls.ctrl_dd_station1))
-	            .append($(ctrl_dd_param1)))
+	    	.append(
+
+	        	$('<div class="row-fluid"></div>')
+		            .attr({
+		                id: id + "-param1"
+		            })
+		            .append($(ctrl_dd_station1))
+		            .append($(ctrl_dd_param1))
+            )
 	        .append(
 		        $('<div class="row-fluid"></div>')
 		            .attr({
-		                id: "param2"
+		                id: id + "-param2"
 		            })
 		            .append($(ctrl_dd_station2))
 		            .append($(ctrl_dd_param2))
 		    )
-	        .appendTo("#modal-body-params");
+	        .appendTo("#" + id + "-modal-body-params");
 
 	    // add click events for visualization update buttons
 	    $('.vis_update').on('click', function (a) {
 
 	        // show the loading div with transparent overlay
-	        $("#div-loading").css("visibility", "visible");
+	        $("#" + id + "-div-loading").css("visibility", "visible");
 
 	        self.chart_datasets_update();
 	        $(".modal").modal("hide");
@@ -893,9 +828,13 @@
 	    }
 
 	    // brush function for selecting focus area in the context section
-	    function brush() {
 
-	        // TODO: dynamic date scaling functions
+	    function brush(){
+
+	    	console.log(".....Brush....this -->..", this);
+	    	
+	    	// var id = self.dom_target;
+	    	// TODO: dynamic date scaling functions
 
 	        // hour, day, month
 	        // --> https://github.com/mbostock/d3/wiki/Time-Scales
@@ -911,19 +850,24 @@
 	        self.chart.focus["param2"].x.domain(self.chart.brush.empty() ? self.chart.context["param2"].x.domain() : self.chart.brush.extent());
 
 	        // update visible path area
-	        self.d_focus.select("#path-focus-param1").attr("d", self.chart.focus["param1"].path);
-	        self.d_focus.select("#path-focus-param2").attr("d", self.chart.focus["param2"].path);
+	        self.d_focus.select("#" + id + "-path-focus-param1")
+	        	.attr("d", self.chart.focus["param1"].path);
+
+	        self.d_focus.select("#" + id + "-path-focus-param2")
+	        	.attr("d", self.chart.focus["param2"].path);
 
 	        // update all circle positions for param1
-	        var brush1_update = d3.select(".datapoints-param1")
-	            .selectAll("path").data(self.chart.timeseries.datasets["param1"].data)
+	        var brush1_update = d3.select("#" + id + "-datapoints-param1")
+	            .selectAll("path")
+	            .data(self.chart.timeseries.datasets["param1"].data)
 	            .attr("transform", function (d) {
 	                return "translate(" + self.chart.focus["param1"].x(d.date_time) + "," + self.chart.focus["param1"].y(d[colY1]) + ")";
 	            })
 	            .attr("d", d3.svg.symbol().type("circle"))
 
-	        var brush2_update = d3.select(".datapoints-param2")
-	            .selectAll("path").data(self.chart.timeseries.datasets["param2"].data)
+	        var brush2_update = d3.select("#" + id + "-datapoints-param2")
+	            .selectAll("path")
+	            .data(self.chart.timeseries.datasets["param2"].data)
 	            .attr("transform", function (d) {
 	                return "translate(" + self.chart.focus["param2"].x(d.date_time) + "," + self.chart.focus["param2"].y(d[colY2]) + ")";
 	            })
@@ -933,8 +877,10 @@
 	        self.d_focus.selectAll(".x.axis")
 	            .call(self.chart.focus.axis["param1"].x);
 
-	    }
+	    };
+   
 
+		EduVis.tool.load_complete(self);
 
     },
 
@@ -942,7 +888,7 @@
 
         // todo: include instance in call
         
-        this.Time_Series_Explorer(this.target_div);
+        this.Time_Series_Explorer(this.dom_target);
 
     },
 
@@ -950,7 +896,8 @@
 
 	    console.log("... UPDATE DATASETS ... ");
 
-	    var self = this;
+	    var self = this,
+	    id = self.dom_target;
 
 	    var configCustom = self.configuration,
 	        ds1 = self.chart.timeseries.datasets["param1"],
@@ -1053,7 +1000,8 @@
 	tool.review_data = function (funct) {
 
 	    var self = this;
-	    var ts = self.chart.timeseries;
+	    var ts = self.chart.timeseries,
+	    	id = self.dom_target;
 
 	    var ds1 = ts.datasets["param1"],
 	        ds2 = ts.datasets["param2"];
@@ -1113,7 +1061,7 @@
 
 	        } else {
 
-	            $("#div-loading").css("visibility", "hidden");
+	            $("#" + id + "-div-loading").css("visibility", "hidden");
 
 	            self.transition_data("param2");
 	            self.transition_data("param1");
@@ -1220,7 +1168,8 @@
 	},
 	tool.add_data = function (param) {
 
-	    var self = this;
+	    var self = this,
+	    	id = self.dom_target;
 
 	    var dataset = self.chart.timeseries.datasets[param];
 
@@ -1238,23 +1187,23 @@
 	    // append the path for the current parameter
 	    self.d_focus.append("path")
 	        .data([data])
-	        .attr("id", "path-focus-" + param)
+	        .attr("id", id + "-path-focus-" + param)
 	        .style("stroke", (param == "param1") ? "red" : "steelblue")
 	        .style("stroke-width", "4px")
 	        .attr("class", "path-focus")
-	        .attr("clip-path", "url(#clip)")
+	        .attr("clip-path", "url(#"+id+"-clip)")
 	        .attr("d", focus.path);
 
 	    // append the context path for the current parameter
 	    self.d_context.append("path")
-	        .attr("id", "path-context-" + param)
+	        .attr("id", id + "-path-context-" + param)
 	        .attr("class", "path-context")
 	        .style("stroke", (param == "param1") ? "red" : "steelblue")
 	        .data([data]).attr("d", context.path);
 
 	    self.d_focus.append("svg:g")
-	        .attr("class", "datapoints-" + param)
-	        .attr("clip-path", "url(#clip)")
+	        .attr("id", id + "-datapoints-" + param)
+	        .attr("clip-path", "url(#"+id+"-clip)")
 	        .selectAll("path").data(data)
 	        .enter()
 	        .append("path")
@@ -1279,27 +1228,27 @@
 	        // append the focus area x axis, we only need one
 	        self.d_focus.append("g")
 	            .attr("class", "x axis")
-	            .attr("id", "path-focus-axis-" + param)
+	            .attr("id", id + "-path-focus-axis-" + param)
 	            .attr("transform", "translate(0," + self.chart.layout.focus.height + ")")
 	            .call(focus_axis.x);
 
 	        // append the context area x axis
 	        self.d_context.append("g")
 	            .attr("class", "x axis")
-	            .attr("id", "path-context-axis-" + param)
+	            .attr("id", id + "-path-context-axis-" + param)
 	            .attr("transform", "translate(0," + self.chart.layout.context.height + ")")
 	            .call(context_axis.x);
 
 	        // append the left axis if it is param1
 	        self.d_focus.append("g")
-	            .attr("id", "y-axis-left")
+	            .attr("id", id + "-y-axis-left")
 	            .attr("class", "y axis-left")
 	            .call(focus_axis.y);
 	    } else {
 
 	        // append the right axis if it is param2
 	        self.d_focus.append("g")
-	            .attr("id", "y-axis-right")
+	            .attr("id", id + "-y-axis-right")
 	            .attr("class", "y axis-right")
 	            .attr("transform", "translate(" + self.chart.layout.focus.width + ",0)")
 	            .call(focus_axis.y);
@@ -1314,17 +1263,17 @@
 
 	},
 	tool.transition_data = function (param) {
-	    var self = this;
+	    var self = this,
+	    	dataset = self.chart.timeseries.datasets[param],
+	    	config_custom = self.configuration;
 
-	    var dataset = self.chart.timeseries.datasets[param];
-	    var config_custom = self.configuration;
-
-	    console.log("Param: " + param);
-	    console.log("Parameter: " + config_custom[param]);
-	    console.log("Column: " + self.data.parameters[config_custom[param]].column);
+	    //console.log("Param: " + param);
+	    //console.log("Parameter: " + config_custom[param]);
+	    //console.log("Column: " + self.data.parameters[config_custom[param]].column);
 
 	    var colY = dataset.column,
-	        units = dataset.units;
+	        units = dataset.units,
+	        id = self.dom_target;
 
 	    var data = dataset.data,
 	        focus = self.chart.focus[param],
@@ -1338,7 +1287,7 @@
 	    console.log(dataset.extents)
 
 	    // transition the focus path
-	    var focus_transition = d3.select("#path-focus-" + param)
+	    var focus_transition = d3.select("#"+ id + "-path-focus-" + param)
 	        .data([data])
 	        .transition()
 	        .duration(2000)
@@ -1348,36 +1297,36 @@
 	    if (param == "param1") {
 
 	        // transition the y axis
-	        var y_axis_transition = d3.select("#y-axis-left")
+	        var y_axis_transition = d3.select("#" + id + "-y-axis-left")
 	            .data([data])
 	            .transition()
 	            .call(focus_axis.y);
 
 	        //update the y axis label
-	        d3.select("#label-y-left-text")
+	        d3.select("#" + id + "-label-y-left-text")
 	            .transition()
 	            .text(self.data.parameters[config_custom.param1].label);
 
 	        // update the station label text for station 1
-	        d3.select("#legend-station1-text")
+	        d3.select("#" + id + "-legend-station1-text")
 	            .transition()
 	            .text(self.data.stations[config_custom.station1].name);
 
 	    } else {
 
 	        // transition the y axis
-	        var y_axis_transition = d3.select("#y-axis-right")
+	        var y_axis_transition = d3.select("#" + id + "-y-axis-right")
 	            .data([data])
 	            .transition()
 	            .call(focus_axis.y);
 
 	        // update the y axis text
-	        d3.select("#label-y-right-text")
+	        d3.select("#" + id + "-label-y-right-text")
 	            .transition()
 	            .text(self.data.parameters[config_custom.param2].label)
 
 	        // update the y axis label
-	        d3.select("#legend-station2-text")
+	        d3.select("#" + id + "-legend-station2-text")
 	            .transition()
 	            .text(self.data.stations[config_custom.station2].name)
 
@@ -1386,7 +1335,7 @@
 	    //console.log("... Transition on #path-context-"+param + " ....");
 
 	    // transition the context path for the current param
-	    d3.select("#path-context-" + param).data([data])
+	    d3.select("#" + id + "-path-context-" + param).data([data])
 	        //       .transition()
 	        //           .duration(2000)
 	        .attr("d", context.path);
@@ -1395,19 +1344,19 @@
 	    if (param == "param1") {
 
 	        // transition the context axis
-	        d3.select("#path-context-axis-param1")
+	        d3.select("#" + id + "-path-context-axis-param1")
 	            .data(data)
 	            .transition()
 	            .call(context_axis.x);
 
 	        // transition the focus axis
-	        d3.select("#path-focus-axis-param1")
+	        d3.select("#" + id + "-path-focus-axis-param1")
 	            .data(data)
 	            .transition()
 	            .call(focus_axis.x);
 	    }
 
-	    var datapoints_update = d3.select(".datapoints-" + param)
+	    var datapoints_update = d3.select("#" + id + "-datapoints-" + param)
 	        .selectAll("path")
 	        .data(data);
 
@@ -1432,7 +1381,7 @@
 	        .remove();
 
 	    // add mouseovers to all paths
-	    d3.select(".datapoints-" + param).selectAll("path")
+	    d3.select("#" + id + "-datapoints-" + param).selectAll("path")
 	        .data(data)
 	        .on("mouseover", function (d) {
 	            return self.chart.tooltip.style("visibility", "visible")
@@ -1451,16 +1400,17 @@
 
 	    // this function will update the config file which is used for subsequent calls and lookups
 	    var self = this,
-	        config = self.configuration; // .custom
+	        config = self.configuration,
+	        id = self.dom_target; // .custom
 
-	    config.date_start = $('#ctrl-datepicker-date-start').val();
-	    config.date_end = $('#ctrl-datepicker-date-end').val();
+	    config.date_start = $("#" + id + "-ctrl-datepicker-date-start").val();
+	    config.date_end = $("#" + id + "-ctrl-datepicker-date-end").val();
 
-	    config.param1 = $("#ctrl-dataset-dropdown-param1").val();
-	    config.param2 = $("#ctrl-dataset-dropdown-param2").val();
+	    config.param1 = $("#" + id + "-ctrl-dataset-dropdown-param1").val();
+	    config.param2 = $("#" + id + "-ctrl-dataset-dropdown-param2").val();
 
-	    config.station1 = $("#ctrl-dataset-dropdown-station1").val();
-	    config.station2 =  $("#ctrl-dataset-dropdown-station2").val();
+	    config.station1 = $("#" + id + "-ctrl-dataset-dropdown-station1").val();
+	    config.station2 =  $("#" + id + "-ctrl-dataset-dropdown-station2").val();
 
 	    //todo: should only update the current parameter, not all
 
@@ -1468,8 +1418,13 @@
 	tool.station_toggle = function (element, station) {
 
 	    // this function will toggle the visibility of the paths when the user clicks the station in the legend
-	    var self = this;
 
+	    console.log(".......STATION TOGGLE.......");
+	    console.log(station, element);
+
+	    var self = this,
+	    	id = element;
+	    	//id = element;
 
 	    if (station == "station1") {
 
@@ -1478,36 +1433,44 @@
 	            self.chart.timeseries.datasets.param1.visible = false;
 
 	            // transition the style to white, indicating that it is now off
-	            d3.select("#legend-station1-circle").style("fill", "#FFF");
+	            d3.select("#" + id + "-legend-station1-circle").style("fill", "#FFF");
 
 	            // hide the path
-	            d3.select("#path-focus-param1").style("visibility", "hidden")
+	            d3.select("#" + id + "-path-focus-param1")
+	            	.style("visibility", "hidden");
 
-	            d3.select(".datapoints-param1").selectAll("path").style("visibility", "hidden")
+	            //d3.select(".datapoints-param1").selectAll("path").style("visibility", "hidden");
+	            d3.select("#" + id + "-datapoints-param1")
+	            	.selectAll("path").style("visibility", "hidden");
+	            
 
 	        } else {
 
 	            self.chart.timeseries.datasets.param1.visible = true;
 
 	            // transition the style to red indicating that it is now on
-	            d3.select("#legend-station1-circle").style("fill", "red");
+	            d3.select("#" + id + "-legend-station1-circle")
+	            	.style("fill", "red");
 
 	            // make the path visible
-	            d3.select("#path-focus-param1").style("visibility", "visible")
+	            d3.select("#" + id + "-path-focus-param1")
+	            	.style("visibility", "visible")
 
-	            d3.select(".datapoints-param1").selectAll("path").style("visibility", "visible");
+	            // todo.. need parent selection
+	            d3.select("#" + id + "-datapoints-param1")
+	            	.selectAll("path").style("visibility", "visible");
 	        }
 	    } else {
 	        if (self.chart.timeseries.datasets.param2.visible == true) {
 	            self.chart.timeseries.datasets.param2.visible = false;
 
-	            d3.select("#legend-station2-circle")
+	            d3.select("#" + id + "-legend-station2-circle")
 	                .style("fill", "#FFFFFF");
 
-	            d3.select("#path-focus-param2")
+	            d3.select("#" + id + "-path-focus-param2")
 	                .style("visibility", "hidden")
 
-	            d3.select(".datapoints-param2")
+	            d3.select("#" + id + "-datapoints-param2")
 	                .selectAll("path")
 	                .style("visibility", "hidden");
 
@@ -1515,13 +1478,13 @@
 
 	            self.chart.timeseries.datasets.param2.visible = true;
 
-	            d3.select("#legend-station2-circle")
+	            d3.select("#" + id + "-legend-station2-circle")
 	                .style("fill", "steelblue");
 
-	            d3.select("#path-focus-param2")
+	            d3.select("#" + id + "-path-focus-param2")
 	                .style("visibility", "visible")
 
-	            d3.select(".datapoints-param2")
+	            d3.select("#" + id + "-datapoints-param2")
 	                .selectAll("path").style("visibility", "visible");
 	        }
 	    }
@@ -1549,4 +1512,3 @@
     EduVis.tool.tools[tool.name] = tool;
 
 }(EduVis));
-
