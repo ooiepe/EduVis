@@ -163,7 +163,8 @@
         loadingDiv : function(){
             // Create a load
             var self = this;
-            $('#'+this.target_div).html('<img id="loading_DOMID_" src="http://epe.marine.rutgers.edu/visualization/img/loading_a.gif" alt="Loading..."/>');
+            $('#'+this.dom_target)
+                .html('HELLO.<img id="loading_DOMID_" src="http://epe.marine.rutgers.edu/visualization/img/loading_a.gif" alt="Loading..."/>');
         },
         parse_dataset : function(){
             
@@ -302,19 +303,19 @@
                     .scale(y)
                     .orient("left");
 
-            var svg = d3.select("#"+self.target_div).append("svg")
-                .attr("id","container_" + self.target_div)
+            var svg = d3.select("#"+self.dom_target).append("svg")
+                .attr("id","container_" + self.dom_target)
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom);
 
             svg.append("defs").append("clipPath")
-                .attr("id", "clip_" + self.target_div)
+                .attr("id", "clip_" + self.dom_target)
                 .append("rect")
                 .attr("width", width)
                 .attr("height", height);
 
             var focus = svg.append("g")
-                .attr("id","focusgraph_"+self.target_div)
+                .attr("id","focusgraph_"+self.dom_target)
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             focus.append("g")
@@ -346,25 +347,19 @@
 
             focus.append("path")
                 .data([d])
-                .attr("clip-path", "url(#clip_"+ self.target_div + ")")
+                .attr("clip-path", "url(#clip_"+ self.dom_target + ")")
                 .attr("d", line)
                 .style("fill","none")
                 .style("stroke", self.configuration.color)
                 .style("stroke-width","2");
 
            // $("#loading_" + self.target_div).hide();
+           
+           EduVis.tool.load_complete(this);
         }
     };
 
-    tool.NDBC_Time_Series = function( _target_div ){
-
-        // reference data here
-        //var target_div = "#" + _target_div || tool.target_div;
-        //$("#" + _target_div).html("TEMPLATE TOOL LOADED");
-
-
-        //this.evtool = new EVTool();
-        //this.sos = new ioosSOS();
+    tool.NDBC_Time_Series = function( ){
 
         var self = this;
 
@@ -408,13 +403,13 @@
         // };
 
         // Create placeholder loading image
-        this.loadingDiv();
+        //self.loadingDiv();
 
         // do configuration overrides exist? if so, parse overrides
         //this.evtool.configurationParse( self.tool.configuration.custom, customToolConfiguration );
 
         // parse dataset and draw graph
-        this.parse_dataset();
+        self.parse_dataset();
 
         
 
@@ -424,7 +419,7 @@
 
         // todo: include instance in call
         
-        this.NDBC_Time_Series(this.target_div);
+        this.NDBC_Time_Series();
 
     };
 
