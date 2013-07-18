@@ -1,0 +1,2310 @@
+{
+    "project": {
+        "name": "Educational Visualization",
+        "description": "EVI: a javascript library for loading visualization tools",
+        "version": "0.2.1",
+        "url": "http://epe.marine.rutgers.edu/ev/",
+        "logo": "http://epe.marine.rutgers.edu/ev/img/ev_logo.png"
+    },
+    "files": {
+        "modules/OLDER_module_resource.js": {
+            "name": "modules/OLDER_module_resource.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "modules/TEMPLATE_module.js": {
+            "name": "modules/TEMPLATE_module.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "modules/module_configuration.js": {
+            "name": "modules/module_configuration.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {
+                "EduVis": 1
+            }
+        },
+        "modules/module_controls.js": {
+            "name": "modules/module_controls.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "modules/module_formatting.js": {
+            "name": "modules/module_formatting.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "modules/module_resource.js": {
+            "name": "modules/module_resource.js",
+            "modules": {
+                "Resource": 1
+            },
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "modules/module_tool.js": {
+            "name": "modules/module_tool.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "modules/module_utility.js": {
+            "name": "modules/module_utility.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "resources/js/jquery-1.8.3.js": {
+            "name": "resources/js/jquery-1.8.3.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "resources/js/jquery-1.9.1.js": {
+            "name": "resources/js/jquery-1.9.1.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "resources/js/jquery-ui-1.10.1.custom.js": {
+            "name": "resources/js/jquery-ui-1.10.1.custom.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "resources/js/jquery-ui-1.9.2.custom.js": {
+            "name": "resources/js/jquery-ui-1.9.2.custom.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "resources/js/module_IOOS_SOS.js": {
+            "name": "resources/js/module_IOOS_SOS.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "EduVis_ALL.js": {
+            "name": "EduVis_ALL.js",
+            "modules": {},
+            "classes": {
+                "EduVis.Configuration": 1,
+                "EduVis.Controls": 1,
+                "EduVis.formats": 1,
+                "resource": 1,
+                "Tool": 1,
+                "Utility": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "EduVis": 1
+            }
+        }
+    },
+    "modules": {
+        "Resource": {
+            "name": "Resource",
+            "submodules": {},
+            "classes": {
+                "EduVis.Configuration": 1,
+                "EduVis.Controls": 1,
+                "EduVis.formats": 1,
+                "resource": 1,
+                "Tool": 1,
+                "Utility": 1
+            },
+            "fors": {},
+            "namespaces": {
+                "EduVis": 1
+            },
+            "tag": "module",
+            "file": "EduVis_ALL.js",
+            "line": 1476,
+            "description": "Provides the base resource queue, loading, and updating functionality."
+        }
+    },
+    "classes": {
+        "EduVis.Configuration": {
+            "name": "EduVis.Configuration",
+            "shortname": "Configuration",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Resource",
+            "namespace": "EduVis",
+            "file": "EduVis_ALL.js",
+            "line": 43,
+            "description": "The configuration module...",
+            "is_constructor": 1
+        },
+        "EduVis.Controls": {
+            "name": "EduVis.Controls",
+            "shortname": "Controls",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Resource",
+            "namespace": "EduVis",
+            "file": "EduVis_ALL.js",
+            "line": 184,
+            "description": "The controls module helps create standardized html elements and UI components.",
+            "is_constructor": 1
+        },
+        "EduVis.formats": {
+            "name": "EduVis.formats",
+            "shortname": "formats",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Resource",
+            "namespace": "EduVis",
+            "file": "EduVis_ALL.js",
+            "line": 578,
+            "description": "A collection of reusable format functions",
+            "is_constructor": 1
+        },
+        "resource": {
+            "name": "resource",
+            "shortname": "resource",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Resource",
+            "namespace": "",
+            "file": "EduVis_ALL.js",
+            "line": 710,
+            "description": "The resource module...",
+            "is_constructor": 1
+        },
+        "Tool": {
+            "name": "Tool",
+            "shortname": "Tool",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Resource",
+            "namespace": "",
+            "file": "EduVis_ALL.js",
+            "line": 1025,
+            "description": "The tool module...",
+            "is_constructor": 1
+        },
+        "Utility": {
+            "name": "Utility",
+            "shortname": "Utility",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Resource",
+            "namespace": "",
+            "file": "EduVis_ALL.js",
+            "line": 1476,
+            "description": "The utility module...",
+            "is_constructor": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "modules/OLDER_module_resource.js",
+            "line": 14,
+            "description": "Check if the required base resource are loaded. If they are loaded, check the version.",
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/OLDER_module_resource.js",
+            "line": 25,
+            "description": "Original funciton to test if base javascript libs were loaded. \ntests for jquery and sets callback to load lib if not present",
+            "return": {
+                "description": "none"
+            },
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/OLDER_module_resource.js",
+            "line": 66,
+            "description": "Queue all tool resources.. local and external scripts and styles into loading queue\nset callbacks for all resources",
+            "return": {
+                "description": "none"
+            },
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/OLDER_module_resource.js",
+            "line": 193,
+            "description": "Load a JavaScript dependency (local resource that has been tested) from the resources folder",
+            "params": [
+                {
+                    "name": "an",
+                    "description": "object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "a standarized object to be used in _resource_inject",
+                "type": "Object"
+            },
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/OLDER_module_resource.js",
+            "line": 282,
+            "description": "Load a JavaScript dependency (local and tested) from the resources folder",
+            "params": [
+                {
+                    "name": "an",
+                    "description": "object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "a standarized object to be used in _resource_inject\n   no return value. a callback is set and executed on load of script",
+                "type": "Object"
+            },
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/TEMPLATE_module.js",
+            "line": 11,
+            "description": "This is where the function actions are defined",
+            "params": [
+                {
+                    "name": "define",
+                    "description": "the function paramenter(s) here ( in this case an object ).. be specific as to its usage",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "define the returned value here, in this case an Object.. be specific",
+                "type": "Object"
+            },
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/TEMPLATE_module.js",
+            "line": 24,
+            "description": "this function does very cool things",
+            "params": [
+                {
+                    "name": "a",
+                    "description": "name of something cool",
+                    "type": "String"
+                },
+                {
+                    "name": "a",
+                    "description": "name of something very cool",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "name of something cool and somethign very cool",
+                "type": "String"
+            },
+            "class": "EduVis.Configuration"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 7,
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 23,
+            "description": "Path to the instance configuration web service. This will ultimatly be adapted as a Drupal component.",
+            "itemtype": "property",
+            "name": "_config_instance_ws",
+            "type": "{string}",
+            "default": "\"\"",
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 33,
+            "itemtype": "method",
+            "name": "_config_parse",
+            "params": [
+                {
+                    "name": "tool",
+                    "description": "name for reference",
+                    "type": "String"
+                },
+                {
+                    "name": "tool",
+                    "description": "instance ID for reference",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The reversed string",
+                "type": "String"
+            },
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 55,
+            "description": "Validate a json configuration",
+            "itemtype": "method",
+            "name": "_config_validate",
+            "params": [
+                {
+                    "name": "_config",
+                    "description": "Tool Configuration",
+                    "type": "Object"
+                },
+                {
+                    "name": "_tool",
+                    "description": "Tool Reference",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Returns true on success",
+                "type": "Boolean"
+            },
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 72,
+            "description": "Writes the configuration object of an instance to the console and returns the configuration object.",
+            "itemtype": "method",
+            "name": "_config_export",
+            "params": [
+                {
+                    "name": "_tool_reference",
+                    "description": "The tool name",
+                    "type": "String"
+                },
+                {
+                    "name": "_instance_reference",
+                    "description": "The instance name or id",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Returns true on success",
+                "type": "Boolean"
+            },
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 87,
+            "description": "Update the configuration settings of an instance.",
+            "itemtype": "method",
+            "name": "_config_settings_update",
+            "params": [
+                {
+                    "name": "_tool_reference",
+                    "description": "The tool name",
+                    "type": "String"
+                },
+                {
+                    "name": "_instance_reference",
+                    "description": "The instance name or id",
+                    "type": "String"
+                },
+                {
+                    "name": "_configuration_object",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Returns true on success",
+                "type": "Boolean"
+            },
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_configuration.js",
+            "line": 109,
+            "description": "Triggers Ajax request for an instance configuratino of a tool creation object. \nThis is triggerd when a tool instance id is provided on the load tool call... EduVis.tool.load().\nOn a successful Ajax response, the tool is initialized with EduVis.tool.init( _tool_object )",
+            "itemtype": "method",
+            "name": "_config_request_instance",
+            "params": [
+                {
+                    "name": "_tool_object",
+                    "description": "The tool object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "EduVis.Configuration",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_controls.js",
+            "line": 22,
+            "itemtype": "method",
+            "name": "_control_create",
+            "params": [
+                {
+                    "name": "tool",
+                    "description": "The parent tool object",
+                    "type": "Object"
+                },
+                {
+                    "name": "id",
+                    "description": "The id to give the control",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "obj_control The control json containing all details for the control.",
+                "type": "Object"
+            },
+            "class": "EduVis.Controls",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_formatting.js",
+            "line": 21,
+            "description": "Format latitude number into usable string. use North(+) and South(-)",
+            "itemtype": "method",
+            "name": "_formatting_format_lat",
+            "params": [
+                {
+                    "name": "lat",
+                    "description": "Latidude to convert",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "the input converted to readable latitude measurement",
+                "type": "String"
+            },
+            "class": "EduVis.formats",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_formatting.js",
+            "line": 28,
+            "itemtype": "method",
+            "name": "_formatting_format_lat",
+            "params": [
+                {
+                    "name": "lat",
+                    "description": "The latitude coordinate to be formatted",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The formatted latitude value",
+                "type": "String"
+            },
+            "class": "EduVis.formats",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_formatting.js",
+            "line": 41,
+            "description": "Format longitude number into usable string. use East(+) and West(-)",
+            "itemtype": "method",
+            "name": "_formatting_format_long",
+            "params": [
+                {
+                    "name": "lat",
+                    "description": "longitude to convert",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "the input converted to readable longitude measurement",
+                "type": "String"
+            },
+            "class": "EduVis.formats",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_formatting.js",
+            "line": 54,
+            "description": "Format a number rounded to given decimal places",
+            "itemtype": "method",
+            "name": "_formatting_format_number_decimal",
+            "params": [
+                {
+                    "name": "x",
+                    "description": "the number to format",
+                    "type": "Number"
+                },
+                {
+                    "name": "n",
+                    "description": "the number of decimal places",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "the input rounded to the given decimal places",
+                "type": "Number"
+            },
+            "class": "EduVis.formats",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_formatting.js",
+            "line": 68,
+            "description": "Return a d3 time format object",
+            "itemtype": "method",
+            "name": "_formatting_getFormatDate",
+            "params": [
+                {
+                    "name": "dateFormatType",
+                    "description": "The type of format. hours, days, months, etc.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The d3.time.format",
+                "type": "d3.time.format"
+            },
+            "class": "EduVis.formats",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_formatting.js",
+            "line": 90,
+            "description": "Format a tool tip value",
+            "itemtype": "method",
+            "name": "_formatting_tooltip",
+            "params": [
+                {
+                    "name": "dateFormatType",
+                    "description": "The type of format. hours, days, months, etc.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "A json object of various number and time formats.",
+                "type": "Object"
+            },
+            "class": "EduVis.formats",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 32,
+            "itemtype": "method",
+            "name": "_resource_queue",
+            "params": [
+                {
+                    "name": "_obj_resources",
+                    "description": "The tool resources object",
+                    "type": "Object"
+                },
+                {
+                    "name": "_tool_name",
+                    "description": "A reference to the tool name",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "none"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 110,
+            "itemtype": "method",
+            "name": "_resource_notify",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "The tool resource",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 123,
+            "itemtype": "method",
+            "name": "_resource_load_local",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "an object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 142,
+            "itemtype": "method",
+            "name": "_resource_load_external",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "an object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 162,
+            "itemtype": "method",
+            "name": "_resource_load_stylesheet",
+            "params": [
+                {
+                    "name": "_obj_stylesheet",
+                    "description": "an object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 212,
+            "description": "Load a JavaScript dependency (local and tested) from the resources folder",
+            "params": [
+                {
+                    "name": "an",
+                    "description": "object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "a standarized object to be used in _resource_inject\n   no return value. a callback is set and executed on load of script",
+                "type": "Object"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 220,
+            "description": "when the script is returned.",
+            "itemtype": "method",
+            "name": "_resource_inject",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "a resource object containing information on the resource to request",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 237,
+            "itemtype": "method",
+            "name": "_resource_queue_remove",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "a resource object containing information on the resource to request",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 253,
+            "itemtype": "method",
+            "name": "_resource_is_loaded",
+            "params": [
+                {
+                    "name": "_resource_name",
+                    "description": "a resource name to be checked for load status",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_resource.js",
+            "line": 266,
+            "itemtype": "method",
+            "name": "_resource_version_loaded",
+            "params": [
+                {
+                    "name": "_resource_name",
+                    "description": "a resource name to be version checked",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 25,
+            "itemtype": "method",
+            "name": "_tool_load",
+            "params": [
+                {
+                    "name": "obj_tool",
+                    "description": "tool creation object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The reversed string",
+                "type": "String"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 106,
+            "itemtype": "method",
+            "name": "_tool_load",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "tool creation object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 116,
+            "itemtype": "method",
+            "name": "_tool_loading_complete",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "tool creation object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 130,
+            "itemtype": "method",
+            "name": "_tool_notify",
+            "params": [
+                {
+                    "name": "_obj_notify",
+                    "description": "a notify object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 142,
+            "itemtype": "method",
+            "name": "_tool_is_ready",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "a tool object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 188,
+            "itemtype": "method",
+            "name": "_tool_find_resources",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "a tool object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "tool_resources",
+                "type": "Object"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 247,
+            "itemtype": "method",
+            "name": "_tool_init",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "a tool object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 325,
+            "itemtype": "method",
+            "name": "_tool_customize",
+            "params": [
+                {
+                    "name": "tool_name",
+                    "description": "the name of the tool to customize",
+                    "type": "String"
+                },
+                {
+                    "name": "instance_id",
+                    "description": "the instance ID of the tool",
+                    "type": "String"
+                },
+                {
+                    "name": "target_div",
+                    "description": "the div where the output will be placed",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 390,
+            "itemtype": "method",
+            "name": "_tool_version",
+            "params": [
+                {
+                    "name": "tool_name",
+                    "description": "the name of the tool to customize",
+                    "type": "String"
+                },
+                {
+                    "name": "instance_id",
+                    "description": "the instance ID of the tool",
+                    "type": "String"
+                },
+                {
+                    "name": "target_div",
+                    "description": "the div where the output will be placed",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_tool.js",
+            "line": 402,
+            "itemtype": "method",
+            "name": "_tool_base_template",
+            "return": {
+                "description": "_object a bare tools object structure",
+                "type": "Object"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_utility.js",
+            "line": 19,
+            "itemtype": "method",
+            "name": "_utility_extend_deep",
+            "params": [
+                {
+                    "name": "parent",
+                    "description": "Parent object",
+                    "type": "Object"
+                },
+                {
+                    "name": "child",
+                    "description": "object instance ID for reference",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "object with parent and child",
+                "type": "Object"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_utility.js",
+            "line": 49,
+            "description": "Check if an object is empty",
+            "itemtype": "method",
+            "name": "_utility_is_object_empty",
+            "params": [
+                {
+                    "name": "_obj",
+                    "description": "Object to test for properties",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "returns true if empty, false if object contains a property",
+                "type": "Bool"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_utility.js",
+            "line": 66,
+            "description": "calulate the standard deviation of an array based on key",
+            "itemtype": "method",
+            "name": "_utility_standard_deviation",
+            "params": [
+                {
+                    "name": "_obj",
+                    "description": "the object or array",
+                    "type": "Object"
+                },
+                {
+                    "name": "_key",
+                    "description": "the object property or array key",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "standard deviation",
+                "type": "Number"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_utility.js",
+            "line": 109,
+            "description": "calulate the linear regression of x and y",
+            "itemtype": "method",
+            "name": "linearRegression",
+            "params": [
+                {
+                    "name": "x",
+                    "description": "an array of x values",
+                    "type": "Array"
+                },
+                {
+                    "name": "y",
+                    "description": "an array of y values",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "linear regression object that includes slope, intercept, and r2",
+                "type": "Number"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "modules/module_utility.js",
+            "line": 143,
+            "description": "Utility object functions exposed in EduVis",
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.8.3.js",
+            "line": 3983,
+            "description": "Utility function for retrieving the text value of an array of DOM nodes",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "",
+                    "type": "Array|Element"
+                }
+            ],
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 3837,
+            "description": "For feature detection",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "The function to test for native support",
+                    "type": "Function"
+                }
+            ],
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 3845,
+            "description": "Create key-value caches of limited size",
+            "return": {
+                "description": "Returns the Object data after storing it on itself with\n\tproperty name the (space-suffixed) string and (if the cache is larger than Expr.cacheLength)\n\tdeleting the oldest entry",
+                "type": "Function(string, Object)"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 3865,
+            "description": "Mark a function for special use by Sizzle",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "The function to mark",
+                    "type": "Function"
+                }
+            ],
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 3874,
+            "description": "Support testing using an element",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "Passed the created div and expects a boolean result",
+                    "type": "Function"
+                }
+            ],
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 4001,
+            "description": "Detect xml",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "An element or a document",
+                    "type": "Element|Object"
+                }
+            ],
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 4012,
+            "description": "Sets document-related variables once based on the current document",
+            "params": [
+                {
+                    "name": "doc",
+                    "description": "An element or document object to use to set the document",
+                    "type": "Element|Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "Returns the current document",
+                "type": "Object"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-1.9.1.js",
+            "line": 4505,
+            "description": "Utility function for retrieving the text value of an array of DOM nodes",
+            "params": [
+                {
+                    "name": "elem",
+                    "description": "",
+                    "type": "Array|Element"
+                }
+            ],
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 7802,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 7803,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 7804,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 8004,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 8005,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 8006,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 8333,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 8334,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.10.1.custom.js",
+            "line": 8335,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 7678,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 7679,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 7680,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 7872,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 7873,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 7874,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 8223,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 8224,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/jquery-ui-1.9.2.custom.js",
+            "line": 8225,
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "resources/js/module_IOOS_SOS.js",
+            "line": 87,
+            "description": "this function will generate a properly formatted IOOS SOS request for a timeseries\n\t     dataset for a specific bouy, observation, and date range\nndbcStation\n\t     - Acceptable Values: see http://sdf.ndbc.noaa.gov/stations.shtml\nobservedProperty\n\t     - air_pressure_at_sea_level\n\t     - air_temperature\n\t     - currents\n\t     - sea_water_salinity\n\t     - sea_water_electrical_conductivity\n\t     - sea_floor_depth_below_sea_surface (water level for tsunami stations)\n\t     - sea_water_temperature\n\t     - waves\n\t     - winds\neventTime as string\n\t     - hours and minutes are acceptable\n\t     - properly formatted eventTime --> 2010-01-01T00:00Z/2010-01-14T00:00Z\neventTime as object\n\t     - eventTime.dateStart --> 2010-01-01\n\t     - eventTime.dateEnd   --> 2010-01-14\ntodo: we could add checks to ensure the station, property and time are correctly formatted",
+            "class": "EduVis.Configuration",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 39,
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 55,
+            "description": "Path to the instance configuration web service. This will ultimatly be adapted as a Drupal component.",
+            "itemtype": "property",
+            "name": "_config_instance_ws",
+            "type": "{string}",
+            "default": "\"\"",
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 65,
+            "itemtype": "method",
+            "name": "_config_parse",
+            "params": [
+                {
+                    "name": "tool",
+                    "description": "name for reference",
+                    "type": "String"
+                },
+                {
+                    "name": "tool",
+                    "description": "instance ID for reference",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The reversed string",
+                "type": "String"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 87,
+            "description": "Validate a json configuration",
+            "itemtype": "method",
+            "name": "_config_validate",
+            "params": [
+                {
+                    "name": "_config",
+                    "description": "Tool Configuration",
+                    "type": "Object"
+                },
+                {
+                    "name": "_tool",
+                    "description": "Tool Reference",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Returns true on success",
+                "type": "Boolean"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 104,
+            "description": "Writes the configuration object of an instance to the console and returns the configuration object.",
+            "itemtype": "method",
+            "name": "_config_export",
+            "params": [
+                {
+                    "name": "_tool_reference",
+                    "description": "The tool name",
+                    "type": "String"
+                },
+                {
+                    "name": "_instance_reference",
+                    "description": "The instance name or id",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "Returns true on success",
+                "type": "Boolean"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 119,
+            "description": "Update the configuration settings of an instance.",
+            "itemtype": "method",
+            "name": "_config_settings_update",
+            "params": [
+                {
+                    "name": "_tool_reference",
+                    "description": "The tool name",
+                    "type": "String"
+                },
+                {
+                    "name": "_instance_reference",
+                    "description": "The instance name or id",
+                    "type": "String"
+                },
+                {
+                    "name": "_configuration_object",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Returns true on success",
+                "type": "Boolean"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 141,
+            "description": "Triggers Ajax request for an instance configuratino of a tool creation object. \nThis is triggerd when a tool instance id is provided on the load tool call... EduVis.tool.load().\nOn a successful Ajax response, the tool is initialized with EduVis.tool.init( _tool_object )",
+            "itemtype": "method",
+            "name": "_config_request_instance",
+            "params": [
+                {
+                    "name": "_tool_object",
+                    "description": "The tool object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "EduVis.Configuration",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 198,
+            "itemtype": "method",
+            "name": "_control_create",
+            "params": [
+                {
+                    "name": "tool",
+                    "description": "The parent tool object",
+                    "type": "Object"
+                },
+                {
+                    "name": "id",
+                    "description": "The id to give the control",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "obj_control The control json containing all details for the control.",
+                "type": "Object"
+            },
+            "class": "EduVis.Controls",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 591,
+            "description": "Format latitude number into usable string. use North(+) and South(-)",
+            "itemtype": "method",
+            "name": "_formatting_format_lat",
+            "params": [
+                {
+                    "name": "lat",
+                    "description": "Latidude to convert",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "the input converted to readable latitude measurement",
+                "type": "String"
+            },
+            "class": "EduVis.formats",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 598,
+            "itemtype": "method",
+            "name": "_formatting_format_lat",
+            "params": [
+                {
+                    "name": "lat",
+                    "description": "The latitude coordinate to be formatted",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The formatted latitude value",
+                "type": "String"
+            },
+            "class": "EduVis.formats",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 611,
+            "description": "Format longitude number into usable string. use East(+) and West(-)",
+            "itemtype": "method",
+            "name": "_formatting_format_long",
+            "params": [
+                {
+                    "name": "lat",
+                    "description": "longitude to convert",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "the input converted to readable longitude measurement",
+                "type": "String"
+            },
+            "class": "EduVis.formats",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 624,
+            "description": "Format a number rounded to given decimal places",
+            "itemtype": "method",
+            "name": "_formatting_format_number_decimal",
+            "params": [
+                {
+                    "name": "x",
+                    "description": "the number to format",
+                    "type": "Number"
+                },
+                {
+                    "name": "n",
+                    "description": "the number of decimal places",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "the input rounded to the given decimal places",
+                "type": "Number"
+            },
+            "class": "EduVis.formats",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 638,
+            "description": "Return a d3 time format object",
+            "itemtype": "method",
+            "name": "_formatting_getFormatDate",
+            "params": [
+                {
+                    "name": "dateFormatType",
+                    "description": "The type of format. hours, days, months, etc.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "The d3.time.format",
+                "type": "d3.time.format"
+            },
+            "class": "EduVis.formats",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 660,
+            "description": "Format a tool tip value",
+            "itemtype": "method",
+            "name": "_formatting_tooltip",
+            "params": [
+                {
+                    "name": "dateFormatType",
+                    "description": "The type of format. hours, days, months, etc.",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "A json object of various number and time formats.",
+                "type": "Object"
+            },
+            "class": "EduVis.formats",
+            "module": "Resource",
+            "namespace": "EduVis"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 729,
+            "itemtype": "method",
+            "name": "_resource_queue",
+            "params": [
+                {
+                    "name": "_obj_resources",
+                    "description": "The tool resources object",
+                    "type": "Object"
+                },
+                {
+                    "name": "_tool_name",
+                    "description": "A reference to the tool name",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "none"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 807,
+            "itemtype": "method",
+            "name": "_resource_notify",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "The tool resource",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 820,
+            "itemtype": "method",
+            "name": "_resource_load_local",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "an object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 839,
+            "itemtype": "method",
+            "name": "_resource_load_external",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "an object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 859,
+            "itemtype": "method",
+            "name": "_resource_load_stylesheet",
+            "params": [
+                {
+                    "name": "_obj_stylesheet",
+                    "description": "an object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 909,
+            "description": "Load a JavaScript dependency (local and tested) from the resources folder",
+            "params": [
+                {
+                    "name": "an",
+                    "description": "object with the dependency name, file name,",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "a standarized object to be used in _resource_inject\n   no return value. a callback is set and executed on load of script",
+                "type": "Object"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 917,
+            "description": "when the script is returned.",
+            "itemtype": "method",
+            "name": "_resource_inject",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "a resource object containing information on the resource to request",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 934,
+            "itemtype": "method",
+            "name": "_resource_queue_remove",
+            "params": [
+                {
+                    "name": "_obj_resource",
+                    "description": "a resource object containing information on the resource to request",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": ""
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 950,
+            "itemtype": "method",
+            "name": "_resource_is_loaded",
+            "params": [
+                {
+                    "name": "_resource_name",
+                    "description": "a resource name to be checked for load status",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 963,
+            "itemtype": "method",
+            "name": "_resource_version_loaded",
+            "params": [
+                {
+                    "name": "_resource_name",
+                    "description": "a resource name to be version checked",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "resource",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1040,
+            "itemtype": "method",
+            "name": "_tool_load",
+            "params": [
+                {
+                    "name": "obj_tool",
+                    "description": "tool creation object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The reversed string",
+                "type": "String"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1121,
+            "itemtype": "method",
+            "name": "_tool_load",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "tool creation object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1131,
+            "itemtype": "method",
+            "name": "_tool_loading_complete",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "tool creation object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1145,
+            "itemtype": "method",
+            "name": "_tool_notify",
+            "params": [
+                {
+                    "name": "_obj_notify",
+                    "description": "a notify object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1157,
+            "itemtype": "method",
+            "name": "_tool_is_ready",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "a tool object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1203,
+            "itemtype": "method",
+            "name": "_tool_find_resources",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "a tool object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "tool_resources",
+                "type": "Object"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1262,
+            "itemtype": "method",
+            "name": "_tool_init",
+            "params": [
+                {
+                    "name": "_obj_tool",
+                    "description": "a tool object.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1340,
+            "itemtype": "method",
+            "name": "_tool_customize",
+            "params": [
+                {
+                    "name": "tool_name",
+                    "description": "the name of the tool to customize",
+                    "type": "String"
+                },
+                {
+                    "name": "instance_id",
+                    "description": "the instance ID of the tool",
+                    "type": "String"
+                },
+                {
+                    "name": "target_div",
+                    "description": "the div where the output will be placed",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1405,
+            "itemtype": "method",
+            "name": "_tool_version",
+            "params": [
+                {
+                    "name": "tool_name",
+                    "description": "the name of the tool to customize",
+                    "type": "String"
+                },
+                {
+                    "name": "instance_id",
+                    "description": "the instance ID of the tool",
+                    "type": "String"
+                },
+                {
+                    "name": "target_div",
+                    "description": "the div where the output will be placed",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Null"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1417,
+            "itemtype": "method",
+            "name": "_tool_base_template",
+            "return": {
+                "description": "_object a bare tools object structure",
+                "type": "Object"
+            },
+            "class": "Tool",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1488,
+            "itemtype": "method",
+            "name": "_utility_extend_deep",
+            "params": [
+                {
+                    "name": "parent",
+                    "description": "Parent object",
+                    "type": "Object"
+                },
+                {
+                    "name": "child",
+                    "description": "object instance ID for reference",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "object with parent and child",
+                "type": "Object"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1518,
+            "description": "Check if an object is empty",
+            "itemtype": "method",
+            "name": "_utility_is_object_empty",
+            "params": [
+                {
+                    "name": "_obj",
+                    "description": "Object to test for properties",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "returns true if empty, false if object contains a property",
+                "type": "Bool"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1535,
+            "description": "calulate the standard deviation of an array based on key",
+            "itemtype": "method",
+            "name": "_utility_standard_deviation",
+            "params": [
+                {
+                    "name": "_obj",
+                    "description": "the object or array",
+                    "type": "Object"
+                },
+                {
+                    "name": "_key",
+                    "description": "the object property or array key",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "standard deviation",
+                "type": "Number"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1578,
+            "description": "calulate the linear regression of x and y",
+            "itemtype": "method",
+            "name": "linearRegression",
+            "params": [
+                {
+                    "name": "x",
+                    "description": "an array of x values",
+                    "type": "Array"
+                },
+                {
+                    "name": "y",
+                    "description": "an array of y values",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "linear regression object that includes slope, intercept, and r2",
+                "type": "Number"
+            },
+            "class": "Utility",
+            "module": "Resource"
+        },
+        {
+            "file": "EduVis_ALL.js",
+            "line": 1612,
+            "description": "Utility object functions exposed in EduVis",
+            "class": "Utility",
+            "module": "Resource"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " resources/js/jquery-1.9.1.js:3845"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " resources/js/jquery-1.9.1.js:4012"
+        },
+        {
+            "message": "Missing item type\nCheck if the required base resource are loaded. If they are loaded, check the version.",
+            "line": " modules/OLDER_module_resource.js:14"
+        },
+        {
+            "message": "Missing item type\nOriginal funciton to test if base javascript libs were loaded. \ntests for jquery and sets callback to load lib if not present",
+            "line": " modules/OLDER_module_resource.js:25"
+        },
+        {
+            "message": "Missing item type\nQueue all tool resources.. local and external scripts and styles into loading queue\nset callbacks for all resources",
+            "line": " modules/OLDER_module_resource.js:66"
+        },
+        {
+            "message": "Missing item type\nLoad a JavaScript dependency (local resource that has been tested) from the resources folder",
+            "line": " modules/OLDER_module_resource.js:193"
+        },
+        {
+            "message": "Missing item type\nLoad a JavaScript dependency (local and tested) from the resources folder",
+            "line": " modules/OLDER_module_resource.js:282"
+        },
+        {
+            "message": "Missing item type\nThis is where the function actions are defined",
+            "line": " modules/TEMPLATE_module.js:11"
+        },
+        {
+            "message": "Missing item type\nthis function does very cool things",
+            "line": " modules/TEMPLATE_module.js:24"
+        },
+        {
+            "message": "Missing item type",
+            "line": " modules/module_configuration.js:7"
+        },
+        {
+            "message": "Missing item type\nLoad a JavaScript dependency (local and tested) from the resources folder",
+            "line": " modules/module_resource.js:212"
+        },
+        {
+            "message": "Missing item type\nUtility object functions exposed in EduVis",
+            "line": " modules/module_utility.js:143"
+        },
+        {
+            "message": "Missing item type\nUtility function for retrieving the text value of an array of DOM nodes",
+            "line": " resources/js/jquery-1.8.3.js:3983"
+        },
+        {
+            "message": "Missing item type\nFor feature detection",
+            "line": " resources/js/jquery-1.9.1.js:3837"
+        },
+        {
+            "message": "Missing item type\nCreate key-value caches of limited size",
+            "line": " resources/js/jquery-1.9.1.js:3845"
+        },
+        {
+            "message": "Missing item type\nMark a function for special use by Sizzle",
+            "line": " resources/js/jquery-1.9.1.js:3865"
+        },
+        {
+            "message": "Missing item type\nSupport testing using an element",
+            "line": " resources/js/jquery-1.9.1.js:3874"
+        },
+        {
+            "message": "Missing item type\nDetect xml",
+            "line": " resources/js/jquery-1.9.1.js:4001"
+        },
+        {
+            "message": "Missing item type\nSets document-related variables once based on the current document",
+            "line": " resources/js/jquery-1.9.1.js:4012"
+        },
+        {
+            "message": "Missing item type\nUtility function for retrieving the text value of an array of DOM nodes",
+            "line": " resources/js/jquery-1.9.1.js:4505"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:7802"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:7803"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:7804"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:8004"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:8005"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:8006"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:8333"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:8334"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.10.1.custom.js:8335"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:7678"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:7679"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:7680"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:7872"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:7873"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:7874"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:8223"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:8224"
+        },
+        {
+            "message": "Missing item type",
+            "line": " resources/js/jquery-ui-1.9.2.custom.js:8225"
+        },
+        {
+            "message": "Missing item type\nthis function will generate a properly formatted IOOS SOS request for a timeseries\n\t     dataset for a specific bouy, observation, and date range\nndbcStation\n\t     - Acceptable Values: see http://sdf.ndbc.noaa.gov/stations.shtml\nobservedProperty\n\t     - air_pressure_at_sea_level\n\t     - air_temperature\n\t     - currents\n\t     - sea_water_salinity\n\t     - sea_water_electrical_conductivity\n\t     - sea_floor_depth_below_sea_surface (water level for tsunami stations)\n\t     - sea_water_temperature\n\t     - waves\n\t     - winds\neventTime as string\n\t     - hours and minutes are acceptable\n\t     - properly formatted eventTime --> 2010-01-01T00:00Z/2010-01-14T00:00Z\neventTime as object\n\t     - eventTime.dateStart --> 2010-01-01\n\t     - eventTime.dateEnd   --> 2010-01-14\ntodo: we could add checks to ensure the station, property and time are correctly formatted",
+            "line": " resources/js/module_IOOS_SOS.js:87"
+        },
+        {
+            "message": "Missing item type",
+            "line": " EduVis_ALL.js:39"
+        },
+        {
+            "message": "Missing item type\nLoad a JavaScript dependency (local and tested) from the resources folder",
+            "line": " EduVis_ALL.js:909"
+        },
+        {
+            "message": "Missing item type\nUtility object functions exposed in EduVis",
+            "line": " EduVis_ALL.js:1612"
+        }
+    ]
+}

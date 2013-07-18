@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>resources/js/module_IOOS_SOS.js - Educational Visualization</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="http://epe.marine.rutgers.edu/ev/img/ev_logo.png" title="Educational Visualization"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.2.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/EduVis.Configuration.html">EduVis.Configuration</a></li>
+            
+                <li><a href="../classes/EduVis.Controls.html">EduVis.Controls</a></li>
+            
+                <li><a href="../classes/EduVis.formats.html">EduVis.formats</a></li>
+            
+                <li><a href="../classes/resource.html">resource</a></li>
+            
+                <li><a href="../classes/Tool.html">Tool</a></li>
+            
+                <li><a href="../classes/Utility.html">Utility</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/Resource.html">Resource</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: resources/js/module_IOOS_SOS.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+(function (eduVis) {
+
+    &quot;use strict&quot;;
+
+    var _tools_version = &quot;0.01&quot;,
+
+    _getObservationObj = function ( aryObservation ) {
+
+	    // get a minimum observations object as required by tool
+	    // pass an array of observations and get object of observation and all properties
+
+	    var observations = {
+
+	        &quot;sea_water_temperature&quot; : {
+	            &quot;name&quot;        : &quot;Seawater Temperature&quot;,
+	            &quot;label&quot;       : &quot;Seawater Temperature (C)&quot;,
+	            &quot;query_param&quot; : &quot;sea_water_temperature&quot;,
+	            &quot;value&quot;       : &quot;sea_water_temperature&quot;,
+	            &quot;column&quot;      : &quot;sea_water_temperature (C)&quot;,
+	            &quot;units&quot;       : &quot;&amp;deg;C&quot;,
+	            &quot;units2&quot;      : &quot;Degrees Celcius&quot;,
+	            &quot;shortName&quot;   : &quot;Water Temp&quot;
+	        },
+	        &quot;sea_water_salinity&quot; : {
+	            &quot;name&quot;        : &quot;Seawater Salinity&quot;,
+	            &quot;label&quot;       : &quot;Seawater Salinity&quot;,
+	            &quot;query_param&quot; : &quot;sea_water_salinity&quot;,
+	            &quot;value&quot;       : &quot;sea_water_salinity&quot;,
+	            &quot;column&quot;      : &quot;sea_water_salinity (psu)&quot;,
+	            &quot;units&quot;       : &quot;&quot;,
+	            &quot;units2&quot;      : &quot;&quot;,
+	            &quot;shortName&quot;   : &quot;Salinity&quot;
+	        },
+	        &quot;air_temperature&quot; : {
+	            &quot;name&quot;        : &quot;Air Temperature&quot;,
+	            &quot;label&quot;       : &quot;Air Temperature (C)&quot;,
+	            &quot;query_param&quot; : &quot;air_temperature&quot;,
+	            &quot;column&quot;      : &quot;air_temperature (C)&quot;,
+	            &quot;units&quot;       : &quot;&amp;deg;C&quot;,
+	            &quot;units2&quot;      : &quot;Degrees Celcius&quot;,
+	            &quot;shortName&quot;   : &quot;Air Temp&quot;
+	        },
+	        &quot;air_pressure_at_sea_level&quot;:{
+	            &quot;name&quot;        : &quot;Air Pressure at Sea Level&quot;,
+	            &quot;label&quot;       : &quot;Air Pressure at Sea Level (hPa)&quot;,
+	            &quot;query_param&quot; : &quot;air_pressure_at_sea_level&quot;,
+	            &quot;column&quot;      : &quot;air_pressure_at_sea_level (hPa)&quot;,
+	            &quot;units&quot;       : &quot;(hPa)&quot;,
+	            &quot;units2&quot;      : &quot;-hPa-&quot;,
+	            &quot;shortName&quot;   : &quot;Air Pressure&quot;
+	        },
+	        &quot;waves&quot; : {
+	            &quot;name&quot;        : &quot;Wave Height&quot;,
+	            &quot;label&quot;       : &quot;Wave Height (m)&quot;,
+	            &quot;query_param&quot; : &quot;waves&quot;,
+	            &quot;column&quot;      : &quot;sea_surface_wave_significant_height (m)&quot;,
+	            &quot;units&quot;       : &quot;m&quot;,
+	            &quot;units2&quot;      : &quot;meters&quot;,
+	            &quot;shortName&quot;   : &quot;Wave Height&quot;
+	        },
+	        &quot;winds&quot; : {
+	            &quot;name&quot;        : &quot;Wind Speed&quot;,
+	            &quot;label&quot;       : &quot;Wind Speed (m/s)&quot;,
+	            &quot;query_param&quot; : &quot;winds&quot;,
+	            &quot;column&quot;      : &quot;wind_speed (m/s)&quot;,
+	            &quot;units&quot;       : &quot;m/s&quot;,
+	            &quot;units2&quot;      : &quot;m/s&quot;,
+	            &quot;shortName&quot;   : &quot;Wind Speed&quot;
+	        }
+	    };
+
+	    var toolObservations = {};
+
+	    // add observations for on aryObservation elements
+	    $.each( aryObservation , function( index, observation ){
+
+	        toolObservations[observation] = observations[observation];
+
+	    });
+
+	    return toolObservations;
+
+	},
+	_request = function () {},
+	_request_Url_Timeseries_Date = function ( ndbcStation, observedProperty, eventTime ){
+
+	    /***
+
+	     this function will generate a properly formatted IOOS SOS request for a timeseries
+	     dataset for a specific bouy, observation, and date range
+
+	     ndbcStation
+	     - Acceptable Values: see http://sdf.ndbc.noaa.gov/stations.shtml
+
+	     observedProperty
+	     - air_pressure_at_sea_level
+	     - air_temperature
+	     - currents
+	     - sea_water_salinity
+	     - sea_water_electrical_conductivity
+	     - sea_floor_depth_below_sea_surface (water level for tsunami stations)
+	     - sea_water_temperature
+	     - waves
+	     - winds
+
+	     eventTime as string
+	     - hours and minutes are acceptable
+	     - properly formatted eventTime --&gt; 2010-01-01T00:00Z/2010-01-14T00:00Z
+
+	     eventTime as object
+	     - eventTime.dateStart --&gt; 2010-01-01
+	     - eventTime.dateEnd   --&gt; 2010-01-14
+
+	     todo: we could add checks to ensure the station, property and time are correctly formatted
+
+	     **/
+
+	    var eventTimeFormatted;
+
+	    if( typeof(eventTime) === &quot;object&quot; ){
+	        //CONSOLE LOG//console.log(&quot;eventtime is object&quot;,eventTime);
+	        eventTimeFormatted = eventTime.dateStart +  &quot;T00:00Z/&quot; + eventTime.dateEnd + &quot;T00:00Z&quot;;
+	    }
+	    else{
+	        //CONSOLE.LOG//console.log(&quot;eventtime is string&quot;,eventTime);
+	        eventTimeFormatted = eventTime;
+	    }
+
+	    return &quot;http://epe.marine.rutgers.edu/visualization/&quot; + &quot;proxy_ndbc.php?&quot; +
+	        &quot;http://sdf.ndbc.noaa.gov/sos/server.php?&quot; +
+	        &quot;request=GetObservation&quot; +
+	        &quot;&amp;&quot; + &quot;version=1.0.0&quot; +
+	        &quot;&amp;&quot; + &quot;service=SOS&quot; +
+	        &quot;&amp;&quot; + &quot;offering=urn:ioos:station:wmo:&quot; + ndbcStation +
+	        &quot;&amp;&quot; + &quot;observedproperty=&quot; + observedProperty +
+	        &quot;&amp;&quot; + &quot;responseformat=text/csv&quot; +
+	        &quot;&amp;&quot; + &quot;eventtime=&quot; + eventTimeFormatted;
+
+	},
+	_station_List_LB = function ( stationList, delimiterElement, delimiterProperty ) {
+
+	    // generate a station object from a text area delimited by line breaks
+
+	    // todo: remove leading and trailing line breaks before splitting.
+	    //s = s.replace(/(^\s*)|(\s*$)/gi,&quot;&quot;);
+	    //s = s.replace(/[ ]{2,}/gi,&quot; &quot;);
+
+	    //todo: remove usage of line breaks. use true functions whenever possible
+
+	    var stationsObj = {}, stationAry, delimEl, delimProp;
+
+	    if( typeof( delimiterElement ) === &quot;undefined&quot; ) delimEl = &quot;\n&quot;;
+	    if( typeof( delimiterProperty ) === &quot;undefined&quot; ) delimProp = &quot;|&quot;;
+
+	    if( typeof(stationList) === &quot;string&quot;){
+
+	        stationAry = stationList.split( delimEl );
+
+	    }
+	    else{
+	        stationAry = stationList;
+	    }
+
+	    console.log(&quot;STATION LIST: &quot; , stationList);
+
+	    $.each(stationAry, function ( index, station) {
+
+	        var parts = station.split( delimProp );
+
+	        var stationId = parts[0];
+	        var stationName = parts[1];
+
+	        stationsObj[stationId] = {
+	            &quot;name&quot;: stationId,
+	            &quot;label&quot;: stationName + &quot; (&quot; + stationId + &quot;)&quot;
+	        };
+
+	    });
+
+	    return stationsObj;
+	}
+
+	EduVis.ioos = {
+		stationListLB : _station_List_LB,
+		requestUrlTimeseriesDate : _request_Url_Timeseries_Date,
+		getObservationObj : _getObservationObj
+	}
+
+}(EduVis));
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

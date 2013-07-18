@@ -1,0 +1,78 @@
+.control {
+    margin: 3px;
+    padding: 3px;
+    /*	width:220px;*/
+    overflow: visible;
+    border: 2px solid #FFFFFF;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    font-size: 10px;
+}
+
+.control:hover {
+    /*border-color:#000000;*/
+}
+
+.legend_timeseries {
+    fill: #FFFFFF;
+    stroke: steelblue;
+    stroke-width: 3px;
+}
+
+.focus-g text {
+    fill: black;
+}
+
+.datapoints-param1 circle, .datapoints-param2 triangle {
+    opacity: 1;
+    /*fill:green;*/
+}
+
+input, textarea, select, .uneditable-input {
+    /*width: auto !important;*/
+}
+
+.legend-stats{
+    padding:0 !important;
+
+}
+
+.kill-margin{
+    margin-left:5px !important;
+}
+
+.kill-padding{
+    padding-left:5px !important;
+    padding-right:5px !important;
+}
+
+.zero-padding-margin{
+    padding:0;
+    margin:0;
+}
+
+.legend-stats div {
+    text-align: center;
+
+}
+
+.hover-pointer:hover{
+    cursor:pointer;
+
+}
+
+.widthAuto{
+    width:auto;
+}
+
+.borderRoundedSmall{
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    border-color:#666;
+}
+
+.hover-cursor-crossout:hover {
+    cursor: crosshair;
+    /*url('../../img/cursor-crossout-24.png'),*/
+}

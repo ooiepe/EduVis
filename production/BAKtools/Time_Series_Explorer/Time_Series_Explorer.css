@@ -1,0 +1,108 @@
+/* CSS for EV2_Time_Series_Explorer */
+
+svg {
+  font: 12px sans-serif;
+}
+
+.x.axis path{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis-right path, .axis-right line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.axis-left path, .axis-left line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.path-focus{
+  fill: none;
+  /* stroke:steelblue;
+  stroke-width:4px;*/
+
+}
+
+.path-context{
+  fill: none;
+  stroke:steelblue;
+  stroke-width:2px;
+
+}
+
+#path-focus-param2{
+  /*stroke:steelblue;*/
+}
+#path-focus-param1{
+  /* stroke:red;*/
+}
+
+#path-context-param1{
+  /*stroke:red;*/
+}
+#path-context-param2{
+  /*stroke:steelblue;*/
+}
+
+.control{
+  margin:3px;
+  padding:6px;
+  /*	width:220px;*/
+  overflow:visible;
+  border:2px solid #FFFFFF;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
+.control:hover{
+  /*border-color:#000000;*/
+}
+
+.legend_station{
+  fill: #FFFFFF;
+  stroke:steelblue;
+  stroke-width:3px;
+}
+
+#legend-station1-circle{
+  stroke:steelblue;
+}
+#legend-station2-circle{
+  stroke:red;
+}
+
+#context-g text{
+  fill:black;
+}
+
+#focus-g text{
+  fill:black;
+}
+
+.datapoints-param1,.datapoints-param2 {
+  /*opacity:0;*/
+}
+
+.kill-margin{
+    margin-left:5px !important;
+}
+
+.kill-padding{
+    padding-left:5px !important;
+    padding-right:5px !important;
+}
+
+.zero-padding-margin{
+    padding:0;
+    margin:0;
+}
