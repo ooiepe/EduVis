@@ -1,11 +1,11 @@
 {
     "name": "Educational Visualization",
-    "description": "EVI: a javascript library for loading visualization tools",
-    "version": "0.2.1",
+    "description": "EV: a javascript framework for loading visualization tools",
+    "version": "0.2.2",
     "url": "http://epe.marine.rutgers.edu/ev/",
     "logo": "http://epe.marine.rutgers.edu/ev/img/ev_logo.png",
     "options": {
-        "outdir": "../production/docs/api",
+        "outdir": "../../EduVis_Production/docs/api",
         "exclude": "tools, resources, modules"
     }
 }

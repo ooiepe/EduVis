@@ -28,7 +28,7 @@
 * @default ""
 */
 
-    var _config_instance_ws = EduVis.parameters.local_resource_url + "custom_instance.php",
+    var _config_instance_ws = EduVis.Environment.path + "custom_instance.php",
 
 /** Parse a Configuration file from the tools default configuration
 * 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Educational Visualization Tools</title>
+	<title>EV Framework Revisited</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="resources/css/EduVis.css">
 	<style type="text/css">
@@ -10,33 +10,9 @@
 </head>
 <body>
 
-<!-- load resources -->
-<script src="resources/js/jquery-1.10.1.min.js"></script>
-
-<!-- load main js -->
 <script src="EduVis.js"></script>
-
-<!-- load modules -->
-<script src="modules/module_configuration.js"></script>
-<script src="modules/module_tool.js"></script>
-<script src="modules/module_controls.js"></script>
-<script src="modules/module_formatting.js"></script>
-<script src="modules/module_resource.js"></script>
-<script src="modules/module_utility.js"></script>
-
 <script>
 (function(){
-
-
-	// // A sample way of loading an exterbak resource
-	EduVis.resource.load_stylesheet(
-		{
-			"name" : "bootstrap-css",
-			"src" : "resources/css/bootstrap.min.css"
-		}
-	);	
-
-	EduVis.tool.tool_list();
 
 	// // // A sample way of loading a local resource
 	// EduVis.resource.load(
@@ -51,7 +27,7 @@
 
 	// );
 
-	// // A sample way of loading an exterbak resource
+	// // A sample way of loading an external resource
 	// EduVis.dependencies.load_external(
 	//
 	// 	{
@@ -79,10 +55,6 @@
 	// });
 
 	// EduVis.tool.load({
-	// 	"name" : "NDBC_Time_Series"
-	// });
-
-	// EduVis.tool.load({
 	// 	"name" : "Time_Series_Explorer",
 	// 	"target_div": "Time_Series_Explorer"
 	// });
@@ -95,10 +67,6 @@
 
 	// EduVis.tool.load({
 	// 	"name" : "Time_Series_Explorer",
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Time_Series_Explorer"
 	// });
 
 	// EduVis.tool.load({
@@ -120,11 +88,9 @@
 	// 	//"instance" : "1023"
 	// });
 
-	// EduVis.tool.load({
-	// 	"name" : "Colorpicker_Example",
-	// 	"target_div": "Colorpicker_Example"
-	// 	//"instance" : "1023"
-	// });
+	EduVis.tool.load({
+		"name" : "NDBC_Time_Series_Explorer"
+	});
 
 }());
 	

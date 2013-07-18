@@ -5,6 +5,7 @@
 * Education & Public Engagement Implementing Organization
 * Written by Michael Mills, Rutgers University
 *
+** WARNING: This framework was built off prototypical work and is currently being refactored.
 */
 
 var EduVis = (function () {
@@ -12,21 +13,21 @@ var EduVis = (function () {
     "use strict";
 
 	var eduVis = {
-		"version" : "0.0.1",
-		"parameters":{
-			"local_resource_url" : "http://ooi.dev/epe/EduVis/"
+		"version" : "1.0.5",
+		"Environment" : {
+
+			"path" : ""
+            //add Environment module?
 		}
 	};
-
-	eduVis.test = function () {	};
 
 	return eduVis;
 
 }());
 
 /* 
-* Last Revision: 06/07/13
-* Version 1.0.3
+* Last Revision: 07/18/2013
+* Version 1.0.5
 * Notes:
 *
 *
@@ -60,7 +61,7 @@ var EduVis = (function () {
 * @default ""
 */
 
-    var _config_instance_ws = EduVis.parameters.local_resource_url + "custom_instance.php",
+    var _config_instance_ws = EduVis.Environment.path + "custom_instance.php",
 
 /** Parse a Configuration file from the tools default configuration
 * 
@@ -588,18 +589,10 @@ var EduVis = (function () {
     
     var _formatting_version = "0.0.1",
 
-    /** 
-    * Format latitude number into usable string. use North(+) and South(-)
-    * @method _formatting_format_lat
-    * @param {Number} lat Latidude to convert
-    * @return {String} the input converted to readable latitude measurement
-    */
-
 /** Format latitude number into usable string. use North(+) and South(-)
 * 
 * @method _formatting_format_lat
-* @param {String} lat The latitude coordinate to be formatted
-
+* @param {Number} lat The latitude coordinate to be formatted
 * @return {String} The formatted latitude value
 */
     
@@ -842,7 +835,7 @@ Provides the base resource queue, loading, and updating functionality.
 * @param {Object} _obj_resource an object with the dependency name, file name, 
 * @return {} 
 */
-    _resource_load_external = function ( _obj_resource) {
+    _resource_load_external = function ( _obj_resource ) {
 
         // test if external resource is available
         _resource_inject({
@@ -991,6 +984,7 @@ Provides the base resource queue, loading, and updating functionality.
 
         load : _resource_load_local,
         load_external : _resource_load_external,
+        load_stylesheet : _resource_load_stylesheet,
         loaded : (function(){return _resources_loaded;})(),        
 
         queue : _resource_queue,
@@ -1012,7 +1006,7 @@ Provides the base resource queue, loading, and updating functionality.
 * todo: path will move to resources
 * todo: load tool tests on script request callback
 
-/*
+*/
 
 /*  *  *  *  *  *  *  *
 *
@@ -1034,8 +1028,10 @@ Provides the base resource queue, loading, and updating functionality.
     "use strict";
 
     var _tools_version = "0.03",
-        _tools_path = "tools/", // full url can be used
+        _tools_path = EduVis.Environment.path + "tools/", // full url can be used
         _tools_resource_path = "",
+        __tools_resource_file__ = _tools_path + "tools.json",
+        __image_path__ = _tools_path,
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -1405,10 +1401,7 @@ Provides the base resource queue, loading, and updating functionality.
 /** returns the tool version
 * 
 * @method _tool_version
-* @param {String} tool_name the name of the tool to customize
-* @param {String} instance_id the instance ID of the tool
-* @param {String} target_div the div where the output will be placed
-* @return {null}
+* @return {String} The tool version
 */
     _tool_version = function(){
         return _tool_version;
@@ -1449,7 +1442,84 @@ Provides the base resource queue, loading, and updating functionality.
             "instances" : {}
 
         };
+    },
+
+/** Request the tool listing via getJSON and display thumbnails and links for the tools.
+* 
+* @method _tool_listing
+* @param _target_div the dom element where the generated thumbnail list should appear
+* @param callback callback function to trigger on append
+
+* @return {null}  
+*/
+    _tool_listing = function(_target_div){
+
+        var domTarget = (typeof _target_div === "undefined") ? "body" : "#" + _target_div; 
+
+        console.log("tool listing", _target_div, domTarget);
+
+        $.getJSON( __tools_resource_file__ , function(tools) {
+
+            console.log("TOOLS --->", tools)
+
+            // set up dom element and add title
+            var toolsHeading = $("<div></div>")
+                .append(
+                    $("<h1></h1>",{
+                        "html" : tools.name,
+                        "title" : "Tools as of " + tools.date
+                    })
+                        .append(
+                            $("<small></small>").html(" Version " + tools.version)
+                        )
+                )
+            
+            var toolsListing = $("<ul></ul>",{"class":"thumbnails"});
+
+            // add a thumbnail for each tool... classed as thumbnail
+            $.each(tools.tools, function(id, tool){
+
+                var toolName = tool.name.replace(/ /g,"_"),
+                    
+                    thumb = $("<li></li>",{"class": "thumbnail span3"})
+                    .css({"height":"280px"})
+                    .append(
+
+                        $("<div></div>", {
+                            "title" : tool.evId + " - " + tool.name
+                        })
+                            .append(
+                                $("<img />",{
+                                    "src" : __image_path__ + tool.thumbnail
+                                })
+                            )
+                            .append(
+                                $("<h5></h5>",{
+                                    "html" : tool.evId + " - " + tool.name
+                                })   
+                            )
+                            .on("click", function(){
+                                
+                                EduVis.tool.load(
+                                    {
+                                        "name" : toolName
+                                    });
+
+                            })
+                    )
+
+                toolsListing.append(thumb);
+            });
+
+            $(domTarget).attr("class","container-fluid")
+                .append(toolsHeading)
+                .append(toolsListing)
+
+
+        });
+
     };
+
 
     eduVis.tool = {
         resource_path : _tools_resource_path,
@@ -1463,7 +1533,8 @@ Provides the base resource queue, loading, and updating functionality.
         customize : _tool_customize,
         load_complete : _tool_loading_complete,
         tools : {},
-        instances : {}
+        instances : {},
+        tool_list : _tool_listing
     };
 
 }(EduVis));
@@ -1607,7 +1678,51 @@ Provides the base resource queue, loading, and updating functionality.
         lr.r2 = Math.pow( ( n * sum_xy - sum_x * sum_y) / Math.sqrt( ( n * sum_xx-sum_x * sum_x ) * ( n * sum_yy-sum_y*sum_y) ), 2);
 
         return lr;
+    },
+
+/** 
+* creates an object with Month as Key and two digit month code "January":"01"
+* 
+* @method _static_months_obj
+* @return {Object} object with key of Month and Value of two digit month representation
+*/
+    _static_months_obj = function () {
+
+        return {
+            "January"   : "01",
+            "February"  : "02",
+            "March"     : "03",
+            "April"     : "04",
+            "May"       : "05",
+            "June"      : "06",
+            "July"      : "07",
+            "August"    : "08",
+            "September" : "09",
+            "October"   : "10",
+            "November"  : "11",
+            "December"  : "12"
+        };
+    },
+
+/** 
+* creates a string array of years from the start year parameter
+* 
+* @method getYearsToPresent
+* @return {Array} string of years from given year param
+*/
+    _get_years_to_present = function ( yearStart ) {
+
+        var presenetDate = new Date(),
+            presenetYear = presenetDate.getFullYear(),
+            yearsAry = [];
+
+        for (var x = yearStart; x <= presenetYear; x++ ){
+            yearsAry.push( x );
+        }
+
+        return yearsAry;
     };
+
 
 /** 
 * Utility object functions exposed in EduVis
@@ -1618,7 +1733,9 @@ Provides the base resource queue, loading, and updating functionality.
         extend : _utility_extend_deep,
         obj_empty : _utility_is_object_empty,
         stdev : _utility_standard_deviation,
-        linReg : linearRegression
+        linReg : linearRegression,
+        getStaticMonthObj : _static_months_obj,
+        getYearsToPresent : _get_years_to_present
     };
 
 }(EduVis));

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>EV Framework Revisited</title>
+	<title>Educational Visualization Tools</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="resources/css/EduVis.css">
 	<style type="text/css">
@@ -10,10 +10,33 @@
 </head>
 <body>
 
-<!-- <script src="resources/js/jquery-1.8.3.js"></script> -->
-<script src="EduVis_ALL.js"></script>
+<!-- load resources -->
+<script src="resources/js/jquery-1.10.1.min.js"></script>
+
+<!-- load main js -->
+<script src="modules/EduVis_base.js"></script>
+
+<!-- load modules -->
+<script src="modules/module_configuration.js"></script>
+<script src="modules/module_tool.js"></script>
+<script src="modules/module_controls.js"></script>
+<script src="modules/module_formatting.js"></script>
+<script src="modules/module_resource.js"></script>
+<script src="modules/module_utility.js"></script>
+
 <script>
 (function(){
+
+
+	// // A sample way of loading an exterbak resource
+	EduVis.resource.load_stylesheet(
+		{
+			"name" : "bootstrap-css",
+			"src" : "resources/css/bootstrap.min.css"
+		}
+	);	
+
+	EduVis.tool.tool_list();
 
 	// // // A sample way of loading a local resource
 	// EduVis.resource.load(
@@ -28,7 +51,7 @@
 
 	// );
 
-	// // A sample way of loading an external resource
+	// // A sample way of loading an exterbak resource
 	// EduVis.dependencies.load_external(
 	//
 	// 	{
@@ -55,9 +78,9 @@
 	// 	"instance_id" : "Template_1"
 	// });
 
-	EduVis.tool.load({
-		"name" : "NDBC_Month_Comparator"
-	});
+	// EduVis.tool.load({
+	// 	"name" : "NDBC_Time_Series"
+	// });
 
 	// EduVis.tool.load({
 	// 	"name" : "Time_Series_Explorer",
@@ -97,11 +120,11 @@
 	// 	//"instance" : "1023"
 	// });
 
-	EduVis.tool.load({
-		"name" : "Colorpicker_Example",
-		"target_div": "Colorpicker_Example"
-		//"instance" : "1023"
-	});
+	// EduVis.tool.load({
+	// 	"name" : "Colorpicker_Example",
+	// 	"target_div": "Colorpicker_Example"
+	// 	//"instance" : "1023"
+	// });
 
 }());
 	

@@ -19,10 +19,10 @@
     "use strict";
 
     var _tools_version = "0.03",
-        _tools_path = "tools/", // full url can be used
+        _tools_path = EduVis.Environment.path + "tools/", // full url can be used
         _tools_resource_path = "",
-        __tools_resource_file__ = '../production/tools.json',
-        __image_path__ = "../production/",
+        __tools_resource_file__ = _tools_path + "tools.json",
+        __image_path__ = _tools_path,
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -448,11 +448,10 @@
         var domTarget = (typeof _target_div === "undefined") ? "body" : "#" + _target_div; 
 
         console.log("tool listing", _target_div, domTarget);
-        
+
         $.getJSON( __tools_resource_file__ , function(tools) {
 
             console.log("TOOLS --->", tools)
-
 
             // set up dom element and add title
             var toolsHeading = $("<div></div>")

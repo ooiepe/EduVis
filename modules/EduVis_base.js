@@ -13,9 +13,11 @@ var EduVis = (function () {
     "use strict";
 
 	var eduVis = {
-		"version" : "0.0.1",
-		"parameters":{
-			"local_resource_url" : ""
+		"version" : "1.0.5",
+		"Environment" : {
+
+			"path" : ""
+            //add Environment module?
 		}
 	};
 
@@ -24,8 +26,8 @@ var EduVis = (function () {
 }());
 
 /* 
-* Last Revision: 07/08/13
-* Version 1.0.4
+* Last Revision: 07/18/2013
+* Version 1.0.5
 * Notes:
 *
 *
