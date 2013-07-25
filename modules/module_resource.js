@@ -23,11 +23,10 @@ Provides the base resource queue, loading, and updating functionality.
 
 
     var _resource_version = "0.0.1",
-        _resource_path = "resources/", // path to javascript resources
+        _resource_path = EduVis.Environment.getPathResources(), // path to javascript resources
         _resource_path_js = _resource_path + "js/",
         _version_jquery = "1.10.1", // latest tested and supported version of jquery
         _version_d3 = "3.0.8",
-
 
 /** Queue and load tool resources based on the tool resource object
 * 
@@ -129,9 +128,13 @@ Provides the base resource queue, loading, and updating functionality.
     _resource_load_local = function ( _obj_resource) {
 
         // test if local resource is available
+
+        //var url = _obj_resource.resource_path || _resource_path_js;
+        var url = EduVis.Environment.getPathResources() + "js/";
+
         _resource_inject({
             "name" : _obj_resource.name,
-            "url" : ( _obj_resource.resource_path || _resource_path_js ) + _obj_resource.resource_file_name,
+            "url" : url + _obj_resource.resource_file_name,
             "validation": _obj_resource.validation || _obj_resource.name,
             "global_reference" : _obj_resource.global_reference,
             "attributes" : _obj_resource.attributes
@@ -169,8 +172,14 @@ Provides the base resource queue, loading, and updating functionality.
     _resource_load_stylesheet = function( _obj_stylesheet ){
 
         var sheet = document.createElement("link");
+
+    
+        console.log( "get path resources" + EduVis.Environment.getPath());
+
+        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPath() +_obj_stylesheet.src;
+
         sheet.setAttribute('type', 'text/css');
-        sheet.setAttribute('href', _obj_stylesheet.src);
+        sheet.setAttribute('href',  sheet_href);
         sheet.setAttribute('rel','stylesheet')
 
         if (sheet.readyState){  //internet explorer
@@ -226,7 +235,7 @@ Provides the base resource queue, loading, and updating functionality.
 */
     _resource_inject = function(_obj_resource){
 
-        $.getScript(_obj_resource.url, function(){
+        $.getScript( _obj_resource.url, function(){
 
              _resource_queue_remove( _obj_resource );
 

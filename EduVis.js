@@ -14,16 +14,14 @@ var EduVis = (function () {
 
 	var eduVis = {
 		"version" : "1.0.5",
-		"Environment" : {
-
-			"path" : ""
-            //add Environment module?
-		}
 	};
+
 
 	return eduVis;
 
 }());
+
+//$ = $ || jQuery;
 
 /* 
 * Last Revision: 07/18/2013
@@ -61,7 +59,8 @@ var EduVis = (function () {
 * @default ""
 */
 
-    var _config_instance_ws = EduVis.Environment.path + "custom_instance.php",
+    var 
+    //_config_instance_ws = EduVis.Environment.path + "custom_instance.php",
 
 /** Parse a Configuration file from the tools default configuration
 * 
@@ -156,7 +155,7 @@ var EduVis = (function () {
             toolInstance = _tool_object.instance_id;
 
         // request instance configuration
-        $.getJSON( _config_instance_ws + "?iid=" + toolInstance, function(data){
+        $.getJSON( EduVis.Environment.path_webservice + "?iid=" + toolInstance, function(data){
                 
             // set tool object instance configuration
             _tool_object.instance_config = data;
@@ -569,6 +568,145 @@ var EduVis = (function () {
 
 
 }(EduVis));
+/*  *  *  *  *  *  *  *
+*
+* EduVis.Environment
+*
+*/
+
+(function (eduVis) {
+
+    "use strict";
+
+    /** 
+    * This is where the function actions are defined
+    * 
+    * @param {Object} define the function paramenter(s) here ( in this case an object ).. be specific as to its usage 
+    * @return {Object} define the returned value here, in this case an Object.. be specific
+    */
+
+    var _environment_path_root,
+    	_environment_path_server,
+    	_environment_path_service_instance,
+    	_environment_path = "",
+    	_environment_path_tools = "tools/",
+    	_environment_path_resources = "resources/",
+
+    _environment_set_path = function( _path ) {
+
+    	_environment_path = (_path || "");
+    	_environment_path_tools = (_path || "") + "tools/";
+    	_environment_path_resources = (_path || "") + "resources/";
+
+    	console.log("....PATH.....", _path);
+
+    },
+
+    /** 
+    * This is where the function actions are defined
+    * 
+    * @param {Object} define the function paramenter(s) here ( in this case an object ).. be specific as to its usage 
+    * @return {Object} define the returned value here, in this case an Object.. be specific
+    */
+	
+    _environment_get_path = function() {
+
+		return _environment_path;
+
+    },
+    _environment_get_path_tools = function() {
+
+		return _environment_path_tools;
+
+    },
+    _environment_get_path_resources = function() {
+
+		return _environment_path_resources;
+
+    },
+
+    _environment_get_webservice = function() {
+
+      	console.log("_environment_path_webservice", _environment_path_webservice);
+
+		return _environment_path_webservice;
+
+    },
+
+    _environment_set_webservice = function( _path_webservice ) {
+
+		_environment_path_webservice = _path_webservice;
+
+    },
+
+   // "custom_instance.php"
+
+    // Color Depth 
+	color_depth = function() {
+
+		var color_depth, bits = 0;
+
+		if (window.screen) {
+
+			bits = screen.colorDepth;
+			// DEAL WITH BUG IN NETSCAPE 4
+			bits = (( bits==14 || bits==18) && bname=="Netscape") ? bits-10 : bits;
+			color_depth = bits + " bits per pixel"; 
+		}
+		else{
+			color_depth = "Only available on browsers v4 or greater";
+		}
+		if (bits == 4){
+			color_depth += " (16 colors)";
+		}
+		else if (bits == 8){
+			color_depth += " (256 colors)";
+		}
+		else if (bits == 16){
+			color_depth += " (65,536 colors -- High Color)";
+		}
+		else if (bits == 24){
+			color_depth += " (16,777,216 colors -- True Color)";
+		}
+		else if (bits == 32){
+			color_depth += " (16,777,216 colors -- True Color [_not_ 4,294,967,296 colors!])"; 
+		}
+		return (color_depth); 
+	},
+	// Document Referrer
+	_environment_referrer = function() {
+		if ( self == top )
+			return document.referrer;
+		else
+		return parent.document.referrer;
+	},
+
+	// This Document
+	_environment_name = function() {
+		return document.URL;
+	};
+
+
+    eduVis.Environment = {
+        setPath: _environment_set_path,
+        getPath: _environment_get_path,
+        
+        getPathTools : _environment_get_path_tools,
+        getPathResources : _environment_get_path_resources,
+
+        setWebservice : _environment_set_webservice,
+        getWebservice : _environment_get_webservice,
+        
+        path_webservice : _environment_get_webservice,
+
+        
+        referrer : _environment_referrer,
+        name : _environment_name
+
+    };
+
+}(EduVis));
+
 
 /*  *  *  *  *  *  *  *
 *
@@ -713,11 +851,10 @@ Provides the base resource queue, loading, and updating functionality.
 
 
     var _resource_version = "0.0.1",
-        _resource_path = "resources/", // path to javascript resources
+        _resource_path = EduVis.Environment.getPathResources(), // path to javascript resources
         _resource_path_js = _resource_path + "js/",
         _version_jquery = "1.10.1", // latest tested and supported version of jquery
         _version_d3 = "3.0.8",
-
 
 /** Queue and load tool resources based on the tool resource object
 * 
@@ -819,9 +956,13 @@ Provides the base resource queue, loading, and updating functionality.
     _resource_load_local = function ( _obj_resource) {
 
         // test if local resource is available
+
+        //var url = _obj_resource.resource_path || _resource_path_js;
+        var url = EduVis.Environment.getPathResources() + "js/";
+
         _resource_inject({
             "name" : _obj_resource.name,
-            "url" : ( _obj_resource.resource_path || _resource_path_js ) + _obj_resource.resource_file_name,
+            "url" : url + _obj_resource.resource_file_name,
             "validation": _obj_resource.validation || _obj_resource.name,
             "global_reference" : _obj_resource.global_reference,
             "attributes" : _obj_resource.attributes
@@ -859,8 +1000,14 @@ Provides the base resource queue, loading, and updating functionality.
     _resource_load_stylesheet = function( _obj_stylesheet ){
 
         var sheet = document.createElement("link");
+
+    
+        console.log( "get path resources" + EduVis.Environment.getPath());
+
+        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPath() +_obj_stylesheet.src;
+
         sheet.setAttribute('type', 'text/css');
-        sheet.setAttribute('href', _obj_stylesheet.src);
+        sheet.setAttribute('href',  sheet_href);
         sheet.setAttribute('rel','stylesheet')
 
         if (sheet.readyState){  //internet explorer
@@ -916,7 +1063,7 @@ Provides the base resource queue, loading, and updating functionality.
 */
     _resource_inject = function(_obj_resource){
 
-        $.getScript(_obj_resource.url, function(){
+        $.getScript( _obj_resource.url, function(){
 
              _resource_queue_remove( _obj_resource );
 
@@ -1028,10 +1175,8 @@ Provides the base resource queue, loading, and updating functionality.
     "use strict";
 
     var _tools_version = "0.03",
-        _tools_path = EduVis.Environment.path + "tools/", // full url can be used
         _tools_resource_path = "",
-        __tools_resource_file__ = _tools_path + "tools.json",
-        __image_path__ = _tools_path,
+        __image_path__ = "img",
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -1045,27 +1190,49 @@ Provides the base resource queue, loading, and updating functionality.
         var tools = typeof eduVis.tools === "object" ? eduVis.tools : {};
 
         obj_tool.instance_id = typeof obj_tool.instance_id === "undefined" ? "default" : obj_tool.instance_id;
+        obj_tool.tool_container_div = typeof obj_tool.tool_container_div === "undefined" ? "body" : "#"+obj_tool.tool_container_div;
+        
         obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
+        console.log("----Tool target --> ", obj_tool.tool_container_div);
 
-        console.log("----Tool target --> ", obj_tool.dom_target);
+                        
+        var tool_container_div = $(obj_tool.tool_container_div)
+        //dom_target = $("#" + obj_tool.dom_target);
 
-        var dom_target = $("#" + obj_tool.dom_target);
-
-        // creat tool container at dom_target
-        if(dom_target.length == 0){
-
-            $('body').append(
-                $("<div></div>")
-                    .addClass("tool-container")
-                    .append("<div></div>")
-                        .attr("id", obj_tool.dom_target)
+        var tool_container = $("<div></div>")
+            .addClass("tool-container")
+            .append(
+                $("<div></div>").attr("id", obj_tool.dom_target)
             )
-        }
-        else{
+            .appendTo(
+                tool_container_div
+            )
 
+        // // creat tool container at dom_target
+        // if(dom_target.length == 0){
 
-        }
+        //     $('body').append(
+        //         $("<div></div>")
+        //             .addClass("tool-container")
+        //             .append("<div></div>")
+        //                 .attr("id", obj_tool.dom_target)
+        //     )
+        // }
+        // else{
+
+        //     dom_target.addClass("tool-container");
+
+        //     // console.log("dom_target", dom_target)
+
+        //     // $(dom_target).append(
+        //     //     $("<div></div>")
+        //     //         .addClass("tool-container")
+        //     //         .append("<div></div>")
+        //     //             .attr("id", obj_tool.dom_target)
+        //     // )
+
+        // }
 
         // create loading div
 
@@ -1080,14 +1247,14 @@ Provides the base resource queue, loading, and updating functionality.
                     )
             )
             .append(
-                $('<img src="resources/img/loading_small.gif" />')
+                $('<img src="' + EduVis.Environment.getPathResources() + 'img/loading_small.gif" />')
             )
             .appendTo(
-                $("#"+obj_tool.dom_target)
+                tool_container_div
             )
 
         // Ajax request for tool javascript source. on success, queue up the tool resources. If an instance id is provided, call Configuraiton.request_instance.
-        $.getScript( _tools_path + obj_tool.name + "/" + obj_tool.name + '.js', function() {
+        $.getScript( EduVis.Environment.getPathTools() + obj_tool.name + "/" + obj_tool.name + '.js', function() {
             
             console.log("....tool notify....")
             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
@@ -1458,7 +1625,7 @@ Provides the base resource queue, loading, and updating functionality.
 
         console.log("tool listing", _target_div, domTarget);
 
-        $.getJSON( __tools_resource_file__ , function(tools) {
+        $.getJSON( EduVis.Environment.getPathTools() + "tools.json" , function(tools) {
 
             console.log("TOOLS --->", tools)
 

@@ -7,11 +7,7 @@
 (function (eduVis) {
 
     "use strict";
-    //var tool = EduVis.tool.template;
-
-    //console.log("tool template", tool);
-
-    // constructor.. EduVis.tool.
+    
     var tool = {
 
         "name" : "NDBC_Time_Series_Explorer",
@@ -119,7 +115,7 @@
         	"parameters" : {}
 
         },
-        "target_div" : "NDBC_Time_Series_Explorer",
+       // "target_div" : "NDBC_Time_Series_Explorer",
         "tools" : {},
 
     };

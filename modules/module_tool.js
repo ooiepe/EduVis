@@ -19,10 +19,8 @@
     "use strict";
 
     var _tools_version = "0.03",
-        _tools_path = EduVis.Environment.path + "tools/", // full url can be used
         _tools_resource_path = "",
-        __tools_resource_file__ = _tools_path + "tools.json",
-        __image_path__ = _tools_path,
+        __image_path__ = "img",
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -36,27 +34,49 @@
         var tools = typeof eduVis.tools === "object" ? eduVis.tools : {};
 
         obj_tool.instance_id = typeof obj_tool.instance_id === "undefined" ? "default" : obj_tool.instance_id;
+        obj_tool.tool_container_div = typeof obj_tool.tool_container_div === "undefined" ? "body" : "#"+obj_tool.tool_container_div;
+        
         obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
+        console.log("----Tool target --> ", obj_tool.tool_container_div);
 
-        console.log("----Tool target --> ", obj_tool.dom_target);
+                        
+        var tool_container_div = $(obj_tool.tool_container_div)
+        //dom_target = $("#" + obj_tool.dom_target);
 
-        var dom_target = $("#" + obj_tool.dom_target);
-
-        // creat tool container at dom_target
-        if(dom_target.length == 0){
-
-            $('body').append(
-                $("<div></div>")
-                    .addClass("tool-container")
-                    .append("<div></div>")
-                        .attr("id", obj_tool.dom_target)
+        var tool_container = $("<div></div>")
+            .addClass("tool-container")
+            .append(
+                $("<div></div>").attr("id", obj_tool.dom_target)
             )
-        }
-        else{
+            .appendTo(
+                tool_container_div
+            )
 
+        // // creat tool container at dom_target
+        // if(dom_target.length == 0){
 
-        }
+        //     $('body').append(
+        //         $("<div></div>")
+        //             .addClass("tool-container")
+        //             .append("<div></div>")
+        //                 .attr("id", obj_tool.dom_target)
+        //     )
+        // }
+        // else{
+
+        //     dom_target.addClass("tool-container");
+
+        //     // console.log("dom_target", dom_target)
+
+        //     // $(dom_target).append(
+        //     //     $("<div></div>")
+        //     //         .addClass("tool-container")
+        //     //         .append("<div></div>")
+        //     //             .attr("id", obj_tool.dom_target)
+        //     // )
+
+        // }
 
         // create loading div
 
@@ -71,14 +91,14 @@
                     )
             )
             .append(
-                $('<img src="resources/img/loading_small.gif" />')
+                $('<img src="' + EduVis.Environment.getPathResources() + 'img/loading_small.gif" />')
             )
             .appendTo(
-                $("#"+obj_tool.dom_target)
+                tool_container_div
             )
 
         // Ajax request for tool javascript source. on success, queue up the tool resources. If an instance id is provided, call Configuraiton.request_instance.
-        $.getScript( _tools_path + obj_tool.name + "/" + obj_tool.name + '.js', function() {
+        $.getScript( EduVis.Environment.getPathTools() + obj_tool.name + "/" + obj_tool.name + '.js', function() {
             
             console.log("....tool notify....")
             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
@@ -449,7 +469,7 @@
 
         console.log("tool listing", _target_div, domTarget);
 
-        $.getJSON( __tools_resource_file__ , function(tools) {
+        $.getJSON( EduVis.Environment.getPathTools() + "tools.json" , function(tools) {
 
             console.log("TOOLS --->", tools)
 

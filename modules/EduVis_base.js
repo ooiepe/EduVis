@@ -14,16 +14,14 @@ var EduVis = (function () {
 
 	var eduVis = {
 		"version" : "1.0.5",
-		"Environment" : {
-
-			"path" : ""
-            //add Environment module?
-		}
 	};
+
 
 	return eduVis;
 
 }());
+
+//$ = $ || jQuery;
 
 /* 
 * Last Revision: 07/18/2013

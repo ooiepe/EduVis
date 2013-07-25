@@ -28,7 +28,8 @@
 * @default ""
 */
 
-    var _config_instance_ws = EduVis.Environment.path + "custom_instance.php",
+    var 
+    //_config_instance_ws = EduVis.Environment.path + "custom_instance.php",
 
 /** Parse a Configuration file from the tools default configuration
 * 
@@ -123,7 +124,7 @@
             toolInstance = _tool_object.instance_id;
 
         // request instance configuration
-        $.getJSON( _config_instance_ws + "?iid=" + toolInstance, function(data){
+        $.getJSON( EduVis.Environment.path_webservice + "?iid=" + toolInstance, function(data){
                 
             // set tool object instance configuration
             _tool_object.instance_config = data;

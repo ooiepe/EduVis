@@ -9,7 +9,7 @@
 	</style>
 </head>
 <body>
-
+<div id="vistool"></div>
 <script src="EduVis.js"></script>
 <script>
 (function(){
@@ -42,11 +42,11 @@
 	// 	"name" : "Bar_Chart"
 	// });
 
-	// EduVis.tool.load({
-	// 	"name" : "Template",
-	// 	"target_div": "DIV1",
-	// 	"instance_id" : "Template_1"
-	// });
+	EduVis.tool.load({
+		"name" : "Template",
+		"target_div": "DIV1",
+		"instance_id" : "Template_1"
+	});
 
 	// EduVis.tool.load({
 	// 	"name" : "Template",
@@ -89,7 +89,8 @@
 	// });
 
 	EduVis.tool.load({
-		"name" : "NDBC_Time_Series_Explorer"
+		"name" : "NDBC_Time_Series_Explorer",
+		"tool_container_div": "vistool"
 	});
 
 }());
