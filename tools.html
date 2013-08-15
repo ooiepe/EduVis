@@ -11,19 +11,24 @@
 <body>
 <h1>Educational Visualization Tools <small>Default Tool Gallery</h1>
 
-<div id="tool-gal"></div>
+<!-- <div id="tool-gal"></div> -->
 
 <script src="EduVis.js"></script>
 <script>
 
 (function(){
 
-	// EduVis.tool.load({
-	// 	"name" : "Time_Series_Explorer",
-	// 	"target_div": "Time_Series_Explorer"
-	// });
-	
-	EduVis.tool.tool_list();
+	// to add to end of body, simply do not include a target div
+	//EduVis.tool.tool_list();
+
+	// to add to a specific div as set in the drupal template, include the element id
+	//EduVis.tool.tool_list('tool-gal');
+
+	// to add to a specific div not defined, write the div using document.write, then call the loading function
+
+	document.write('<div id="tool-gal"></div>');
+	EduVis.tool.tool_list('tool-gal');
+
 
 }());
 	

@@ -1176,7 +1176,7 @@ Provides the base resource queue, loading, and updating functionality.
 
     var _tools_version = "0.03",
         _tools_resource_path = "",
-        __image_path__ = "img",
+        __image_path__ = "tools/img/",
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 

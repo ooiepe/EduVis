@@ -115,7 +115,6 @@
         	"parameters" : {}
 
         },
-       // "target_div" : "NDBC_Time_Series_Explorer",
         "tools" : {},
 
     };

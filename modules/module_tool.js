@@ -20,7 +20,7 @@
 
     var _tools_version = "0.03",
         _tools_resource_path = "",
-        __image_path__ = "img",
+        __image_path__ = "tools/img/",
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -35,7 +35,6 @@
 
         obj_tool.instance_id = typeof obj_tool.instance_id === "undefined" ? "default" : obj_tool.instance_id;
         obj_tool.tool_container_div = typeof obj_tool.tool_container_div === "undefined" ? "body" : "#"+obj_tool.tool_container_div;
-        
         obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
         console.log("----Tool target --> ", obj_tool.tool_container_div);
@@ -52,31 +51,6 @@
             .appendTo(
                 tool_container_div
             )
-
-        // // creat tool container at dom_target
-        // if(dom_target.length == 0){
-
-        //     $('body').append(
-        //         $("<div></div>")
-        //             .addClass("tool-container")
-        //             .append("<div></div>")
-        //                 .attr("id", obj_tool.dom_target)
-        //     )
-        // }
-        // else{
-
-        //     dom_target.addClass("tool-container");
-
-        //     // console.log("dom_target", dom_target)
-
-        //     // $(dom_target).append(
-        //     //     $("<div></div>")
-        //     //         .addClass("tool-container")
-        //     //         .append("<div></div>")
-        //     //             .attr("id", obj_tool.dom_target)
-        //     // )
-
-        // }
 
         // create loading div
 
@@ -287,6 +261,7 @@
         if(typeof Tool === "object"){
 
             if( _tool_is_ready(Tool) ){
+
 
                 var instance_id = obj_tool.instance_id;
 

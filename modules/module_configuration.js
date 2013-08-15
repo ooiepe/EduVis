@@ -97,18 +97,22 @@
 */
     _config_settings_update = function(_tool_reference, _instance_reference, _configuration_object){
 
-        EduVis.tool.instances[_tool_reference][_instance_reference].configuration;
+       // EduVis.tool.instances[_tool_reference][_instance_reference].configuration;
+
+       //$.map(obj, function(element,index) {return index})
 
     },
+
     _config_set_state = function(){
 
     },
+
     _config_get_state = function(){
 
     },
 
 /**
-* Triggers Ajax request for an instance configuratino of a tool creation object. 
+* Triggers Ajax request for an instance configuration of a tool creation object. 
 * This is triggerd when a tool instance id is provided on the load tool call... EduVis.tool.load().
 * On a successful Ajax response, the tool is initialized with EduVis.tool.init( _tool_object ) 
 *
@@ -132,6 +136,18 @@
             // initialize tool with requested configuration
             EduVis.tool.init( _tool_object );
         });
+    },
+
+    _config_apply_instance_configuration = function( _tool_name, _tool_instance, _configuration){
+
+        // we may need to create a new tool object here using tool name, instance id, and set the configuration
+        var tool_object = {
+            "name" : _tool_name,
+            "instance_id" : _tool_instance,
+            "instance_config" : _configuration
+        };
+
+        EduVis.tool.init( tool_object );
     };
 
     eduVis.configuration = {
@@ -139,7 +155,9 @@
         validate: _config_validate,
         tool: _config_parse,
         //instance: _config_parse_instance_config,
-        request_instance : _config_request_instance
+        request_instance : _config_request_instance,
+        apply_instance_config : _config_apply_instance_configuration
+
     };
 
 }(EduVis));

@@ -9,37 +9,37 @@
 		{
 			"name": "NDBC Time Series",
 			"evId" : "EV-T0",
-			"thumbnail" : "img/NDBC_Time_Series.jpg"
+			"thumbnail" : "NDBC_Time_Series.jpg"
 		},
 		{
 			"name" : "NDBC Month Comparator",
 			"evId" : "EV-T1",
-			"thumbnail" : "img/NDBC_Month_Comparator.jpg"
+			"thumbnail" : "NDBC_Month_Comparator.jpg"
 		},
 		{
 			"name" : "NDBC Time Series Explorer",
 			"evId" : "EV-T2",
-			"thumbnail" : "img/NDBC_Time_Series_Explorer.jpg"
+			"thumbnail" : "NDBC_Time_Series_Explorer.jpg"
 		},
 		{
 			"name" : "Glider Profile Explorer",
 			"evId" : "EV-T3",
-			"thumbnail" : "img/Glider_Profile_Explorer.jpg"
+			"thumbnail" : "Glider_Profile_Explorer.jpg"
 		},
 		{
 			"name" : "Advanced Glider Profile Explorer",
 			"evId" : "EV-T4",
-			"thumbnail" : "img/Advanced_Glider_Profile_Explorer.jpg"			
+			"thumbnail" : "Advanced_Glider_Profile_Explorer.jpg"			
 		},
 		{
 			"name" : "NDBC Data Comparison Tool",
 			"evId" : "EV-T5",
-			"thumbnail" : "img/NDBC_Data_Comparison_Tool.jpg"			
+			"thumbnail" : "NDBC_Data_Comparison_Tool.jpg"			
 		},
 		{
 			"name" : "Bar Chart",
 			"evId" : "EV-T6",
-			"thumbnail" : "img/Custom_Bar_Chart.jpg"		
+			"thumbnail" : "Custom_Bar_Chart.jpg"		
 		}
 	]
 }
