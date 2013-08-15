@@ -891,8 +891,12 @@
 
 	    console.log("... UPDATE DATASETS ... ");
 
+	    console.log("config", self.configuration);
+
 	    var self = this,
 	    id = self.dom_target;
+
+
 
 	    var configCustom = self.configuration,
 	        ds1 = self.chart.timeseries.datasets["param1"],
