@@ -83,7 +83,11 @@
             console.log("....tool instance....");
             
             //if(typeof obj_tool.instance_id !== "undefined"){
-            if(obj_tool.instance_id !== "default"){
+            
+            if(typeof obj_tool.configuration == "object"){
+                alert('tool object');
+            }
+            else if(obj_tool.instance_id !== "default"){
                 
                 console.log("....tool instance request....");
                 EduVis.configuration.request_instance(obj_tool);
