@@ -84,8 +84,8 @@
             
             //if(typeof obj_tool.instance_id !== "undefined"){
             
-            if(typeof obj_tool.configuration == "object"){
-                alert('tool object');
+            if(typeof obj_tool.instance_config =="object"){
+                console.log('tool config injected: ', obj_tool.instance_config)
             }
             else if(obj_tool.instance_id !== "default"){
                 
