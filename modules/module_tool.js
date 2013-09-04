@@ -84,10 +84,13 @@
             
             //if(typeof obj_tool.instance_id !== "undefined"){
             
-            if(typeof obj_tool.instance_config =="object"){
-                console.log('tool config injected: ', obj_tool.instance_config)
-            }
-            else if(obj_tool.instance_id !== "default"){
+            // if(typeof obj_tool.instance_config =="object"){
+            //     console.log('tool config injected: ', obj_tool.instance_config);
+
+            // }
+            // else 
+
+            if(obj_tool.instance_id !== "default"){
                 
                 console.log("....tool instance request....");
                 EduVis.configuration.request_instance(obj_tool);
