@@ -29,7 +29,82 @@ var EduVis = (function () {
 * Notes:
 *
 *
-*//*  *  *  *  *  *  *  
+*//*  *  *  *  *  *  *  *
+*
+* EduVis - Educational Visualition Framework
+* Ocean Observatories Initiative
+* Education & Public Engagement Implementing Organization
+* Written by Michael Mills, Rutgers University
+*
+** WARNING: This framework was built off prototypical work and is currently being refactored.
+*/
+
+var EduVis = (function () {
+
+    "use strict";
+
+	var eduVis = {
+		"version" : "1.0.5",
+	};
+
+
+	return eduVis;
+
+}());
+
+//$ = $ || jQuery;
+
+/* 
+* Last Revision: 07/18/2013
+* Version 1.0.5
+* Notes:
+*
+*
+*//*  *  *  *  *  *  *  *
+*
+* EduVis.NAME_OF_MODULE
+*
+*/
+
+(function (eduVis) {
+
+    "use strict";
+
+    /** 
+    * This is where the function actions are defined
+    * 
+    * @param {Object} define the function paramenter(s) here ( in this case an object ).. be specific as to its usage 
+    * @return {Object} define the returned value here, in this case an Object.. be specific
+    */
+
+    var _function_name = function() {
+
+      return "this is cool";
+      	// do cool things
+    },
+
+    /** 
+    * this function does very cool things
+    * 
+    * @param {String} a name of something cool
+    * @param {String} a name of something very cool
+    * @return {String} name of something cool and somethign very cool 
+    */
+
+    _function_name_B = function(cool_thing, very_cool_thing){
+
+    	// do very cool things;
+
+    	return cool_thing + "is cool, but " + very_cool_thing + " is very cool";
+    };
+
+    eduVis.NAME_OF_MODULE = {
+        functionA: _function_name,
+        functionB: _function_name_B
+    };
+
+}(EduVis));
+/*  *  *  *  *  *  *  
 *
 * EduVis.Configuration
 *
@@ -1194,7 +1269,7 @@ Provides the base resource queue, loading, and updating functionality.
 
     var _tools_version = "0.03",
         _tools_resource_path = "",
-        __image_path__ = "tools/img/",
+        __image_path__ = "img/",
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -1657,7 +1732,7 @@ Provides the base resource queue, loading, and updating functionality.
                         })
                             .append(
                                 $("<img />",{
-                                    "src" : __image_path__ + tool.thumbnail
+                                    "src" : EduVis.Environment.getPathTools() + __image_path__ + tool.thumbnail
                                 })
                             )
                             .append(
