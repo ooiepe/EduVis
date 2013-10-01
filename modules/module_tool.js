@@ -20,7 +20,7 @@
 
     var _tools_version = "0.03",
         _tools_resource_path = "",
-        __image_path__ = "tools/img/",
+        __image_path__ = "img/",
 
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
@@ -483,7 +483,7 @@
                         })
                             .append(
                                 $("<img />",{
-                                    "src" : __image_path__ + tool.thumbnail
+                                    "src" : EduVis.Environment.getPathTools() + __image_path__ + tool.thumbnail
                                 })
                             )
                             .append(
