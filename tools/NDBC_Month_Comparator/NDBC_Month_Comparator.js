@@ -53,7 +53,7 @@
                 {
                     "name" : "bootstrap-colorpicker",
                     "resource_path" : "resources/js/",
-                     "resource_file_name" : "bootstrap-colorpicker.js",
+                    "resource_file_name" : "bootstrap-colorpicker.js",
                     "dependsOn":["bootstrap"]
                 },
                 {

@@ -40,6 +40,11 @@
 			"name" : "Bar Chart",
 			"evId" : "EV-T6",
 			"thumbnail" : "Custom_Bar_Chart.jpg"		
+		},
+		{
+			"name" : "Data Browser",
+			"evId" : "Data_Browser",
+			"thumbnail" : "Custom_Bar_Chart.jpg"
 		}
 	]
 }

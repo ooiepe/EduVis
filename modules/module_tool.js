@@ -161,8 +161,6 @@
             scripts_length = scripts.length,
             stylesheets_length = stylesheets.length;
 
-            console.log("RRRRR", r);
-
         for (;i<scripts_length; i++) {
 
             if(typeof EduVis.resource.loaded[scripts[i]] !== "object"){

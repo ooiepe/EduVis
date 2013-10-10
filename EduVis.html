@@ -42,20 +42,19 @@
 	// 	"name" : "Bar_Chart"
 	// });
 
-	EduVis.tool.load({
-		"name" : "Template",
-		"target_div": "DIV1",
-		"instance_id" : "Template_1"
-	});
-
 	// EduVis.tool.load({
 	// 	"name" : "Template",
-	// 	"target_div": "DIV2",
+	// 	"target_div": "DIV1",
 	// 	"instance_id" : "Template_1"
 	// });
 
 	// EduVis.tool.load({
-	// 	"name" : "Time_Series_Explorer",
+	// 	"name" : "Template",
+	// 	"target_div": "vistool"
+	// });
+
+	// EduVis.tool.load({
+	// 	"name" : "NDBC_Time_Series_Explorer",
 	// 	"target_div": "Time_Series_Explorer"
 	// });
 
@@ -69,11 +68,11 @@
 	// 	"name" : "Time_Series_Explorer",
 	// });
 
-	// EduVis.tool.load({
-	// 	"name" : "NDBC_Data_Comparator",
-	// 	"target_div": "NDBC_Data_Comparator",
-	// 	"instance" : "1023"
-	// });
+// 	EduVis.tool.load({
+// 		"name" : "NDBC_Data_Comparator",
+// 		"target_div": "NDBC_Data_Comparator",
+// //		"instance" : "1023"
+// 	});
 
 	// EduVis.tool.load({
 	// 	"name" : "Glider_Profile_Explorer",
@@ -88,10 +87,34 @@
 	// 	//"instance" : "1023"
 	// });
 
+	// EduVis.tool.load({
+	// 	"name" : "Data_Browser",
+	// 	"tool_container_div": "vistool"
+	// });
+
 	EduVis.tool.load({
-		"name" : "NDBC_Time_Series_Explorer",
-		"tool_container_div": "vistool"
+		"name" : "Data_Browser",
+		"target_div": "vistool",
+		"toolParent":"NDBC_Time_Series",
+		"onLoadComplete":function(){
+
+
+
+		}
 	});
+
+	setTimeout(function(){
+			
+			EduVis.tool.load({
+				"name" : "Time_Series",
+				//"target_div": "vistool",
+				"dataBrowser":"Data_Browser"
+			});
+		
+
+	},4000)
+
+	
 
 }());
 	

@@ -62,7 +62,7 @@
         }
         return true;
     },
-
+    
 /** 
 * calulate the standard deviation of an array based on key
 * 

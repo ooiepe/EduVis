@@ -1,0 +1,9 @@
+#glider_deployment_chooser_map { height: 320px; }
+
+.borderRounded{
+    
+    padding:6px;
+    border:2px solid #666666;
+    -moz-border-radius: 5px;
+    border-radius:5px;
+}

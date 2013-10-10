@@ -411,8 +411,6 @@
         // parse dataset and draw graph
         self.parse_dataset();
 
-        
-
     },
 
     tool.init = function() {
