@@ -15,7 +15,7 @@
 
         "name" : "Template",
         "description" : "A Tool Template.",
-        "url" : "??__url_to_tool_help_file__?",
+        "url" : "",
 
         "version" : "0.0.1",
         "authors" : [
