@@ -124,10 +124,17 @@
 */
     _tool_loading_complete = function(_obj_tool){
 
+        //console.log("Obj_tool", _obj_tool);
+        
         //fade out loading div for a specific tool instance
         var div_loading = _obj_tool.dom_target + "_loading";
+
+        if(typeof _obj_tool.objDef.onLoadComplete === "function"){
+            _obj_tool.objDef.onLoadComplete();
+        }
         
         $('#' + div_loading).fadeOut();
+
     },
 
 /** notifcations for a specic tool. currently just console logging the entire object. * could be developed to bring pop up notificaiton or alert notification to tools
@@ -336,7 +343,7 @@
 
         var tool = EduVis.tool.instances[tool_name][instance_id],
             divToolEditor,
-            divControls
+            divControls,
             el_btn;
 
             divToolEditor = $("<div></div>")

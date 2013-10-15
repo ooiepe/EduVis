@@ -69,7 +69,7 @@
                 },
                 {
                     "name": "jquery-ui",
-                    "url":"http://code.jquery.com/ui/1.9.2/jquery-ui.js",
+                    "url":"http://code.jquery.com/ui/1.10.3/jquery-ui.js",
                     "global_reference" : "d3",
                     "dependsOn":["jquery"]
                 }
@@ -86,7 +86,7 @@
             "stylesheets_external" : [
                 {
                     "name" : "jquery-ui-css",
-                    "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
+                    "src" : "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
                 },
                 {
                     "name" : "colorpicker-css",

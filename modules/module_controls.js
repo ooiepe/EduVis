@@ -62,10 +62,10 @@
                     })
                     //.addClass("span2")
                     .on("change", function () {
-                        tool.customization_update();
+                        //tool.customization_update();
                     });
 
-                ctrl = $("<div></div>")
+                ctrl = $("<div/>")
                     .addClass("control")
                     .append(lbl)
                     .append(input);
@@ -256,27 +256,28 @@
                     .append(el_i);
 
                 var el_div = $("<div></div>")
-                    .addClass("input-append color")
+                    //.addClass("input-append color")
                     .attr({
                         "id": id + "_cp",
-                        "data-color": control.default_value,
-                        "data-color-format": "hex"
+                      //  "data-color": control.default_value,
+                      //  "data-color-format": "hex"
                     })
                     .append(input)
                         .append(el_span);
 
-                $(el_div).colorpicker()
+                $(el_div) //.colorpicker()
                     .on("changeColor", function (cp) {
                         $("#" + id).val(cp.color.toHex());
                         //$("#" + id).val(tool.current_config[id] = cp.color.toHex())
                         //self.updateJSON();
-                        tool.customization_update();
+                        //tool.customization_update();
                     });
-
+ 
                 ctrl = $("<div></div>")
                     .addClass("control ctlhandle")
                     .append(lbl)
                     .append(el_div);
+
 
                 break;
 
@@ -382,12 +383,27 @@
 
         // Preview a control
 
+    },
+
+    _control_load_tool_control_values = function(tool_config){
+
+        var control_obj = {};
+
+        $.each(tool_config,function(config_item,config_value){
+
+            control_obj[config_item] = $("#config-" + config_item).val();;
+
+        });
+
+        return control_obj;        
+
     };
 
     eduVis.controls = {
         load : _control_load,
         preview : _control_preview,
-        create : _control_create
+        create : _control_create,
+        load_tool_config_values : _control_load_tool_control_values
     };
 
 

@@ -256,10 +256,10 @@ var EduVis = (function () {
                     })
                     //.addClass("span2")
                     .on("change", function () {
-                        tool.customization_update();
+                        //tool.customization_update();
                     });
 
-                ctrl = $("<div></div>")
+                ctrl = $("<div/>")
                     .addClass("control")
                     .append(lbl)
                     .append(input);
@@ -450,27 +450,28 @@ var EduVis = (function () {
                     .append(el_i);
 
                 var el_div = $("<div></div>")
-                    .addClass("input-append color")
+                    //.addClass("input-append color")
                     .attr({
                         "id": id + "_cp",
-                        "data-color": control.default_value,
-                        "data-color-format": "hex"
+                      //  "data-color": control.default_value,
+                      //  "data-color-format": "hex"
                     })
                     .append(input)
                         .append(el_span);
 
-                $(el_div).colorpicker()
+                $(el_div) //.colorpicker()
                     .on("changeColor", function (cp) {
                         $("#" + id).val(cp.color.toHex());
                         //$("#" + id).val(tool.current_config[id] = cp.color.toHex())
                         //self.updateJSON();
-                        tool.customization_update();
+                        //tool.customization_update();
                     });
-
+ 
                 ctrl = $("<div></div>")
                     .addClass("control ctlhandle")
                     .append(lbl)
                     .append(el_div);
+
 
                 break;
 
@@ -576,12 +577,27 @@ var EduVis = (function () {
 
         // Preview a control
 
+    },
+
+    _control_load_tool_control_values = function(tool_config){
+
+        var control_obj = {};
+
+        $.each(tool_config,function(config_item,config_value){
+
+            control_obj[config_item] = $("#config-" + config_item).val();;
+
+        });
+
+        return control_obj;        
+
     };
 
     eduVis.controls = {
         load : _control_load,
         preview : _control_preview,
-        create : _control_create
+        create : _control_create,
+        load_tool_config_values : _control_load_tool_control_values
     };
 
 
@@ -606,9 +622,12 @@ var EduVis = (function () {
     var _environment_path_root,
     	_environment_path_server,
     	_environment_path_service_instance,
-    	_environment_path = "",
-    	_environment_path_tools = "tools/",
-    	_environment_path_resources = "resources/",
+    	//_environment_path = "",
+    	//_environment_path_tools = "tools/",
+    	//_environment_path_resources = "resources/",
+        _environment_path,
+        _environment_path_tools = "tools/",
+        _environment_path_resources = "resources/",
 
     _environment_set_path = function( _path ) {
 
@@ -616,33 +635,45 @@ var EduVis = (function () {
     	_environment_path_tools = (_path || "") + "tools/";
     	_environment_path_resources = (_path || "") + "resources/";
 
-    	console.log("....PATH.....", _path);
-
+    	console.log(".... P A T H .....", _path);
     },
-
-    /** 
-    * This is where the function actions are defined
-    * 
-    * @param {Object} define the function paramenter(s) here ( in this case an object ).. be specific as to its usage 
-    * @return {Object} define the returned value here, in this case an Object.. be specific
-    */
-	
+    
     _environment_get_path = function() {
-
-		return _environment_path;
-
+        return _environment_path;
     },
-    _environment_get_path_tools = function() {
 
+    _environment_set_paths = function( _path, _tools, _resources ) {
+
+        // initialize with defaults.
+        _environment_path_root = (_path || "");
+        _environment_path_tools = (_tools || "");// + "tools/";
+        _environment_path_resources = (_resources || "");// + "resources/";
+
+        console.log("....  P A T H S .....", _path);
+    },
+
+    _environment_set_path_tools = function( _path_tools ) {
+        _environment_path_tools = _path_tools;
+    },
+	
+    _environment_get_path_tools = function() {
 		return _environment_path_tools;
 
     },
-    _environment_get_path_resources = function() {
 
-		return _environment_path_resources;
-
+    _environment_set_path_resources = function( _path_resources ) {
+        _environment_path_resources = _path_resources;
     },
 
+    _environment_get_path_resources = function() {
+		return _environment_path_resources;
+    },
+
+    _environment_set_webservice = function( _path_webservice ) {
+
+        _environment_path_webservice = _path_webservice;
+
+    },
     _environment_get_webservice = function() {
 
       	console.log("_environment_path_webservice", _environment_path_webservice);
@@ -650,14 +681,6 @@ var EduVis = (function () {
 		return _environment_path_webservice;
 
     },
-
-    _environment_set_webservice = function( _path_webservice ) {
-
-		_environment_path_webservice = _path_webservice;
-
-    },
-
-   // "custom_instance.php"
 
     // Color Depth 
 	color_depth = function() {
@@ -691,12 +714,11 @@ var EduVis = (function () {
 		}
 		return (color_depth); 
 	},
+
 	// Document Referrer
 	_environment_referrer = function() {
-		if ( self == top )
-			return document.referrer;
-		else
-		return parent.document.referrer;
+		if ( self == top ) return document.referrer;
+		else return parent.document.referrer;
 	},
 
 	// This Document
@@ -707,7 +729,10 @@ var EduVis = (function () {
 
     eduVis.Environment = {
         setPath: _environment_set_path,
+        setPaths: _environment_set_paths,
         getPath: _environment_get_path,
+
+        setPathTools : _environment_set_path_tools,
         
         getPathTools : _environment_get_path_tools,
         getPathResources : _environment_get_path_resources,
@@ -716,7 +741,6 @@ var EduVis = (function () {
         getWebservice : _environment_get_webservice,
         
         path_webservice : _environment_get_webservice,
-
         
         referrer : _environment_referrer,
         name : _environment_name
@@ -868,10 +892,12 @@ Provides the base resource queue, loading, and updating functionality.
     "use strict";
 
     var _resource_version = "0.0.1",
-        _resource_path = EduVis.Environment.getPathResources(), // path to javascript resources
-        _resource_path_js = _resource_path + "js/",
-        _version_jquery = "1.10.1", // latest tested and supported version of jquery
+        _resource_path = EduVis.Environment.getPathResources(), 
+        _resource_path_js = _resource_path + "js/",             // path to javascript resources
+        _version_jquery = "1.10.1",
         _version_d3 = "3.0.8",
+        _resources_loaded = {},
+        _resources_queued = {},
 
 /** Queue and load tool resources based on the tool resource object
 * 
@@ -975,8 +1001,8 @@ Provides the base resource queue, loading, and updating functionality.
         // test if local resource is available
 
         //var url = _obj_resource.resource_path || _resource_path_js;
-        //var url = EduVis.Environment.getPathResources() + "js/";
-        var url = _obj_resource.resource_path || _resource_path_js;
+        var url = EduVis.Environment.getPathResources() + "js/";
+        //var url = _obj_resource.resource_path || _resource_path_js;
 
         console.log(".....");
         console.log("Resource load local.", url, _obj_resource);
@@ -1142,10 +1168,7 @@ Provides the base resource queue, loading, and updating functionality.
          }
 
         return "default";
-    },
-
-    _resources_loaded = {},
-    _resources_queued = {};
+    };
 
     eduVis.resource = {
 
@@ -1156,13 +1179,13 @@ Provides the base resource queue, loading, and updating functionality.
         load : _resource_load_local,
         load_external : _resource_load_external,
         load_stylesheet : _resource_load_stylesheet,
-        //loaded : (function(){return _resources_loaded;})(),
+        loaded : (function(){return _resources_loaded;})(),
 
-        loaded : _resources_loaded,
+        //loaded : _resources_loaded,
 
         queue : _resource_queue,
-        //queued : (function(){return _resources_queued;})(),
-        queued : _resources_queued,
+        queued : (function(){return _resources_queued;})(),
+        //queued : _resources_queued,
         
         // identify : _resource_identify,
         notify : _resource_notify,
@@ -1307,10 +1330,17 @@ Provides the base resource queue, loading, and updating functionality.
 */
     _tool_loading_complete = function(_obj_tool){
 
+        //console.log("Obj_tool", _obj_tool);
+        
         //fade out loading div for a specific tool instance
         var div_loading = _obj_tool.dom_target + "_loading";
+
+        if(typeof _obj_tool.objDef.onLoadComplete === "function"){
+            _obj_tool.objDef.onLoadComplete();
+        }
         
         $('#' + div_loading).fadeOut();
+
     },
 
 /** notifcations for a specic tool. currently just console logging the entire object. * could be developed to bring pop up notificaiton or alert notification to tools
@@ -1344,13 +1374,11 @@ Provides the base resource queue, loading, and updating functionality.
             scripts_length = scripts.length,
             stylesheets_length = stylesheets.length;
 
-            console.log("RRRRR", r);
-
         for (;i<scripts_length; i++) {
 
             if(typeof EduVis.resource.loaded[scripts[i]] !== "object"){
 
-                console.log("returned FALSE! -> ", i, scripts[i])
+                console.log("returned FALSE! -> ", scripts[i])
                 return false;
             }
         }
@@ -1360,7 +1388,7 @@ Provides the base resource queue, loading, and updating functionality.
 
             if(typeof EduVis.resource.loaded[stylesheets[i]] !== "object"){
 
-                console.log("returned FALSE! -> ", i, stylesheets[i])
+                console.log("returned FALSE! -> ", stylesheets[i])
 
                 return false;
             }
@@ -1394,7 +1422,7 @@ Provides the base resource queue, loading, and updating functionality.
 
             scripts = [],
             stylesheets = [],
-            i=0, j=0, k=0, l=0,
+            i = 0, j=0, k=0, l=0,
             _tool_resources = {
                 "scripts" : [],
                 "stylesheets" : []
@@ -1427,9 +1455,6 @@ Provides the base resource queue, loading, and updating functionality.
             style_count+=1;
         }
 
-        console.log(".....TOOL RESOURCES.....")
-        console.log(_tool_resources);
-        
         return _tool_resources;
     },
 
@@ -1524,7 +1549,7 @@ Provides the base resource queue, loading, and updating functionality.
 
         var tool = EduVis.tool.instances[tool_name][instance_id],
             divToolEditor,
-            divControls
+            divControls,
             el_btn;
 
             divToolEditor = $("<div></div>")

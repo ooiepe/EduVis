@@ -22,10 +22,12 @@ Provides the base resource queue, loading, and updating functionality.
     "use strict";
 
     var _resource_version = "0.0.1",
-        _resource_path = EduVis.Environment.getPathResources(), // path to javascript resources
-        _resource_path_js = _resource_path + "js/",
-        _version_jquery = "1.10.1", // latest tested and supported version of jquery
+        _resource_path = EduVis.Environment.getPathResources(), 
+        _resource_path_js = _resource_path + "js/",             // path to javascript resources
+        _version_jquery = "1.10.1",
         _version_d3 = "3.0.8",
+        _resources_loaded = {},
+        _resources_queued = {},
 
 /** Queue and load tool resources based on the tool resource object
 * 
@@ -129,8 +131,8 @@ Provides the base resource queue, loading, and updating functionality.
         // test if local resource is available
 
         //var url = _obj_resource.resource_path || _resource_path_js;
-        //var url = EduVis.Environment.getPathResources() + "js/";
-        var url = _obj_resource.resource_path || _resource_path_js;
+        var url = EduVis.Environment.getPathResources() + "js/";
+        //var url = _obj_resource.resource_path || _resource_path_js;
 
         console.log(".....");
         console.log("Resource load local.", url, _obj_resource);
@@ -296,10 +298,7 @@ Provides the base resource queue, loading, and updating functionality.
          }
 
         return "default";
-    },
-
-    _resources_loaded = {},
-    _resources_queued = {};
+    };
 
     eduVis.resource = {
 
@@ -310,13 +309,13 @@ Provides the base resource queue, loading, and updating functionality.
         load : _resource_load_local,
         load_external : _resource_load_external,
         load_stylesheet : _resource_load_stylesheet,
-        //loaded : (function(){return _resources_loaded;})(),
+        loaded : (function(){return _resources_loaded;})(),
 
-        loaded : _resources_loaded,
+        //loaded : _resources_loaded,
 
         queue : _resource_queue,
-        //queued : (function(){return _resources_queued;})(),
-        queued : _resources_queued,
+        queued : (function(){return _resources_queued;})(),
+        //queued : _resources_queued,
         
         // identify : _resource_identify,
         notify : _resource_notify,

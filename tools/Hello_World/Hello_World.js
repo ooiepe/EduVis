@@ -13,8 +13,8 @@
 
     var tool = {
 
-        "name" : "Template",
-        "description" : "A Tool Template.",
+        "name" : "Hello_World",
+        "description" : "The Hello World of EV.",
         "url" : "??__url_to_tool_help_file__?",
 
         "version" : "0.0.1",
@@ -39,45 +39,48 @@
 
             ],
 
-            "stylesheets_local" : [],
-
-            "stylesheets_external" : [
-                {
-                    "name" : "jquery-ui",
-                    "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
-                }
+            "stylesheets_local" : [
+                // {
+                //     "name" : "toolstyle",
+                //     "src" : "tools/Hello_World/Hello_World.css"
+                // }
             ],
 
-            "datasets" : [] // in case we being to support additional local resource files
+            "stylesheets_external" : [],
+
+            "datasets" : []
             
         },
 
         "configuration" : {
-        	"alertMessage" : "this is an Alert Message."
+        	"hello_message" : "Hello, World!"
         },
 
         "controls" : {
 
-            "alertMessage" : {
+            "hello_message" : {
 
                 "type" : "textbox",
-                "label" : "Testing the Text Box",
-                "tooltip": "What is a tooltip?",
-                "default_value" : "This is a test",
-                "description" : "this control is for testing the text box of template.js"
+                "label" : "Hello Message",
+                "tooltip": "Enter your hello world message?",
+                "default_value" : "Hello, World!",
+                "description" : "Modfiy your hello world message."
             }
         },
         "data" : {},
-        "target_div" : "Template",
+        "target_div" : "Hello_World",
         "tools" : {}
 
     };
 
-    tool.Template = function( _target ){
+    tool.Hello_World = function( _target ){
 
       	//document.getElementById(_target_div).innerHTML = "TEMPLATE TOOL LOADED";
 
-      	alert(tool.configuration.alertMessage);
+        $("#"+_target).append(
+        
+            $("<div/>").html(tool.configuration.hello_message)
+        );
 
         EduVis.tool.load_complete(this);
 
@@ -85,9 +88,7 @@
 
     tool.init = function() {
 
-        // todo: include instance in call
-        //console.log(" ... template init..... ", this)
-        this.Template(this.dom_target);
+        this.Hello_World(this.dom_target);
 
     };
 
