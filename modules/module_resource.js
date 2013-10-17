@@ -178,9 +178,9 @@ Provides the base resource queue, loading, and updating functionality.
 
         var sheet = document.createElement("link");
 
-        console.log( "get path resources" + EduVis.Environment.getPath());
+        console.log( "get path resources" , EduVis.Environment.getPath() );
 
-        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPath() +_obj_stylesheet.src;
+        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathRoot() + _obj_stylesheet.src; //EduVis.Environment.getPath() +_obj_stylesheet.src;
 
         sheet.setAttribute('type', 'text/css');
         sheet.setAttribute('href',  sheet_href);

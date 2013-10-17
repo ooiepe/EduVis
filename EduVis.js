@@ -607,6 +607,7 @@ var EduVis = (function () {
 *
 * EduVis.Environment
 *
+*   TODO: document this module
 */
 
 (function (eduVis) {
@@ -614,43 +615,47 @@ var EduVis = (function () {
     "use strict";
 
     /** 
+    * TODO: document this module
     * This is where the function actions are defined
     * 
     * @param {Object} define the function paramenter(s) here ( in this case an object ).. be specific as to its usage 
     * @return {Object} define the returned value here, in this case an Object.. be specific
     */
 
-    var _environment_path_root,
-    	_environment_path_server,
-    	_environment_path_service_instance,
-    	//_environment_path = "",
-    	//_environment_path_tools = "tools/",
-    	//_environment_path_resources = "resources/",
-        _environment_path,
+    var _environment_path_root = "",
+    	_environment_path_server = "",
+    	_environment_path_service_instance = "",
+
+        _environment_path_eduvis = "",
         _environment_path_tools = "tools/",
         _environment_path_resources = "resources/",
 
     _environment_set_path = function( _path ) {
 
-    	_environment_path = (_path || "");
-    	_environment_path_tools = (_path || "") + "tools/";
-    	_environment_path_resources = (_path || "") + "resources/";
+    	_environment_path_root = (_path || "");
+    	//_environment_path_tools = (_path || "") + "tools/";
+    	//_environment_path_resources = (_path || "") + "resources/";
 
     	console.log(".... P A T H .....", _path);
     },
     
     _environment_get_path = function() {
-        return _environment_path;
+        return _environment_path_root;
     },
 
-    _environment_set_paths = function( _path, _tools, _resources ) {
+    _environment_set_paths = function( _root, _tools, _resources ) {
 
         // initialize with defaults.
-        _environment_path_root = (_path || "");
+        _environment_path_root = (_root || "");
+        //_environment_path_root = (_path || "");
         _environment_path_tools = (_tools || "");// + "tools/";
         _environment_path_resources = (_resources || "");// + "resources/";
 
-        console.log("....  P A T H S .....", _path);
+        console.log("....  P A T H S .....", _root);
+        console.log("root path", _environment_path_root);
+        console.log("tools path", _environment_path_tools);
+        console.log("resources path", _environment_path_resources);
+
     },
 
     _environment_set_path_tools = function( _path_tools ) {
@@ -659,6 +664,15 @@ var EduVis = (function () {
 	
     _environment_get_path_tools = function() {
 		return _environment_path_tools;
+
+    },
+
+    _environment_set_path_root = function( _path_root ) {
+        _environment_path_root = _path_root;
+    },
+    
+    _environment_get_path_root = function() {
+        return _environment_path_root;
 
     },
 
@@ -732,6 +746,7 @@ var EduVis = (function () {
         setPath: _environment_set_path,
         setPaths: _environment_set_paths,
         getPath: _environment_get_path,
+        getPathRoot: _environment_get_path_root,
 
         setPathTools : _environment_set_path_tools,
         
@@ -1049,9 +1064,9 @@ Provides the base resource queue, loading, and updating functionality.
 
         var sheet = document.createElement("link");
 
-        console.log( "get path resources" + EduVis.Environment.getPath());
+        console.log( "get path resources" , EduVis.Environment.getPath() );
 
-        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPath() +_obj_stylesheet.src;
+        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathRoot() + _obj_stylesheet.src; //EduVis.Environment.getPath() +_obj_stylesheet.src;
 
         sheet.setAttribute('type', 'text/css');
         sheet.setAttribute('href',  sheet_href);
