@@ -255,7 +255,8 @@ var EduVis = (function () {
                         'maxlength': typeof (control.maxlength) === "undefined" ? "" : control.maxlength
                     })
                     //.addClass("span2")
-                    .on("change", function () {
+                    .on("change", function (a) {
+                        control.update_event(a);
                         //tool.customization_update();
                     });
 
@@ -585,7 +586,7 @@ var EduVis = (function () {
 
         $.each(tool_config,function(config_item,config_value){
 
-            control_obj[config_item] = $("#config-" + config_item).val();;
+            control_obj[config_item] = $("#config-" + config_item).val();
 
         });
 
