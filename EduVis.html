@@ -14,6 +14,8 @@
 <script>
 (function(){
 
+	EduVis.Environment.setPaths("", "tools/", "resources/");
+
 	// // // A sample way of loading a local resource
 	// EduVis.resource.load(
 	// 	{
@@ -25,86 +27,10 @@
 	// 	}
 	// );
 
-	// // A sample way of loading an external resource
-	// EduVis.dependencies.load_external(
-	// 	{
-	// 		"name":"d3",
-	// 		"url":"http://d3js.org/d3.v3.min.js",
-	// 		"global_reference" : "d3"
-	// 	}
-	// );
-
-	// EduVis.tool.load({
-	// 	"name" : "Bar_Chart"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Template",
-	// 	"target_div": "DIV1",
-	// 	"instance_id" : "Template_1"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Template",
-	// 	"target_div": "vistool"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "NDBC_Time_Series_Explorer",
-	// 	"target_div": "Time_Series_Explorer"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Time_Series_Explorer",
-	// 	"target_div": "Time_Series_Explorer",
-	// 	"instance_id" : "Time_Series_Explorer_1"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Time_Series_Explorer",
-	// });
-
-	// 	EduVis.tool.load({
-	// 		"name" : "NDBC_Data_Comparator",
-	// 		"target_div": "NDBC_Data_Comparator",
-	// //		"instance" : "1023"
-	// 	});
-
-	// EduVis.tool.load({
-	// 	"name" : "Glider_Profile_Explorer",
-	// 	"target_div": "Glider_Profile_Explorer"
-	// 	//,
-	// 	//"instance" : "1023"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Advanced_Glider_Profile_Explorer",
-	// 	"target_div": "Glider_Profile_Explorer",
-	// 	//"instance" : "1023"
-	// });
-
-	// EduVis.tool.load({
-	// 	"name" : "Data_Browser",
-	// 	"tool_container_div": "vistool",
-	// 	"toolParent":"NDBC_Time_Series",
-	// 	"onLoadComplete":function(){
-
-	// 		EduVis.tool.load({
-	// 			"name" : "Time_Series",
-	// 			//"target_div": "vistool",
-	// 			"dataBrowser":"Data_Browser"
-	// 		});
-	// 	}
-	// });
-	
-	EduVis.Environment.setPaths("", "tools/", "resources/")
-
 	EduVis.tool.load({
 		"name" : "Hello_World",
 		"tool_container_div": "vistool"
 	});
-
-
 
 }());
 	

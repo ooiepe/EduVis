@@ -6,6 +6,24 @@
 
 (function (eduVis) {
 
+    function hello_message_update(evt){
+
+        var target = evt.target,
+            val = target.value;
+
+        // update tool configuration value for hello_message
+        tool.configuration.hello_message = val;
+
+        console.log("tool", tool);
+        console.log("evt",evt);
+        console.log("this",this);
+
+        // update visual
+        d3.select("#hello-world-tool-svg-text").text(val);
+
+    }
+
+
     "use strict";
     //var tool = EduVis.tool.template;
 
@@ -31,29 +49,30 @@
             "scripts_local" : [],
 
             "scripts_external" : [
-            	{
+                {
                     "name" : "d3",
                     "url" : "http://d3js.org/d3.v3.min.js",
                     "global_reference" : "d3"
                 }
-
             ],
 
-            "stylesheets_local" : [
-                // {
-                //     "name" : "toolstyle",
-                //     "src" : "tools/Hello_World/Hello_World.css"
-                // }
+            "stylesheets" : [
+                {
+                    "name" : "toolstyle",
+                    "src" : "Hello_World.css"
+                }
             ],
 
-            "stylesheets_external" : [],
+            //"stylesheets_external" : [],
 
             "datasets" : []
             
         },
 
         "configuration" : {
-        	"hello_message" : "Hello, World!"
+            // configuration id should match control id
+            "hello_message" : "Hello, World!"
+
         },
 
         "controls" : {
@@ -64,7 +83,8 @@
                 "label" : "Hello Message",
                 "tooltip": "Enter your hello world message?",
                 "default_value" : "Hello, World!",
-                "description" : "Modfiy your hello world message."
+                "description" : "Modify your hello world message.",
+                "update_event" : hello_message_update
             }
         },
         "data" : {},
@@ -75,12 +95,36 @@
 
     tool.Hello_World = function( _target ){
 
-      	//document.getElementById(_target_div).innerHTML = "TEMPLATE TOOL LOADED";
+        d3.select("#"+_target)
+            .append("svg")
+                .attr(
+                    {
+                        "height":100,
+                        "width":850
+                    }
+                )
+                .append("text")
+                    .attr(
+                        {
+                            "id":"hello-world-tool-svg-text",
+                            "x": 10,
+                            "y": 50,
+                            "fill": "blue",
+                            "font-size":40
+                        }
+                    )
+                    .text(tool.configuration.hello_message);
 
-        $("#"+_target).append(
-        
-            $("<div/>").html(tool.configuration.hello_message)
-        );
+        // $("#"+_target).append(
+   
+        //     $("<h2/>",{
+        //         id : "hello-world-tool-text",
+        //         html: tool.configuration.hello_message
+        //     })
+                
+        // );
+
+        //alert("instance loaded from folder non relative path.");
 
         EduVis.tool.load_complete(this);
 

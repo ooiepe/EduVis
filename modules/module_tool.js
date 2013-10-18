@@ -208,21 +208,24 @@
             scr_local = resources.scripts_local,
             scr_local_length = scr_local.length,
 
-            sty_ext = resources.stylesheets_external,
-            sty_ext_length = sty_ext.length,
+            //sty_ext = resources.stylesheets_external,
+            //sty_ext_length = sty_ext.length,
 
-            sty_local = resources.stylesheets_local,
-            sty_local_length = sty_local.length,
+            //sty_local = resources.stylesheets_local,
+            //sty_local_length = sty_local.length,
+
+            stylesheets = resources.stylesheets,
+            stylesheets_length = stylesheets.length,
 
             scripts = [],
-            stylesheets = [],
+            styles = [],
             i = 0, j=0, k=0, l=0,
             _tool_resources = {
                 "scripts" : [],
                 "stylesheets" : []
             },
             scripts = _tool_resources.scripts,
-            stylesheets = _tool_resources.stylesheets,
+            //styles = _tool_resources.stylesheets,
 
             script_count = 0,
             style_count = 0;
@@ -238,16 +241,25 @@
             script_count+=1;
         }
 
-        for(; k<sty_ext_length; k++){
+        // for(; k<sty_ext_length; k++){
 
-            stylesheets[style_count] = sty_ext[k].name;
+        //     stylesheets[style_count] = sty_ext[k].name;
+        //     style_count+=1;
+        // }
+
+        // for(; l<sty_local_length; l++){
+        //     stylesheets[style_count] = sty_local[l].name;
+        //     style_count+=1;
+        // }
+        
+        console.log("stylesheets", stylesheets);
+        
+        for(; k<stylesheets_length; k++){
+
+            styles[style_count] = stylesheets[k].name;
             style_count+=1;
         }
 
-        for(; l<sty_local_length; l++){
-            stylesheets[style_count] = sty_local[l].name;
-            style_count+=1;
-        }
 
         return _tool_resources;
     },
@@ -316,8 +328,8 @@
                 setTimeout((function(){
 
                     // rescursive delayed call.. 1 seconds.. to tool initiation
-                    if(EduVis.utility.hault){
-                        console.log("..EduVis Haulted..");
+                    if(EduVis.utility.halt){
+                        console.log("..EduVis Halted..");
                     }else{
 
                         _tool_init(obj_tool);
