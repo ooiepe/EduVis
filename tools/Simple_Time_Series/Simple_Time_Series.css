@@ -1,0 +1,27 @@
+svg {
+  font: 11px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+path {
+}
+
+.axis, .label {
+  fill: #333333;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.refline {
+  stroke: #930000 ;
+  shape-rendering: crispEdges;
+}
+
+.y.axis line {
+  stroke-opacity: .4;
+}

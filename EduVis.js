@@ -553,6 +553,42 @@ var EduVis = (function () {
 
                 break;
 
+            case "data-browser":
+
+                var dataBrowserContainer = $("<div/>")
+                    .attr({
+                        "id" : "data-browser-control",
+                    });
+
+                var dataBrowserButton = $("button")
+                    .attr({
+                        "class":"btn",
+                        "value" : "btn-data-browser"
+                    })
+                    .html("Load Data Browser")
+                    .on("click", function(){
+                        
+                        console.log("Loading Data Browser Control", this);
+
+                        EduVis.tool.load({
+                            "name" : "DataBrowser",
+                            "tool_container_div": "data-browser-control"
+                        });
+                    });
+
+
+                ctrl = $("<div></div>")
+                    .addClass("control") // 
+                    .append(dataBrowserButton)
+                    .append(dataBrowserContainer)
+
+                // simple add button that will load the DataBrowser tool
+
+                
+
+
+                break;
+
             default:
                 // empty div if nothing is passed
                 ctrl = $("<div></div>");
@@ -1088,10 +1124,6 @@ Provides the base resource queue, loading, and updating functionality.
 
         //console.log( "get path resources" , EduVis.Environment.getPathRoot() );
 
-        var objsty = _obj_stylesheet;
-        console.log(objsty, _tool);
-        // local or external
-
         // if http, we assume external.. set stylesheet src
         // if not http, build the resource path and append the src.. append the tool name for folder
 
@@ -1542,8 +1574,7 @@ Provides the base resource queue, loading, and updating functionality.
         
         if(typeof Tool === "object"){
 
-            if( _tool_is_ready(Tool) ){
-
+            if( _tool_is_ready( Tool ) ){
 
                 var instance_id = obj_tool.instance_id;
 
@@ -1560,7 +1591,9 @@ Provides the base resource queue, loading, and updating functionality.
 
                     }
                     else{
+
                         EduVis.tool.instances[name][instance_id] = Tool;
+                        
                     }
                 }
                 else{

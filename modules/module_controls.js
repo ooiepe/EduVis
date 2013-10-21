@@ -359,6 +359,42 @@
 
                 break;
 
+            case "data-browser":
+
+                var dataBrowserContainer = $("<div/>")
+                    .attr({
+                        "id" : "data-browser-control",
+                    });
+
+                var dataBrowserButton = $("button")
+                    .attr({
+                        "class":"btn",
+                        "value" : "btn-data-browser"
+                    })
+                    .html("Load Data Browser")
+                    .on("click", function(){
+                        
+                        console.log("Loading Data Browser Control", this);
+
+                        EduVis.tool.load({
+                            "name" : "DataBrowser",
+                            "tool_container_div": "data-browser-control"
+                        });
+                    });
+
+
+                ctrl = $("<div></div>")
+                    .addClass("control") // 
+                    .append(dataBrowserButton)
+                    .append(dataBrowserContainer)
+
+                // simple add button that will load the DataBrowser tool
+
+                
+
+
+                break;
+
             default:
                 // empty div if nothing is passed
                 ctrl = $("<div></div>");
