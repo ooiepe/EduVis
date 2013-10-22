@@ -1,5 +1,5 @@
 /* Simple Time Series Tool
- * Revised 10/17/2013
+ * Revised 10/22/2013
  */
 (function (eduVis) {
     "use strict";
@@ -43,20 +43,12 @@
 
         "configuration" : {
           "station" : "44025",
-          "start_date" : "7",
+          "network" : "NDBC",
+          "parameter" : "air_temperature",
+          "start_date" : "2",
           "end_date" : "now",
           "data_cart" : 
-            {
-              "NDBC":
-                {"44025":
-                  {"parameters":
-                    {
-                      "air_pressure":{},
-                      "air_temperature":{}
-                    }
-                  }
-                }
-            }
+            {"NDBC":{"44025":{"parameters":{"air_pressure":{},"air_temperature":{}}}},"CO-OPS":{"2695540":{"parameters":{"air_pressure":{},"air_temperature":{},"measured_tide":{}}}}}
         },
 
         "data" : {},
@@ -119,7 +111,7 @@
       g.yAxis = d3.svg.axis().scale(g.y).orient("left").tickSize(-g.width,0,0);
       
       g.svg = d3.select("#"+_target).append("svg")
-        	.attr("id","svggraph")
+          .attr("id","svggraph")
           .attr("width", g.width + g.margin.left + g.margin.right)
           .attr("height", g.height + g.margin.top + g.margin.bottom);
       
@@ -137,7 +129,7 @@
           .x(function(d) { return g.x(d.date); })
           .y(function(d) { return g.y(d.data); });
       
-      g.svg.append("text")
+      g.title = g.svg.append("text")
           .attr("class", "gtitle")
           .attr("text-anchor", "middle")
           .attr("font-size", "18")
@@ -146,7 +138,7 @@
           .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
           .text("NDBC Station " + this.configuration.station);
       
-      g.svg.append("text")
+      g.ylabel = g.svg.append("text")
           .attr("id", "ylabel")
           .attr("class", "glabel")
           .attr("text-anchor", "middle")
@@ -156,10 +148,9 @@
           .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
           .text("Discharge (cfs)");
 
-      tool.createButtons(_target);
+      tool.select_createDropdowns(_target);
       tool.select_updateStations();
       tool.select_updateParameters();
-
 
     };
 
@@ -186,11 +177,13 @@
       g.y.domain(d3.extent(data, (function(d) { return d.data; })));
       
       g.focus.append("g")
+          .attr("id", "xAxis")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + g.height + ")")
           .call(g.xAxis);
     
       g.focus.append("g")
+          .attr("id", "yAxis")
           .attr("class", "y axis")
           .call(g.yAxis);
           
@@ -202,7 +195,10 @@
           .attr("stroke","#a33333")
           .attr("stroke-width","2px");
       
-      d3.select('#ylabel').text(cols[1].key);
+      //d3.select('#ylabel').text(cols[1].key);
+
+      g.ylabel.text(cols[1].key);
+
     };    
     
     tool.init = function(_target) {
@@ -211,12 +207,24 @@
         EduVis.tool.load_complete(this);
     };
 
-    function graph_update_sta(evt){
-        var target = evt.target,
-            val = target.value;
-        tool.configuration.station = val;
+    tool.graph_update_sta = function(network_station){
+        var net_sta = network_station.split(","),
+            network = net_sta[0],
+            station = net_sta[1];
+
+        tool.configuration.network = network;
+        tool.configuration.station = station;
+
+        // are we sure we want to updated the graph here?
         tool.graph_update();
-    }
+    };
+
+    tool.graph_update_param = function(parameter){
+
+        tool.configuration.parameter = parameter;
+        tool.graph_update();
+    };
+
     function graph_update_sd(evt){
         var target = evt.target,
             val = target.value;
@@ -231,8 +239,20 @@
     }
     
     tool.graph_update = function() {
-      var g = this.graph;
-      g.url = 'http://epedev.oceanobservatories.org/timeseries/data.php?network=NDBC&station=' + this.configuration.station + '&parameter=air_temperature&start_time='+this.configuration.start_date+'&end_time='+this.configuration.end_date;
+      var g = this.graph,
+        config = this.configuration,
+        network = config.network,
+        station = config.station,
+        parameter = config.parameter,
+        start = config.start_date,
+        end = config.end_date;
+
+      g.url = 'http://epedev.oceanobservatories.org/timeseries/data.php?' + 
+          'network=' + network + 
+          '&station=' + station + 
+          '&parameter=' + parameter + 
+          '&start_time=' + start +
+          '&end_time=' + end;
       
       d3.csv(g.url, function(error, data) {
         tool.updategraph(data);
@@ -249,6 +269,7 @@
         d.data = +d[cols[1].key];
       }); 
 
+      // update the timeseries path
       g.x.domain(d3.extent(data, (function(d) { return d.date; })));
       g.y.domain(d3.extent(data, (function(d) { return d.data; })));
       
@@ -259,10 +280,16 @@
           .ease("linear")
           .attr("d", g.line1);
       
-      d3.select('#ylabel').text(cols[1].key);
+      //d3.select('#ylabel').text(cols[1].key);
+      g.ylabel.text(cols[1].key);
+
+      // update x and y axis 
+      d3.select("#yAxis").call(g.yAxis);
+      d3.select("#xAxis").call(g.xAxis);
+
     };
 
-    tool.createButtons = function(_target){
+    tool.select_createDropdowns = function(_target){
 
       // add dropdowns for stations and networks
       var tool_dropdowns = $("<div/>")
@@ -276,9 +303,11 @@
           })
           .on("change", function(evt){
 
-            tool.configuration.station = evt.target.value;
+            // update network and station in config
+            tool.graph_update_sta(evt.target.value);
 
-            alert("station changed to " + evt.target.value);
+            //tool.configuration.station = evt.target.value;
+            //alert("station changed to " + evt.target.value);
 
             tool.select_updateParameters();
 
@@ -288,10 +317,11 @@
           $("<select>").attr({
             "id" : "select-parameters"
           })
-          .on("change", function(){
+          .on("change", function(evt){
 
-            alert("parameter changed");
-            // trigger udpate function
+            //alert("parameter changed to " + evt.target.value);
+            
+            tool.graph_update_param(evt.target.value)
 
           })
         );
@@ -306,6 +336,8 @@
     tool.select_updateStations = function(){
 
       // -->
+
+      var config = tool.configuration;
 
       // clear the current stations
       $("#select-stations").empty();
@@ -334,6 +366,26 @@
       // add all the options from the options array to the select
       $("#select-stations").append(options);
 
+      var selected_param = $("#select-parameters option")
+          .filter(function(){
+            console.log("config param", config.parameter);
+            return ($(this).val() == config.parameter);
+          })
+          //.prop('selected', true);
+
+      // if(selected_param.length == 0){
+        
+      //   $(".param-icon").remove();
+
+      //   // insert an icon to let user know to select param
+      //   $('<i class="icon-exclamation-sign param-icon">!!</i>')
+      //     .insertBefore($("#select-parameters"))
+
+      //   config.parameter =  $("#select-parameters").val();
+
+      // }
+
+
       // -->
 
     };
@@ -343,8 +395,16 @@
       var net_sta = $("#select-stations").val().split(","),
           network = net_sta[0],
           station = net_sta[1],
-          dc = tool.configuration.data_cart,
-          options = [];
+          config = tool.configuration,
+          dc = config.data_cart,
+          options = [],
+          selected_param;
+          // need to condition for param that is not available in a newly updated list (when station changes and the new station does not have the previously selected param.. in that case, just take the first parameter of the list.. and put an exclaimation next to the dropdown to indicated update ened)
+
+        // reference to param
+        // does current param exist in list?
+      
+      $(".param-icon").remove();
 
       $("#select-parameters")
         .empty()
@@ -364,10 +424,28 @@
             options.push(option);
 
           });
-
         });
 
-       $("#select-parameters").empty().append(options);
+      $("#select-parameters")
+        .empty()
+        .append(options);
+
+      selected_param = $("#select-parameters option")
+          .filter(function(){
+            console.log("config param", config.parameter);
+            return ($(this).val() == config.parameter);
+          })
+          .prop('selected', true);
+
+      if(selected_param.length == 0){
+
+        $(".param-icon").remove();
+
+        // insert an icon to let user know to select param
+        $('<i class="icon-exclamation-sign param-icon">!!</i>')
+          .insertBefore($("#select-parameters"))
+
+      }
 
     };
 
