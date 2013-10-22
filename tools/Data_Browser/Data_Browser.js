@@ -44,7 +44,7 @@
                     //"resource_path": "resources/js/",
                     "resource_file_name" : "leaflet.markercluster.js",
                     "global_reference" : "L",
-                    "dependsOn" : ["leaflet-js"],
+                    "dependsOn" : ["leaflet_js"],
                     "attributes":{}
                 }
             ],
