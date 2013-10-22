@@ -845,7 +845,7 @@
             this.map.removeLayer(this.layer_station_markers);
         }
 
-        var search_stations_query = "http://ooi.dev/epe/data-services/" + this.stationSearch();
+        var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + this.stationSearch();
 
         $.getJSON( search_stations_query, function(geodata){
 
@@ -1036,7 +1036,7 @@
         
             // request station from data-services
 
-            $.getJSON( "http://ooi.dev/epe/data-services/stations/" + station.properties.network + "/" + station.properties.name, function( data ) {
+            $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + station.properties.network + "/" + station.properties.name, function( data ) {
 
                 // get reference to drop down
                 // if exists, check for presence of current network/station
@@ -1146,4 +1146,3 @@
     EduVis.tool.tools[tool.name] = tool;
 
 }(EduVis));
-
