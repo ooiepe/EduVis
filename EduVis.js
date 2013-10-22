@@ -553,39 +553,33 @@ var EduVis = (function () {
 
                 break;
 
-            case "data-browser":
+            case "dataBrowser":
 
                 var dataBrowserContainer = $("<div/>")
                     .attr({
-                        "id" : "data-browser-control",
-                    });
+                        "id" : "data-browser-container"
+                    }),
 
-                var dataBrowserButton = $("button")
+                dataBrowserButton = $("<a/>")
                     .attr({
-                        "class":"btn",
-                        "value" : "btn-data-browser"
+                        "class": "btn",
+                        //"value" : "btn-data-browser"
                     })
                     .html("Load Data Browser")
                     .on("click", function(){
                         
-                        console.log("Loading Data Browser Control", this);
-
                         EduVis.tool.load({
-                            "name" : "DataBrowser",
-                            "tool_container_div": "data-browser-control"
+                            "name" : "Data_Browser",
+                            "target_div" : "data-browser-container",
+                            "tool_container_div": "data-browser-container",
+                            "parent_tool" : control.parent_tool,
+                            "data_cart" : control.data_cart
                         });
                     });
 
-
-                ctrl = $("<div></div>")
-                    .addClass("control") // 
+                ctrl = $("<div/>")
                     .append(dataBrowserButton)
                     .append(dataBrowserContainer)
-
-                // simple add button that will load the DataBrowser tool
-
-                
-
 
                 break;
 

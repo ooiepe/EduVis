@@ -64,9 +64,16 @@ h4.db-title{
 	padding: 0 10px;
 }
 
+#db-sidebar-left label, #db-sidebar-right label{
+	display: inline !important;
+	margin-left:4px;
+	margin-right:4px;
+}
+
+
 #db-sidebar-right {
 	position: absolute;
-	width: 240px;
+	width: 220px;
 	right: 0;
 	top: 0;
 	bottom: 0;

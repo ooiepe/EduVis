@@ -284,8 +284,7 @@
         
         if(typeof Tool === "object"){
 
-            if( _tool_is_ready(Tool) ){
-
+            if( _tool_is_ready( Tool ) ){
 
                 var instance_id = obj_tool.instance_id;
 
@@ -302,7 +301,9 @@
 
                     }
                     else{
+
                         EduVis.tool.instances[name][instance_id] = Tool;
+                        
                     }
                 }
                 else{

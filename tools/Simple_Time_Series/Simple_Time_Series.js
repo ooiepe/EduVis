@@ -13,9 +13,13 @@
                 "name" : "Sage Lichtenwalner",
                 "association" : "Rutgers University",
                 "url" : "http://marine.rutgers.edu/~sage"
+            },
+            {
+                "name" : "Michael Mills",
+                "association" : "Rutgers University",
+                "url" : "http://marine.rutgers.edu/~mmills"
             }
         ],
-        
         "resources" : {
             "scripts_local" : [],
             "scripts_external" : [
@@ -27,8 +31,6 @@
                         "charset" : "utf-8"
                     }
                 }
-
-
             ],
             "stylesheets" : [
                  {
@@ -42,46 +44,70 @@
         "configuration" : {
           "station" : "44025",
           "start_date" : "7",
-          "end_date" : "now"
-        },
-
-        "controls" : {
-            "station" : {
-                "type" : "textbox",
-                "label" : "Station",
-                "tooltip": "Enter a NDBC Station ID.",
-                "default_value" : "44025",
-                "description" : "Enter a NDBC Station ID.",
-                "update_event" : graph_update_sta
-            },
-            "start_date" : {
-                "type" : "textbox",
-                "label" : "Start Date",
-                "tooltip": "Enter date in the format yyyy/mm/dd or a number of days you want prior to the end date.",
-                "default_value" : "7",
-                "description" : "Enter the starting date.",
-                "update_event" : graph_update_sd
-            },
-            "end_date" : {
-                "type" : "textbox",
-                "label" : "End Date",
-                "tooltip": "Enter date in the format yyyy/mm/dd or the word 'now'.",
-                "default_value" : "now",
-                "description" : "Enter the ending date.",
-                "update_event" : graph_update_ed
+          "end_date" : "now",
+          "data_cart" : 
+            {
+              "NDBC":
+                {"44025":
+                  {"parameters":
+                    {
+                      "air_pressure":{},
+                      "air_temperature":{}
+                    }
+                  }
+                }
             }
         },
+
         "data" : {},
-        "target_div" : "Hello_World",
+        // "target_div" : "Hello_World",
         "tools" : {},
         "graph" : {}
+    };
+
+    tool.controls = {
+        // "station" : {
+        //     "type" : "textbox",
+        //     "label" : "Station",
+        //     "tooltip": "Enter a NDBC Station ID.",
+        //     "default_value" : "44025",
+        //     "description" : "Enter a NDBC Station ID.",
+        //     "update_event" : graph_update_sta
+        // },
+        "start_date" : {
+            "type" : "textbox",
+            "label" : "Start Date",
+            "tooltip": "Enter date in the format yyyy/mm/dd or a number of days you want prior to the end date.",
+            "default_value" : "7",
+            "description" : "Enter the starting date.",
+            "update_event" : graph_update_sd
+        },
+        "end_date" : {
+            "type" : "textbox",
+            "label" : "End Date",
+            "tooltip": "Enter date in the format yyyy/mm/dd or the word 'now'.",
+            "default_value" : "now",
+            "description" : "Enter the ending date.",
+            "update_event" : graph_update_ed
+        },
+        "data_cart" : {
+            "type":"dataBrowser",
+            "label" : "Data Browser",
+            "parent_tool" : "Simple_Time_Series",
+            "data_cart" : tool.configuration.data_cart,
+            "update_event" : function(a){ 
+
+              tool.select_updateStations();
+              tool.select_updateParameters();
+            }
+        }
     };
 
     tool.setup = function( _target ){
       var g = this.graph;
 
-      g.margin = {top: 26, right: 25, bottom: 20, left: 60},
-      g.width = 840 - g.margin.left - g.margin.right,
+      g.margin = {top: 26, right: 25, bottom: 20, left: 60};
+      g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
       
       g.parseDate = d3.time.format.iso.parse;
@@ -129,6 +155,12 @@
           .attr("dy", "1em")
           .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
           .text("Discharge (cfs)");
+
+      tool.createButtons(_target);
+      tool.select_updateStations();
+      tool.select_updateParameters();
+
+
     };
 
     tool.draw = function() {
@@ -173,7 +205,7 @@
       d3.select('#ylabel').text(cols[1].key);
     };    
     
-    tool.init = function() {
+    tool.init = function(_target) {
         this.setup(this.dom_target);
         this.draw();
         EduVis.tool.load_complete(this);
@@ -228,7 +260,116 @@
           .attr("d", g.line1);
       
       d3.select('#ylabel').text(cols[1].key);
-    };  
+    };
+
+    tool.createButtons = function(_target){
+
+      // add dropdowns for stations and networks
+      var tool_dropdowns = $("<div/>")
+        .attr({
+          "id": "tool-dropdowns"
+        })
+        .append(
+          $("<select></select>")
+          .attr({
+            "id" : "select-stations"
+          })
+          .on("change", function(evt){
+
+            tool.configuration.station = evt.target.value;
+
+            alert("station changed to " + evt.target.value);
+
+            tool.select_updateParameters();
+
+          })
+        )
+        .append(
+          $("<select>").attr({
+            "id" : "select-parameters"
+          })
+          .on("change", function(){
+
+            alert("parameter changed");
+            // trigger udpate function
+
+          })
+        );
+
+      $("#"+_target).append(
+        tool_dropdowns
+      );
+
+    };
+
+
+    tool.select_updateStations = function(){
+
+      // -->
+
+      // clear the current stations
+      $("#select-stations").empty();
+
+      var options = [];
+
+      // build the stations
+      $.each(tool.configuration.data_cart, function(network, network_obj){
+
+        $.each(network_obj,function(station, station_obj){
+
+          // create new option and add it to the options array
+          var option = $("<option/>")
+            .attr({
+              "value": network + "," + station
+            })
+            .html(
+              network + " - " + station
+            );
+
+          options.push(option);
+
+        });
+      });
+
+      // add all the options from the options array to the select
+      $("#select-stations").append(options);
+
+      // -->
+
+    };
+
+    tool.select_updateParameters = function(){
+
+      var net_sta = $("#select-stations").val().split(","),
+          network = net_sta[0],
+          station = net_sta[1],
+          dc = tool.configuration.data_cart,
+          options = [];
+
+      $("#select-parameters")
+        .empty()
+        .append("<option>..updating..</option>");
+
+        $.each(dc[network][station],function(station, parameters){
+
+          $.each(parameters,function(parameter){
+
+            // create new option and add it to the options array
+            var option = $("<option></option>")
+              .attr({
+                "value": parameter
+              })
+              .html(parameter);
+
+            options.push(option);
+
+          });
+
+        });
+
+       $("#select-parameters").empty().append(options);
+
+    };
 
     // extend base object with tool..
     EduVis.tool.tools[tool.name] = tool;

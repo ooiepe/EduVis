@@ -32,24 +32,16 @@
 
 
             "scripts_local" : [
-
                 {
-                    "name" : "jquery-ui",
-                    "resource_path" : "resources/js/",
-                    "resource_file_name" : "jquery-ui-1.10.1.custom.min.js",
-                    "dependsOn" : ["jquery-1.9.1"]
-                }
-                ,
-                {
-                    "name": "leaflet-js",
-                    "resource_path": "resources/js/",
+                    "name": "leaflet_js",
+                    //"resource_path": "resources/js/",
                     "resource_file_name" : "leaflet.js",
                     "global_reference" : "L",
                     "attributes":{}
                 },
                 {
-                    "name": "leaflet-markercluster",
-                    "resource_path": "resources/js/",
+                    "name": "leaflet_markercluster",
+                    //"resource_path": "resources/js/",
                     "resource_file_name" : "leaflet.markercluster.js",
                     "global_reference" : "L",
                     "dependsOn" : ["leaflet-js"],
@@ -65,31 +57,29 @@
                 //     "global_reference" : "L"
                 // }
                 //,
-                // {
-                //     "name" : "leaflet-markercluster-js", 
-                //     "url" : "http://ooi.dev/epe/EduVis/resources/js/leaflet.markercluster.js",
-                //     "global_reference" : "L.markerCluster",
-                //     "dependsOn" : ["leaflet-js"]
-                // }
+                {
+                    "name" : "jquery_ui_js", 
+                    "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
+                    //"dependsOn" : ["jquery"]
+                }
+                
 
             ],
 
-            "stylesheets_local" : [
+            "stylesheets" : [
                 {
                     "name": "data-browser-css",
-                    "src": "tools/Data_Browser/Data_Browser.css"
+                    "src": "css/Data_Browser.css"
                 },
                 {
                     "name": "leaflet-markercluster-css",
-                    "src": "resources/css/MarkerCluster.css"
+                    "src": "css/MarkerCluster.css"
                 },
                 {
                     "name": "leaflet-markercluster-default",
-                    "src": "resources/css/MarkerCluster.Default.css"
-                } 
-            ],
-
-            "stylesheets_external" : [
+                    "src": "css/MarkerCluster.Default.css"
+                },
+            
                 {   "name": "jquery-smoothness",
                     "src": "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
                 },
@@ -108,10 +98,8 @@
         },
 
         "configuration" : {
-        	
-            "alertMessage" : "This is an Alert Message. Data browser has loaded.",
-            "data" : "Seven, 7\nEight, 8\nNine, 9"
 
+            "data_cart" : {}
         },
 
         "controls" : {
@@ -131,24 +119,10 @@
                 "default_value" : "This is a test",
                 "description" : "this control is for testing the text box of template.js"
             }
-            //,
-
-            // "color" : {
-            //     "type" : "colorpicker",
-            //     "label" : "Bar Color",
-            //     "tooltip" : "Select a hexidecimal color for your graph.",
-            //     "default_value" : "#4682B4",
-            //     "validation" : {
-            //         "type" : "hexcolor"
-            //     }
-            // }
         },
-        "toolParent":"",
         "data" : {},
         "target_div" : "data-browser",
         "tools" : {},
-//        "map" : {},
-        "cart_data" : {},
         "data_browser_domid" : "",
         "layer_station_markers" : {},
         "timerSearchProgress" : {},
@@ -189,7 +163,7 @@
             fillOpacity: 0.8
         },
 
-        "data_cart" : {},
+        //"data_cart" : {},
 
         "db_data" : {
             "parameters": [
@@ -323,11 +297,12 @@
                                         "name":"db-date-start"          /// date_start
                                     })
                                 )
+                                .append("<br />")
                                 .append(
                                     $("<label/>",{
                                         "for":"db-date-end"
                                     })
-                                    .html("Start End: ")
+                                    .html("End Date: ")
                                 )
                                 .append(
                                     $("<input/>",{
@@ -410,6 +385,30 @@
                         "id":"db-data-cart"
                     })
                 )
+            )
+             .append(
+                $("<div/>", {
+                    "id":"db-data-cart-apply",
+                })
+                .css({
+                    "margin":"0 30% 0 30%"
+                })
+                .append(
+                    $("<a/>", {
+                        "type":"button",
+                        "class":"btn btn-large",
+                    })
+                    .html("Apply")
+                    .on("click",function(){
+
+                        var parentToolName = tool.objDef.parent_tool,
+                            parentTool = EduVis.tool.instances[parentToolName].default;
+
+                        parentTool.configuration.data_cart = tool.configuration.data_cart;
+                        parentTool.controls.data_cart.update_event();
+
+                    })
+                )
             ),
 
             db_footer = $("<div/>", {
@@ -433,14 +432,17 @@
         header = $("#db-header").height(),
         footer = $("#db-footer").height(),
         mainHeight = height - header - footer - 2,
-        winStationHeight = (mainHeight/2-20),
-        winCartheight = winStationHeight;
+        winStationHeight = (mainHeight/2-50), // now compensate for Apply button original->(mainHeight/2-20)
+        winCartHeight = winStationHeight,
+        winApplyHeight = 60;
+
 
         $("#data-browser-wrap").height(mainHeight);
         $("#db-map").height(mainHeight);
 
         $("#db-station-details").height(winStationHeight);
         $("#db-data-cart").height(winStationHeight);
+        $("#db-data-cart-apply").height(winApplyHeight);
 
     };
 
@@ -451,7 +453,7 @@
 
         var cart_networks = $("<div></div>");
 
-        $.each( tool.data_cart , function( network, station){
+        $.each( tool.configuration.data_cart , function( network, station){
             
             var cart_network = $("<div></div>")
                 .addClass("cart-network")
@@ -497,7 +499,7 @@
 
                                             evt_param_remove_click.stopImmediatePropagation();
 
-                                            delete tool.data_cart[network][station]["parameters"][param];
+                                            delete tool.configuration.data_cart[network][station]["parameters"][param];
 
                                             $(".cart-param-tools").remove();
 
@@ -837,11 +839,6 @@
 
     tool.searchData = function (){
 
-
-        console.log("---- search ----");
-       
-        console.log("---- end search ----");
-
         //console.log("layer station markers", tool.layer_station_markers);
 
         if(this.map.hasLayer(this.layer_station_markers)){
@@ -948,7 +945,7 @@
             data_cart_item[network][station]["parameters"][param]={};
 
             // extend the cart item into the cart.. bascially, just appending the parameter. 
-            $.extend(true, tool.data_cart, data_cart_item);
+            $.extend(true, tool.configuration.data_cart, data_cart_item);
     };
 
     /** 
@@ -1065,16 +1062,19 @@
                         )
                         .append( 
 
-                            $("<button />")
+                            $("<a/>")
                                 .attr({
+                                    "class":"btn btn-info btn-mini",
                                     "id":"select-" + station_dom_id + "_" +  param,
-                                    "value" : station_dom_id + "-" +  param
+                                    "href" : "#a-"+ station_dom_id + "_" +  param
                                 })
-                                .html("add")
-                                .on("click", function(a, b){
-                                    console.log("station", station);
+                                .html("Add")
+                                .on("click", function(evt){
 
-                                    tool.data_cart_add_param(station, param);//$(a.target).val());
+                                    //evt.stopPropagation();
+                                    evt.stopImmediatePropagation();
+
+                                    tool.data_cart_add_param(station, param);
                                     tool.dataCart();
                                 })
                         )
@@ -1089,6 +1089,7 @@
                 });
 
                 $("#db-station-details")
+                .empty()
                 .append(
                     $("<h4/>")
                         .addClass("title")
@@ -1109,11 +1110,18 @@
 
         //this.dataBrowser_html( _target );
 
-        if(typeof tool.objDef.toolParent != "undefined"){
+        if(typeof tool.objDef.toolParent !== "undefined"){
             tool.toolParent = tool.objDef.toolParent;
         }
 
-        this.dataBrowser_html();
+        if(typeof tool.objDef.data_cart !== "undefined"){
+            
+            console.log("Data Browser Configuration", tool.objDef.data_cart);
+
+            tool.configuration.data_cart = tool.objDef.data_cart;
+        }
+
+        this.dataBrowser_html(_target);
         this.dataBrowser_js();
 
         EduVis.tool.load_complete(this);
@@ -1124,13 +1132,13 @@
 
         //console.log("TOOL OBJ", _obj)
         // todo: include instance in call
-        
+
         this.DataBrowser(this.dom_target);
 
     };
 
     tool.exportCart = function(){
-        return tool.data_cart;
+        return tool.configuration.data_cart;
     };
 
     // extend base object with tool.. need to be able to leave options out of tool configuration file.
