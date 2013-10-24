@@ -224,7 +224,7 @@ Provides the base resource queue, loading, and updating functionality.
                     //_resource_queue_remove(_obj_stylesheet);
 
                     // remove resource from resource queue
-                   // setTimeout("_resource_queue_remove(_obj_stylesheet)");
+                    // setTimeout("_resource_queue_remove(_obj_stylesheet)");
                     //     (function(){                            
                     //         console.log("remove STYLESHEET from queue....")
                     //         ;

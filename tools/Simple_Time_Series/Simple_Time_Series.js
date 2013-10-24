@@ -6,7 +6,6 @@
     var tool = {
         "name" : "Simple_Time_Series",
         "description" : "The Hello World of EV.",
-        "url" : "??__url_to_tool_help_file__?",
         "version" : "0.1",
         "authors" : [
             {
@@ -21,16 +20,15 @@
             }
         ],
         "resources" : {
-            "scripts_local" : [],
-            "scripts_external" : [
+            "scripts" : [
               {
-                    "name" : "d3",
-                    "url" : "http://d3js.org/d3.v3.js",
-                    "global_reference" : "d3",
-                    "attributes" : {
-                        "charset" : "utf-8"
-                    }
+                "name" : "d3",
+                "url" : "http://d3js.org/d3.v3.js",
+                "global_reference" : "d3",
+                "attributes" : {
+                    "charset" : "utf-8"
                 }
+              }
             ],
             "stylesheets" : [
                  {
@@ -69,7 +67,7 @@
         "start_date" : {
             "type" : "textbox",
             "label" : "Start Date",
-            "tooltip": "Enter date in the format yyyy/mm/dd or a number of days you want prior to the end date.",
+            "tooltip": "Enter date in the format yyyy-mm-dd or a number of days you want prior to the end date.",
             "default_value" : "7",
             "description" : "Enter the starting date.",
             "update_event" : graph_update_sd
@@ -77,7 +75,7 @@
         "end_date" : {
             "type" : "textbox",
             "label" : "End Date",
-            "tooltip": "Enter date in the format yyyy/mm/dd or the word 'now'.",
+            "tooltip": "Enter date in the format yyyy-mm-dd or the word 'now'.",
             "default_value" : "now",
             "description" : "Enter the ending date.",
             "update_event" : graph_update_ed
@@ -136,7 +134,7 @@
           .attr("y", 0)
           .attr("dy", ".75em")
           .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
-          .text("NDBC Station " + this.configuration.station);
+          .text( this.configuration.network + " Station " + this.configuration.station);
       
       g.ylabel = g.svg.append("text")
           .attr("id", "ylabel")
@@ -146,7 +144,7 @@
           .attr("y", 0)
           .attr("dy", "1em")
           .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
-          .text("Discharge (cfs)");
+          .text( this.configuration.parameter);
 
       tool.select_createDropdowns(_target);
       tool.select_updateStations();
@@ -154,11 +152,11 @@
 
     };
 
+
     tool.draw = function() {
-      var g = this.graph;
-      g.url = 'http://epedev.oceanobservatories.org/timeseries/data.php?network=NDBC&station=' + this.configuration.station + '&parameter=air_temperature&start_time='+this.configuration.start_date+'&end_time='+this.configuration.end_date;
+      var url = tool.createUrl();
       
-      d3.csv(g.url, function(error, data) {
+      d3.csv(url, function(error, data) {
         tool.drawgraph(data);
       });
 
@@ -195,8 +193,6 @@
           .attr("stroke","#a33333")
           .attr("stroke-width","2px");
       
-      //d3.select('#ylabel').text(cols[1].key);
-
       g.ylabel.text(cols[1].key);
 
     };    
@@ -239,26 +235,31 @@
     }
     
     tool.graph_update = function() {
-      var g = this.graph,
-        config = this.configuration,
-        network = config.network,
-        station = config.station,
-        parameter = config.parameter,
-        start = config.start_date,
-        end = config.end_date;
+      
+      var url = tool.createUrl();        
+      
+      d3.csv(url, function(error, data) {
+        tool.updategraph(data);
+      });
 
-      g.url = 'http://epedev.oceanobservatories.org/timeseries/data.php?' + 
+    };
+
+    tool.createUrl = function(){
+
+      var config = this.configuration,
+          network = config.network,
+          station = config.station,
+          parameter = config.parameter,
+          start = config.start_date,
+          end = config.end_date;
+
+      return 'http://epedev.oceanobservatories.org/timeseries/data.php?' + 
           'network=' + network + 
           '&station=' + station + 
           '&parameter=' + parameter + 
           '&start_time=' + start +
           '&end_time=' + end;
-      
-      d3.csv(g.url, function(error, data) {
-        tool.updategraph(data);
-      });
-
-    };
+    }
     
     tool.updategraph = function(data) {
       var g = this.graph;
@@ -282,6 +283,7 @@
       
       //d3.select('#ylabel').text(cols[1].key);
       g.ylabel.text(cols[1].key);
+      g.title.text( this.configuration.network + " Station " + this.configuration.station);
 
       // update x and y axis 
       d3.select("#yAxis").call(g.yAxis);
@@ -304,12 +306,11 @@
           .on("change", function(evt){
 
             // update network and station in config
-            tool.graph_update_sta(evt.target.value);
+            if(tool.select_updateParameters())
+              tool.graph_update_sta(evt.target.value);
 
             //tool.configuration.station = evt.target.value;
             //alert("station changed to " + evt.target.value);
-
-            tool.select_updateParameters();
 
           })
         )
@@ -364,13 +365,17 @@
       });
 
       // add all the options from the options array to the select
-      $("#select-stations").append(options);
+      $("#select-stations")
+        .append(options)
+        .val(config.network + "," + config.station);
 
-      var selected_param = $("#select-parameters option")
-          .filter(function(){
-            console.log("config param", config.parameter);
-            return ($(this).val() == config.parameter);
-          })
+      console.log("*****" + config.network + "," + config.station);
+
+      // var selected_param = $("#select-parameters option")
+      //     .filter(function(){
+      //       console.log("config param", config.parameter);
+      //       return ($(this).val() == config.parameter);
+      //     })
           //.prop('selected', true);
 
       // if(selected_param.length == 0){
@@ -391,6 +396,8 @@
     };
 
     tool.select_updateParameters = function(){
+
+      console.log($("#select-stations").val());
 
       var net_sta = $("#select-stations").val().split(","),
           network = net_sta[0],
@@ -442,10 +449,17 @@
         $(".param-icon").remove();
 
         // insert an icon to let user know to select param
-        $('<i class="icon-exclamation-sign param-icon">!!</i>')
-          .insertBefore($("#select-parameters"))
+        $('<i class="icon-exclamation-sign param-icon"></i>')
+          .insertBefore($("#select-parameters"));
 
+        $("<option>(choose one)</option>")
+          .prop("selected", true)
+          .insertBefore($("#select-parameters option"))
+
+        return false;
       }
+
+      return true;
 
     };
 

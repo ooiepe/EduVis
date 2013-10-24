@@ -31,39 +31,28 @@
         "resources" : {
 
 
-            "scripts_local" : [
+            "scripts" : [
                 {
+                    "resource_type" : "tool",
                     "name": "leaflet_js",
-                    //"resource_path": "resources/js/",
-                    "resource_file_name" : "leaflet.js",
-                    "global_reference" : "L",
+                    "url" : "js/leaflet.js",
+                    "namespace" : "L",
                     "attributes":{}
                 },
                 {
+                    "resource_type" : "tool",
                     "name": "leaflet_markercluster",
-                    //"resource_path": "resources/js/",
-                    "resource_file_name" : "leaflet.markercluster.js",
-                    "global_reference" : "L",
+                    "url" : "js/leaflet.markercluster.js",
+                    "namespace" : "L",
                     "dependsOn" : ["leaflet_js"],
                     "attributes":{}
-                }
-            ],
-
-            "scripts_external" : [
-
-                // {
-                //     "name" : "leaflet-js", 
-                //     "url" : "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js",
-                //     "global_reference" : "L"
-                // }
-                //,
+                },  
                 {
+                    //"resource_type":"external",
                     "name" : "jquery_ui_js", 
                     "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
                     //"dependsOn" : ["jquery"]
                 }
-                
-
             ],
 
             "stylesheets" : [
@@ -1130,10 +1119,13 @@
 
     tool.init = function(_obj) {
 
-        //console.log("TOOL OBJ", _obj)
-        // todo: include instance in call
-
         this.DataBrowser(this.dom_target);
+
+        var parentToolName = tool.objDef.parent_tool,
+            parentTool = EduVis.tool.instances[parentToolName].default;
+
+        tool.configuration.data_cart = parentTool.configuration.data_cart;
+
         this.dataCart();
 
     };
@@ -1146,3 +1138,4 @@
     EduVis.tool.tools[tool.name] = tool;
 
 }(EduVis));
+

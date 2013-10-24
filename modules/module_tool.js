@@ -22,6 +22,7 @@
         _tools_resource_path = "",
         __image_path__ = "img/",
 
+
 /** Load the tool. Show the loading screen. Request the tool javascript via jQuery getScript
 * 
 * @method _tool_load
@@ -38,7 +39,6 @@
         obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
         console.log("----Tool target --> ", obj_tool.tool_container_div);
-
                         
         var tool_container_div = $(obj_tool.tool_container_div)
         //dom_target = $("#" + obj_tool.dom_target);
@@ -77,8 +77,9 @@
             console.log("....tool notify....")
             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
 
-            console.log("....tool queue....");
-            EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
+            //console.log("....tool queue....");
+            //EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
+            EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
 
             console.log("....tool instance....");
             
@@ -155,6 +156,18 @@
 * @param {Object} _obj_tool a tool object. 
 * @return {Boolean} 
 */  
+    _tool_isReady = function( _obj_tool ){
+
+        console.log("are loaded", EduVis.asset.areAssetsLoaded(_obj_tool.resources.scripts));
+
+        if(EduVis.asset.areAssetsLoaded(_obj_tool.resources.scripts)){
+            return true;
+            console.log();console.log();
+            console.log( "******** TOOL IS READY TO LOAD ********");
+            console.log();console.log();
+        }
+
+    },
 
     _tool_is_ready = function( _obj_tool ){
 
@@ -198,6 +211,7 @@
 * @method _tool_find_resources
 * @param {Object} _obj_tool a tool object. 
 * @return {Object} tool_resources 
+* deprecated and replaced with asset module
 */  
     _tool_find_resources = function(_obj_tool){
 
@@ -284,7 +298,8 @@
         
         if(typeof Tool === "object"){
 
-            if( _tool_is_ready( Tool ) ){
+            //if( _tool_is_ready( Tool ) ){
+            if( _tool_isReady( Tool ) ){
 
                 var instance_id = obj_tool.instance_id;
 
