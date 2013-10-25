@@ -46,9 +46,7 @@
         
         "resources" : {
 
-            "scripts_local" : [],
-
-            "scripts_external" : [
+           "scripts" : [
                 {
                     "name" : "d3",
                     "url" : "http://d3js.org/d3.v3.min.js",
@@ -57,13 +55,11 @@
             ],
 
             "stylesheets" : [
-                {
+               {
                     "name" : "toolstyle",
                     "src" : "Hello_World.css"
                 }
             ],
-
-            //"stylesheets_external" : [],
 
             "datasets" : []
             

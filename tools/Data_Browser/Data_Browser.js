@@ -1,6 +1,6 @@
 /*  *  *  *  *  *  *  *
 *
-* TOOL TEMPLATE
+* Data Browser Control
 *
 */
 
@@ -48,10 +48,8 @@
                     "attributes":{}
                 },  
                 {
-                    //"resource_type":"external",
                     "name" : "jquery_ui_js", 
                     "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
-                    //"dependsOn" : ["jquery"]
                 }
             ],
 
@@ -175,13 +173,27 @@
                     "modified": "0000-00-00 00:00:00"
                 },
                 {
-                    "name": "conductivity",
+                    "name": "salinity",
                     "category": "water_property",
                     "description": "Ability of a material to pass an electrical current. Inverse of resistance. In water, it is a proxy from which salinity is derived for water quality or to further derive water density.",
                     "units": "siemens | uS",
                     "cf_parameter": "",
                     "ioos_parameter": "",
                     "modified": "0000-00-00 00:00:00"
+                },
+                {
+                    "name": "water_temperature",
+                    "category": "water_property",
+                    "description": "Temperature of water in situ."
+                },
+                {
+                    "name": "wave_height",
+                    "description": "Wave height."
+                },
+                {
+                    "name": "wind_speed",
+                    "category": "atmospheric",
+                    "description": "Wind speed."
                 }
             ],
 
@@ -271,6 +283,7 @@
                         $("<div/>", {
                             "id":"db-select-times"
                         })
+                        .append("<h3>Date Range</h3>")
                         .append(
                             $("<div/>")
                                 .append(
@@ -351,7 +364,7 @@
                     $("<h4/>", {
                         "class":"db-title"
                     })
-                    .html(".station.")
+                    .html("Station Details")
                 )
                 .append(
                     $("<div/>", {
@@ -367,7 +380,7 @@
                     $("<h4/>", {
                         "class":"db-title"
                     })
-                    .html(".selection.")
+                    .html("Selected Station List")
                 )
                 .append(
                     $("<div/>", {
@@ -446,7 +459,7 @@
             
             var cart_network = $("<div></div>")
                 .addClass("cart-network")
-                .html("<h4>"+network+"</h4>");
+                //.html("<h4>"+network+"</h4>");
 
             var cart_network_stations = $("<div></div>")
                 .addClass("cart-stations");
@@ -455,7 +468,49 @@
 
                 var cart_network_station = $("<div></div>")
                     .addClass("cart-station")
-                    .html("<h4>"+station+"</h4>");
+                    .html("<h4>" + network + " " +station+"</h4>")
+                    .click(function(){
+                        tool.stationWindowUpdate_fromCart(network,station);
+                    })
+                    .hover(
+                        function() {
+                            var sta = $(this);
+
+                            // is there already a span element? if so, remove it
+                            if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
+                                
+                            $("<span/>")
+                                .html("[X]")
+                                .css({
+                                    "float":"right",
+                                    "margin":"2px",
+                                    "border":"1px solid red",
+                                })
+                                .attr("title","Remove Station " + station)
+                                .addClass("cart-station-tools")
+
+                                .on("click", function(evt_station_remove_click){
+
+                                    console.log("station remove click");
+
+                                    evt_station_remove_click.stopImmediatePropagation();
+
+                                    delete tool.configuration.data_cart[network][station];
+
+                                    $(".cart-param-tools").remove();
+
+                                    sta.fadeOut();
+
+                                    // simply remove this item.. no need for full redraw
+                                    //tool.dataCart();
+                                })
+                                .insertBefore(sta);
+                            
+                        },
+                        function() {
+                            $( this ).find( "span:last" ).remove();
+                        }
+                     )
                 
                 var station_params = $("<div></div>")
                     .addClass("cart-params");
@@ -469,7 +524,9 @@
                         //mouseover of parameter item
                         .hover(
                             function() {
-                                $( this ).append( 
+                                var par = $(this);
+
+                                $( par ).append( 
                                     $("<span/>")
                                         .html("[X]")
                                         .css({
@@ -477,6 +534,7 @@
                                             "margin":"2px",
                                             "border":"1px solid red",
                                         })
+                                        .attr("title", "Remove " + param)
                                         .addClass("cart-param-tools")
 
                                         .on("click", function(evt_param_remove_click){
@@ -492,7 +550,7 @@
 
                                             $(".cart-param-tools").remove();
 
-                                            tool.dataCart();
+                                            par.fadeOut();
                                         })
                                 );
                             },
@@ -925,17 +983,32 @@
 
         var sp = station.properties,
             network = sp.network,
-            station = sp.name,
-            
-            data_cart_item = {};
-            data_cart_item[network] = {};
-            data_cart_item[network][station] = {};
-            data_cart_item[network][station]["parameters"] = {};
-            data_cart_item[network][station]["parameters"][param]={};
+            station = sp.name;
 
-            // extend the cart item into the cart.. bascially, just appending the parameter. 
-            $.extend(true, tool.configuration.data_cart, data_cart_item);
+        tool.dataCartAddParam(network,station,param);
+
+            // data_cart_item = {};
+            // data_cart_item[network] = {};
+            // data_cart_item[network][station] = {};
+            // data_cart_item[network][station]["parameters"] = {};
+            // data_cart_item[network][station]["parameters"][param]={};
+
+            // // extend the cart item into the cart.. bascially, just appending the parameter. 
+            // $.extend(true, tool.configuration.data_cart, data_cart_item);
     };
+
+    tool.dataCartAddParam = function(network,station,param){
+        
+        var data_cart_item = {};
+           
+        data_cart_item[network] = {};
+        data_cart_item[network][station] = {};
+        data_cart_item[network][station]["parameters"] = {};
+        data_cart_item[network][station]["parameters"][param]={};
+        
+        // extend the cart item into the cart.. bascially, just appending the parameter.
+        $.extend(true, tool.configuration.data_cart, data_cart_item);
+    }
 
     /** 
     * 
@@ -999,6 +1072,88 @@
     *   @method stationWindowUpdate load the station details into the station window div
     *   @param station station object
     */
+
+    tool.stationWindowUpdate_fromCart = function(network,station){
+
+        var station_dom_id = "station-" + network + "-"+station;
+
+        if( $("#" + station_dom_id).length > 0){
+
+            // item already exists in DOM, no need for request, just set visibility of div
+            console.log("station already present")
+
+        }
+        else{
+
+            $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
+
+                console.log(data);
+
+                var stationObj = data;
+
+                // get reference to drop down
+                // if exists, check for presence of current network/station
+
+                // move to function to add to station dropdown.. also add to object to track additions / subtractions
+                //
+                var dom_station_window = $("<div></div>")
+                    .attr({
+                        "id" : station_dom_id
+                    });
+
+                $.each(data.parameters, function(parameters, param){
+                    
+                    console.log("param",param);
+
+                    dom_station_window.append( $("<div/>") 
+                        
+                        .append( 
+
+                            $("<label/>")
+                                .attr("for","select-" + station_dom_id + "_" + param)
+                                .html(param)
+                        )
+                        .append( 
+
+                            $("<a/>")
+                                .attr({
+                                    "class":"btn btn-info btn-mini",
+                                    "id":"select-" + station_dom_id + "_" +  param,
+                                    "href" : "#a-"+ station_dom_id + "_" +  param
+                                })
+                                .html("Add")
+                                .on("click", function(evt){
+
+                                    //evt.stopPropagation();
+                                    evt.stopImmediatePropagation();
+
+                                    tool.dataCartAddParam(network, station, param);
+                                    tool.dataCart();
+                                })
+                        )
+                        .append( 
+
+                            $("<a></a>")
+                                .attr("title", param.description)
+                                .attr("href", "#"+param)
+                        )
+                    )
+
+                });
+
+                $("#db-station-details")
+                .empty()
+                .append(
+                    $("<h4/>")
+                        .addClass("title")
+                        .html("Network: (" + network + ") " + station)
+                )
+                .append(dom_station_window);
+
+            });
+        }
+
+    };
 
     tool.stationWindowUpdate = function(station){
 

@@ -1,5 +1,6 @@
 h4.db-title{
 	margin:0px;
+	padding-top:6px;
 	border-top:1px solid #CCCCCC;
 	border-bottom: 1px outset #CC99CC;
 }
@@ -145,10 +146,12 @@ h4.db-title{
 	padding-left:3px;
 }
 
-.db-cart-param{
 
+.db-cart-param, .cart-param{
+	padding-left:6px;
 
 }
+
 .db-cart-param-tools{
 	cursor:pointer;
 }
