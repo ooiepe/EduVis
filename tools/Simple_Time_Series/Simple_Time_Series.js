@@ -121,7 +121,26 @@
       
       g.focus = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
+
+      g.focus.append("g")
+        .attr("id", "xAxis")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + g.height + ")")
+        .call(g.xAxis);
+        
+      g.focus.append("g")
+        .attr("id", "yAxis")
+        .attr("class", "y axis")
+        .call(g.yAxis);
       
+      g.focus.append("path")
+              //.datum(data)
+              .attr("class", "line")
+              .attr("d", g.line1)
+              .attr("fill","none")
+              .attr("stroke","#a33333")
+              .attr("stroke-width","2px");
+
       g.line1 = d3.svg.line()
           .interpolate("monotone")
           .x(function(d) { return g.x(d.date); })
@@ -146,54 +165,55 @@
           .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
           .text( this.configuration.parameter);
 
+      
       tool.select_createDropdowns(_target);
       tool.select_updateStations();
       tool.select_updateParameters();
 
     };
 
-
     tool.draw = function() {
       var url = tool.createUrl();
       
       d3.csv(url, function(error, data) {
-        tool.drawgraph(data);
+        tool.updategraph(data);
       });
 
     };
     
     tool.drawgraph = function(data) {
-      var g = this.graph;
 
-      var cols = d3.entries(data[0]);
-      data.forEach(function(d) {
-        d.date = g.parseDate(d.date);
-        d.data = +d[cols[1].key];
-      }); 
+          var g = this.graph,
+            cols = d3.entries(data[0]);
 
-      g.x.domain(d3.extent(data, (function(d) { return d.date; })));
-      g.y.domain(d3.extent(data, (function(d) { return d.data; })));
-      
-      g.focus.append("g")
-          .attr("id", "xAxis")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + g.height + ")")
-          .call(g.xAxis);
-    
-      g.focus.append("g")
-          .attr("id", "yAxis")
-          .attr("class", "y axis")
-          .call(g.yAxis);
+          data.forEach(function(d) {
+            d.date = g.parseDate(d.date);
+            d.data = +d[cols[1].key];
+          }); 
           
-      g.focus.append("path")
-          .datum(data)
-          .attr("class", "line")
-          .attr("d", g.line1)
-          .attr("fill","none")
-          .attr("stroke","#a33333")
-          .attr("stroke-width","2px");
-      
-      g.ylabel.text(cols[1].key);
+          g.x.domain(d3.extent(data, (function(d) { return d.date; })));
+          g.y.domain(d3.extent(data, (function(d) { return d.data; })));
+          
+          g.focus.append("g")
+              .attr("id", "xAxis")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + g.height + ")")
+              .call(g.xAxis);
+        
+          g.focus.append("g")
+              .attr("id", "yAxis")
+              .attr("class", "y axis")
+              .call(g.yAxis);
+              
+          g.focus.append("path")
+              .datum(data)
+              .attr("class", "line")
+              .attr("d", g.line1)
+              .attr("fill","none")
+              .attr("stroke","#a33333")
+              .attr("stroke-width","2px");
+          
+          g.ylabel.text(cols[1].key);      
 
     };    
     
@@ -239,7 +259,9 @@
       var url = tool.createUrl();        
       
       d3.csv(url, function(error, data) {
+
         tool.updategraph(data);
+
       });
 
     };
@@ -262,32 +284,53 @@
     }
     
     tool.updategraph = function(data) {
-      var g = this.graph;
 
-      var cols = d3.entries(data[0]);
-      data.forEach(function(d) {
-        d.date = g.parseDate(d.date);
-        d.data = +d[cols[1].key];
-      }); 
+      if(typeof data === "undefined"){
 
-      // update the timeseries path
-      g.x.domain(d3.extent(data, (function(d) { return d.date; })));
-      g.y.domain(d3.extent(data, (function(d) { return d.data; })));
-      
-      g.svg.selectAll("path.line")
-          .data([data])
-          .transition()
-          .duration(1000)
-          .ease("linear")
-          .attr("d", g.line1);
-      
-      //d3.select('#ylabel').text(cols[1].key);
-      g.ylabel.text(cols[1].key);
-      g.title.text( this.configuration.network + " Station " + this.configuration.station);
+        // insert an icon to let user know to select param
+        $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
+          .insertAfter($("#select-parameters"));
 
-      // update x and y axis 
-      d3.select("#yAxis").call(g.yAxis);
-      d3.select("#xAxis").call(g.xAxis);
+      }
+      else{
+
+        if(data.length == 0){
+
+            // insert an icon to let user know to select param
+          $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
+            .insertAfter($("#select-parameters"));
+
+        }
+        else{
+
+          var g = this.graph,
+              cols = d3.entries(data[0]);
+
+          data.forEach(function(d) {
+            d.date = g.parseDate(d.date);
+            d.data = +d[cols[1].key];
+          }); 
+
+          // update the timeseries path
+          g.x.domain(d3.extent(data, (function(d) { return d.date; })));
+          g.y.domain(d3.extent(data, (function(d) { return d.data; })));
+          
+          g.svg.selectAll("path.line")
+              .data([data])
+              .transition()
+              .duration(1000)
+              .ease("linear")
+              .attr("d", g.line1);
+          
+          //d3.select('#ylabel').text(cols[1].key);
+          g.ylabel.text(cols[1].key);
+          g.title.text( this.configuration.network + " Station " + this.configuration.station);
+
+          // update x and y axis 
+          d3.select("#yAxis").call(g.yAxis);
+          d3.select("#xAxis").call(g.xAxis);
+        }
+      }
 
     };
 
@@ -320,7 +363,7 @@
           })
           .on("change", function(evt){
 
-            //alert("parameter changed to " + evt.target.value);
+            $(".param-icon").remove();
             
             tool.graph_update_param(evt.target.value)
 
@@ -336,14 +379,11 @@
 
     tool.select_updateStations = function(){
 
-      // -->
-
-      var config = tool.configuration;
+      var config = tool.configuration,
+        options = [];
 
       // clear the current stations
       $("#select-stations").empty();
-
-      var options = [];
 
       // build the stations
       $.each(tool.configuration.data_cart, function(network, network_obj){
@@ -365,33 +405,54 @@
       });
 
       // add all the options from the options array to the select
+
+      // find network-station in dropdown.. if not exists.. choose one
+
       $("#select-stations")
-        .append(options)
-        .val(config.network + "," + config.station);
+        .append(options);
 
-      console.log("*****" + config.network + "," + config.station);
 
-      // var selected_param = $("#select-parameters option")
-      //     .filter(function(){
-      //       console.log("config param", config.parameter);
-      //       return ($(this).val() == config.parameter);
-      //     })
-          //.prop('selected', true);
+      // check if value is in list
+      // if not, change configuration to the first item in the list.
 
-      // if(selected_param.length == 0){
-        
-      //   $(".param-icon").remove();
+      if($("#select-stations option[value='" + config.network + "," + config.station + "']").val() === undefined){
 
-      //   // insert an icon to let user know to select param
-      //   $('<i class="icon-exclamation-sign param-icon">!!</i>')
-      //     .insertBefore($("#select-parameters"))
+        $("#select-stations option:first")
+          .prop("selected", "selected");
+          
+          var net_sta = $("#select-stations").val().split(",");
+            
+          config.network = net_sta[0];
+          config.station = net_sta[1];
 
-      //   config.parameter =  $("#select-parameters").val();
+          //alert("check values " + $("#select-stations").val());
+
+      }
+      else{
+
+        $("#select-stations").val(config.network + "," + config.station);
+      }
+
+      //     // // value does not exist, so select the first one
+      //     // $("#select-stations option:first")
+      //     //   .prop("selected", "selected");
+      //     //alert("check values " + $("#select-stations").val());
+
+      //     // var net_sta = $("#select-stations").val().split(",");
+      //     // alert($("#select-stations").val());
+          
+      //     // config.network = net_sta[0];
+      //     // config.station = net_sta[1];
 
       // }
+      // else{
+      //   //alert($("#select-stations").val());
 
+      //   $("#select-stations").val(config.network + "," + config.station);
 
-      // -->
+      // } 
+
+      console.log("*****" + config.network + "," + config.station);
 
     };
 
@@ -446,7 +507,7 @@
 
       if(selected_param.length == 0){
 
-        $(".param-icon").remove();
+//        $(".param-icon").remove();
 
         // insert an icon to let user know to select param
         $('<i class="icon-exclamation-sign param-icon"></i>')
@@ -454,7 +515,7 @@
 
         $("<option>(choose one)</option>")
           .prop("selected", true)
-          .insertBefore($("#select-parameters option"))
+          .insertBefore($("#select-parameters option:first"))
 
         return false;
       }
