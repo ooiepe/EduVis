@@ -175,7 +175,7 @@
                 {
                     "name": "salinity",
                     "category": "water_property",
-                    "description": "Ability of a material to pass an electrical current. Inverse of resistance. In water, it is a proxy from which salinity is derived for water quality or to further derive water density.",
+                    "description": "The salt content of a water sample or body of water.",
                     "units": "siemens | uS",
                     "cf_parameter": "",
                     "ioos_parameter": "",
@@ -187,13 +187,13 @@
                     "description": "Temperature of water in situ."
                 },
                 {
-                    "name": "wave_height",
-                    "description": "Wave height."
+                    "name": "significant_wave_height",
+                    "description": "The mean height of the hightest third of the waves recorded during the sampling period."
                 },
                 {
                     "name": "wind_speed",
                     "category": "atmospheric",
-                    "description": "Wind speed."
+                    "description": "Magnitude of wind velocity."
                 }
             ],
 
@@ -907,7 +907,7 @@
                //   layer.bindPopup(
                         // station.properties.description
                //   );
-                    console.log(station.properties.network + " - " + station.properties.name, station);
+                    //console.log(station.properties.network + " - " + station.properties.name, station);
 
                     //station_feature.setAttribute("title","testing");
 
@@ -953,7 +953,7 @@
                     });
                 },
                 pointToLayer: function (station, latlng) {
-                    console.log(tool.stationMarkerOptions[station.properties.network]);
+                    //console.log(tool.stationMarkerOptions[station.properties.network]);
 
                     return L.circleMarker(latlng, tool.stationMarkerOptions[station.properties.network]);
                 }
@@ -1022,7 +1022,6 @@
 
         return _map.getBounds().toBBoxString();
     };
-
 
     /** 
     * 
