@@ -395,7 +395,6 @@
             else{
               alert("station change, but update parameters returns false. add visual?");
             }
-
           })
         )
         .append(
@@ -403,7 +402,6 @@
             "id" : "select-parameters"
           })
           .on("change", function(evt){
-
             
             // turn on loading icon, but be smart about it..
             // use id as value, give it a class.. remove all with class, then 
@@ -413,7 +411,6 @@
 
             $('<img class="loading-icon loading-'+ evt.target.value + ' " src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
               .insertAfter($("#select-parameters"))
-
 
             $(".param-icon").remove();
             
