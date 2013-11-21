@@ -181,6 +181,16 @@
         }
 
         return yearsAry;
+    },
+
+    _svgToCanvas = function(svg_source_dom_id,canvas_dom_id){
+
+        //load an svg snippet in the canvas
+        canvg(
+          document.getElementById('canvas'),
+          $('<div>').append($("#vistool svg").clone()).html(), // hack to pull html contents
+          { ignoreMouse: true, ignoreAnimation: true }
+        );
     };
 
 
