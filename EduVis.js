@@ -642,6 +642,8 @@ var EduVis = (function () {
                         //tool.customization_update();
                     });
 
+                input.css(typeof control.cssInput === "object" ? control.cssInput : {})
+                
                 ctrl = $("<div/>")
                     .addClass("control")
                     .append(lbl)
@@ -663,7 +665,7 @@ var EduVis = (function () {
                     })
                     .html(control.default_value)
                     .change(function(){
-                        self.customization_update();
+                        //self.customization_update();
                     });
 
                 ctrl = $("<div></div>")
@@ -695,7 +697,7 @@ var EduVis = (function () {
                     .attr({
                         "id": id
                     }).change(function () {
-                        tool.customization_update();
+                        //tool.customization_update();
                     });
 
                 console.log("control dropdown: options:", control.options);
@@ -770,36 +772,53 @@ var EduVis = (function () {
                     })
                     .html(control.description);
 
-                input = $("<input />")
-                    .addClass("input-small")
-                    .attr({
-                        "id": id,
-                        "type": "text"
-                    })
-                    .addClass("datepicker")
-                    .val(control.default_value)
-                    .on("change", function () {
-                        tool.customization_update();
-                    });
+                // input or div
+                if(typeof control.inline === "undefined"){
+
+                    input = $("<input />")
+                        .attr({
+                            "type": "text"
+                        })
+                  
+                }
+                else{
+                    input = $("<div/>");
+                }
+
+                // input 
+                //     .addClass("datepicker")
+                //     //.val(control.default_value)
+                //     // .on("change", function () {
+                //     //     //tool.customization_update();
+                //     //     console.log("datepicker changed")
+                //     // });
 
                 // set jquery datepicker settings
-                $( input ).datepicker({
-                    "dateFormat": "yy-mm-dd",
-                    changeMonth: true,
-                    changeYear: true,
-                    showButtonPanel: true
-                })
-                    .on("changeDate", function () {
-                        tool.customization_update();
-                    });
-
-                ctrl = $("<div></div>")
+                $( input )
+                    .attr({
+                        "id": id 
+                    })
+                    .datepicker({
+                        "dateFormat": "mm-dd-yy",
+                        "changeMonth": true,
+                        "changeYear": true,
+                        "showButtonPanel": false,
+                        "onSelect" : function(d,i){
+                            console.log("datepicker changed!",d,i);
+                            //tool.configuration.date_start = d;
+                        },
+                        "defaultDate": control.default_value
+                        //"maxDate": "0",
+                        //"showOptions": { "direction": "up" }
+                    })
+                    .val(control.default_value);
+                   
+                ctrl = $("<div/>")
                     .addClass("control ctlhandle")
                     .append(lbl)
                     .append(input);
 
                 break;
-
 
             case "colorpicker":
 
@@ -957,13 +976,220 @@ var EduVis = (function () {
                             "parent_tool" : control.parent_tool,
                             "data_cart" : control.data_cart
                         });
-                    });
+
+                        $(this).hide();
+
+                    }),
 
                 ctrl = $("<div/>")
                     .append(dataBrowserButton)
                     .append(dataBrowserContainer)
 
                 break;
+
+            case "dateRange" :
+
+                // $( "#from" ).datepicker({
+                //   defaultDate: "+1w",
+                //   changeMonth: true,
+                //   numberOfMonths: 3,
+                //   onClose: function( selectedDate ) {
+                //     $( "#to" ).datepicker( "option", "minDate", selectedDate );
+                //   }
+                // });
+                // $( "#to" ).datepicker({
+                //   defaultDate: "+1w",
+                //   changeMonth: true,
+                //   numberOfMonths: 3,
+                //   onClose: function( selectedDate ) {
+                //     $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+                //   }
+                // });
+
+                var drContainer = $("<div/>")
+                    .attr({
+                        "id" : "dr-container"
+                    }),
+
+                drRange = $("<div/>")
+                    .attr({
+                        "id" : "dr-range"
+                    })
+                    .css({
+                        "height":"300px"
+                    })
+                    .hide()
+                    .append(
+                        $("<h2>Selected Date Range</h2>")
+                    )
+                    .append(
+
+                        EduVis.controls.create(this, "date_start", {
+
+                            "type" : "datepicker",
+                            "label" : "dateRange",
+                            "tooltip": "The start date.",
+                            "default_value" : obj_control.default_value.date_start,
+                            "description" : "<b>Start Date<b>",
+                            "inline" : "inline",
+                            "update_event": function(){
+                                alert("start date changed: " + $(this).val());
+                            }
+                        })
+                        .css({
+                            "width":"300px",
+                            "height":"300px",
+                            "float":"left"
+                        })
+                    )
+                    .append(
+
+                        EduVis.controls.create(this, "date_end", {
+
+                            "type" : "datepicker",
+                            "label" : "dateRange",
+                            "tooltip": "The end date.",
+                            "default_value" : obj_control.default_value.date_end,
+                            "description" : "<b>End Date</b>",
+                            "inline" : "inline",
+                            "update_event": function(){
+                                alert("end date changed: " + $(this).val());
+                            }
+                        })
+                        .css({
+                            "width":"300px",
+                            "height":"300px",
+                            "float":"left"
+                        })
+                    ),
+
+                
+                drRealtime = $("<div/>")
+                    .attr({
+                        "id" : "dr-realtime"
+                    })
+                    .css({
+                        "height":"300px"
+                    })
+                    .append(
+                        $("<h2>Real Time Date Range</h2>")
+                    )
+                    .append(
+                        $("<div/>")
+                            .append(
+                                $("<h5># Days Prior</h5>")
+                            )
+                            .append(
+                                $("<input />")
+                                    .attr({
+                                        "id":"dr-realtime-dateStart",
+                                        "type":"text",
+                                        "width":"250px"
+                                    })
+                            )
+                    )
+                    .append(
+                        $("<div/>")
+                            .append(
+                                $("<h5>Current Date</h5>")
+                            )
+                            // .append(
+                            //     $("<input />")
+                            //         .attr({
+                            //             "id":"dr-realtime-dateEnd",
+                            //             "type":"text",
+                            //             "width":"250px",
+                            //             "enabled": "false",
+                            //             "value" : "now"
+                            //         })
+                            // )
+                    )
+
+                    
+                    // for now, just use textbox.. additional functionality will come later
+                    // now append radio button with pre built options
+                    // not considering month length or leap years
+                    // 1 day 1
+                    // 1 week 7
+                    // 1 month 31
+                    // 1 year 365
+
+                    // end date = now
+
+                    .hide(),
+
+                drOptions = $("<div/>")
+                    .attr({
+                        "id" : "dr-selections"
+                    })
+                    .css({
+                        "height": "40px"
+                    })
+                    .append(
+                        $("<div/>")
+                            .addClass("btn")
+                            .css({
+                                "width":"40%",
+                                "float":"left",
+                                "padding-left": "20px"
+                            })
+                            .html("Date Range")
+                            .on("click",function(){
+                                drRealtime.hide()
+                                drRange.show();
+                                // when changing to date range option, set date_end input to match 
+                                // the tool configuration
+                                $("#date_end").val(tool.configuration.date_end);
+
+                            })
+                    )
+                    .append(
+                        $("<div/>")
+                            .addClass("btn")
+                            .css({
+                                "width":"40%",
+                                "float":"right",
+                                "padding-right": "20px"
+                            })
+                            .html("Real Time")
+                            .on("click",function(){
+                                drRange.hide();
+                                drRealtime.show();
+                                $("#date_end").val("now");
+                            })
+                    ),
+
+                drOptionSelected = $("<div/>")
+                    .attr({
+                        "id" : "dr-selector"
+                    });
+
+
+                if(typeof control.defaultPicker === "undefined"){
+                    drRange.hide();
+                    drRealtime.show();
+                }
+                else{
+                    drRange.show();
+                    drRealtime.hide();
+                }
+
+
+                ctrl = drContainer
+                    
+                    .append(drOptions)
+
+                    .append(
+
+                        drOptionSelected
+                            
+                            .append(drRange)
+
+                            .append(drRealtime)
+                    )
+
+                break;
+
 
             default:
                 // empty div if nothing is passed
@@ -1004,13 +1230,124 @@ var EduVis = (function () {
 
         return control_obj;        
 
+    },
+
+    _control_drupal_edit_controls = function(divToolControls, evTool){
+
+        if(typeof evTool.controls !== "object"){
+                    
+            // if there are no controls, tell the user
+            divToolControls.append(
+                
+                $("<p/>",{"class":"notify"})
+                    .html("This tool does not have any configurable properties.")
+            );
+        }
+        else{
+
+                var control_count = 1;
+            // Add each control to the specified div
+            $.each(evTool.controls, function (control_id, control) {
+                
+                console.log("control_count:", control_count++, control_id);
+                // override default value with form based value, if exists
+                
+                if(typeof control.default_value === "object"){
+
+                    // rebuild multiple items object
+                    var tmp_obj = {};
+                    $.each(control.default_value, function(index, val) {
+
+                        //if(index == control_id){
+                            tmp_obj[index] = evTool.configuration[index];   
+                        //}
+
+                        console.log("index", index);
+                        console.log("value", val);
+                     
+                    });
+                    console.log("tmp_obj", tmp_obj);
+
+                    $.extend(true, control.default_value, tmp_obj);
+
+                }
+                else{
+                    control.default_value = evTool.configuration[control_id];
+                }
+                                        
+                console.log("DEFAULT VALUE", control.default_value);
+
+                // add the tool to the controls area
+                divToolControls.append(
+                    
+                    $("<div/>")
+                        .append(
+                            EduVis.controls.create( evTool, "config-" + control_id, control)
+                        )
+                        .append(
+                            $("<button/>")
+                                .addClass("btn btn-small config-apply-button")
+                                .html("Apply")
+                                .on("click", function(a){
+
+                                    a.preventDefault();
+
+                                    if(typeof control.applyClick !== "undefined"){
+                                        control.applyClick();
+                                    }
+                                    
+                                    console.log("control", control, "control_id:", control_id, "typeof: " + typeof control.default_value);
+
+                                    // does this have multiple 
+                                    if(typeof control.default_value === "object"){
+
+                                        $.each(control.default_value,function(k,v){
+
+                                            console.log("k,v",k,v);
+
+                                            // todo: include control name in config item id.. 
+                                            // config_range_date_start, for example.. currently using config key
+
+                                            evTool.configuration[k] = $("#" + k).val();
+
+                                        });
+
+                                    }
+                                    else{
+                                        console.log("else", control_id, control);   
+                                        evTool.configuration[control_id] = $("#config-" + control_id).val();
+                                    }
+                                })
+                        )
+                                
+                        .append(
+                            $("<button/>")
+                                .addClass("btn btn-small config-apply-button")
+                                .html("Reset")
+                                .on("click", function(a){
+                                    a.preventDefault();
+                                    //console.log("this:", this);
+                                    console.log("----control configuration----", a);
+
+                                    evTool.configuration[control] = control.default_value;
+
+                                })
+                        )   
+                )
+
+            });
+        }
+
+        return divToolControls;
+
     };
 
     eduVis.controls = {
         load : _control_load,
         preview : _control_preview,
         create : _control_create,
-        load_tool_config_values : _control_load_tool_control_values
+        load_tool_config_values : _control_load_tool_control_values,
+        drupal_edit_controls : _control_drupal_edit_controls
     };
 
 
@@ -2413,6 +2750,16 @@ Provides the base resource queue, loading, and updating functionality.
         }
 
         return yearsAry;
+    },
+
+    _svgToCanvas = function(svg_source_dom_id,canvas_dom_id){
+
+        //load an svg snippet in the canvas
+        canvg(
+          document.getElementById('canvas'),
+          $('<div>').append($("#vistool svg").clone()).html(), // hack to pull html contents
+          { ignoreMouse: true, ignoreAnimation: true }
+        );
     };
 
 
