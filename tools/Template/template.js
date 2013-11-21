@@ -7,9 +7,6 @@
 (function (eduVis) {
 
     "use strict";
-    //var tool = EduVis.tool.template;
-
-    //console.log("tool template", tool);
 
     var tool = {
 
@@ -28,27 +25,22 @@
         
         "resources" : {
 
-            "scripts_local" : [],
-
-            "scripts_external" : [
-            	{
+            "scripts" : [
+                {
                     "name" : "d3",
                     "url" : "http://d3js.org/d3.v3.min.js",
                     "global_reference" : "d3"
                 }
-
             ],
 
-            "stylesheets_local" : [],
-
-            "stylesheets_external" : [
+            "stylesheets" : [
                 {
                     "name" : "jquery-ui",
                     "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
                 }
             ],
 
-            "datasets" : [] // in case we being to support additional local resource files
+            "datasets" : [] 
             
         },
 
