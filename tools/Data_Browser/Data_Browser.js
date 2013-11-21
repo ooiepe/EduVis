@@ -438,7 +438,6 @@
         winCartHeight = winStationHeight,
         winApplyHeight = 60;
 
-
         $("#data-browser-wrap").height(mainHeight);
         $("#db-map").height(mainHeight);
 
@@ -447,7 +446,6 @@
         $("#db-data-cart-apply").height(winApplyHeight);
 
     };
-
 
     tool.dataCart = function(){
 
@@ -475,6 +473,7 @@
                     .hover(
                         function() {
                             var sta = $(this);
+                            console.log("sta****", sta);
 
                             // is there already a span element? if so, remove it
                             if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
@@ -504,7 +503,8 @@
                                     // simply remove this item.. no need for full redraw
                                     //tool.dataCart();
                                 })
-                                .insertBefore(sta);
+                                .prependTo(sta);
+                                //.insertBefore(sta);
                             
                         },
                         function() {
@@ -677,7 +677,7 @@
 
                             $("<a></a>")
                                 .attr("title", param.description)
-                                .attr("href","#"+param.name)
+                                //.attr("href","#"+param.name)
                         )
                 );
 
@@ -855,31 +855,41 @@
 
     tool.searchQueue = function(){
 
-        var self = this;
-        // turn on the progress bar
-        $( "#db-search-progress" ).progressbar({"enabled":true, value: 25});
+        var self = this,
+            time_segments = 5,
+            time_overall = 2000,
+            time_interval = time_overall/time_segments,
+            time_progress_interval = 100/time_segments;
         
+        // turn on the progress bar and set value to 25
+        $( "#db-search-progress" )
+            .progressbar({"enabled":true, value: time_progress_interval});
+        
+        // clear interval
         clearInterval(tool._timerSearchProgress);
+
+        // set the interval timer to increment 25. time is 3/4 second
         tool._timerSearchProgress = setInterval(function(){
 
             var progressbar = $( "#db-search-progress" ),
                 progressValue = progressbar.progressbar("value");
-                progressbar.progressbar({"value": progressValue + 25});
 
-        }, 750);
+            progressbar.progressbar({"value": progressValue + time_progress_interval});
+
+        }, time_interval);
 
         clearTimeout(tool._timerSearchQueue);
         tool._timerSearchQueue = setTimeout(function(){
             
+            // tun the search timer
             tool.searchData();
 
             $( "#db-search-progress" ).progressbar( "value",0);
             clearInterval(tool._timerSearchProgress);
 
-        }, 3000);
+        }, time_overall);
 
     };
-
 
     // for now we will just use a button to run the searches. 
     // ultimately this will be on updates of any of the search criteria
@@ -1086,7 +1096,7 @@
 
             $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
 
-                console.log(data);
+                console.log("**** station data **** ", data);
 
                 var stationObj = data;
 
@@ -1104,7 +1114,10 @@
                     
                     console.log("param",param);
 
-                    dom_station_window.append( $("<div/>") 
+                    dom_station_window.append( 
+
+                        $("<div/>")
+                            .css({"overflow":"overlay"})
                         
                         .append( 
 
@@ -1114,11 +1127,13 @@
                         )
                         .append( 
 
+                            // <button class="btn btn-mini" type="button">Mini button</button>
                             $("<a/>")
                                 .attr({
-                                    "class":"btn btn-info btn-mini",
+                                    "class":"btn btn-mini station-window-add",
                                     "id":"select-" + station_dom_id + "_" +  param,
-                                    "href" : "#a-"+ station_dom_id + "_" +  param
+                                    //"href" : "#a-"+ station_dom_id + "_" +  param,
+                                    "type" : "button"
                                 })
                                 .html("Add")
                                 .on("click", function(evt){
@@ -1130,12 +1145,12 @@
                                     tool.dataCart();
                                 })
                         )
-                        .append( 
+                        // .append( 
 
-                            $("<a></a>")
-                                .attr("title", param.description)
-                                .attr("href", "#"+param)
-                        )
+                        //     $("<a></a>")
+                        //         .attr("title", param.description)
+                        //         .attr("href", "#"+param)
+                        // )
                     )
 
                 });
@@ -1143,9 +1158,25 @@
                 $("#db-station-details")
                 .empty()
                 .append(
-                    $("<h4/>")
-                        .addClass("title")
-                        .html("Network: (" + network + ") " + station)
+                    $("<div>")
+                        .append(
+                            $("<h4/>")
+                                .addClass("title")
+                                .html("Network: (" + network + ") " + station)
+                        )
+
+                        .hover(
+                        function() {
+                            $(this).parent().prepend(
+                                $('<span class="station-detail-hover" style="float:right">[this]</span>')
+                            )
+                        },
+                        function() {
+                            $( ".station-detail-hover" ).remove();
+                        }
+                     )
+
+
                 )
                 .append(dom_station_window);
 
@@ -1243,6 +1274,20 @@
             });
         }
     };
+
+    tool.getStationDetails = function(network, station){
+
+        
+
+        $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
+
+
+        
+        });
+
+
+    }
+    
 
     tool.DataBrowser = function( _target ){
 
