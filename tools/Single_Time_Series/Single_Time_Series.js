@@ -1,10 +1,10 @@
-/* Simple Time Series Tool
+/* Single Time Series Tool
  * Revised 10/22/2013
  */
 (function (eduVis) {
     "use strict";
     var tool = {
-        "name" : "Simple_Time_Series",
+        "name" : "Single_Time_Series",
         "description" : "The Hello World of EV.",
         "version" : "0.1",
         "authors" : [
@@ -20,7 +20,9 @@
             }
         ],
         "resources" : {
-            "scripts" : [
+
+
+           "scripts" : [
               {
                 "name" : "d3",
                 "url" : "http://d3js.org/d3.v3.js",
@@ -28,13 +30,22 @@
                 "attributes" : {
                     "charset" : "utf-8"
                 }
+              },
+              {
+                "name" : "jquery_ui_js", 
+                "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
               }
             ],
             "stylesheets" : [
-                 {
-                     "name" : "Simple_Time_Series_css",
-                     "src" : "Simple_Time_Series.css"
-                 }
+               {
+                   "name" : "Single_Time_Series_css",
+                   "src" : "Single_Time_Series.css"
+               },
+               {
+
+                 "name" : "jquery-ui-css",
+                  "src" : "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+                }
             ],
             "datasets" : []            
         },
@@ -43,8 +54,8 @@
           "station" : "44025",
           "network" : "NDBC",
           "parameter" : "air_temperature",
-          "start_date" : "2",
-          "end_date" : "now",
+          "date_start" : "2",
+          "date_end" : "now",
           "data_cart" : 
             {"NDBC":{"44025":{"parameters":{"air_pressure":{},"air_temperature":{}}}},"CO-OPS":{"2695540":{"parameters":{"air_pressure":{},"air_temperature":{},"measured_tide":{}}}}}
         },
@@ -64,26 +75,51 @@
         //     "description" : "Enter a NDBC Station ID.",
         //     "update_event" : graph_update_sta
         // },
-        "start_date" : {
-            "type" : "textbox",
-            "label" : "Start Date",
-            "tooltip": "Enter date in the format yyyy-mm-dd or a number of days you want prior to the end date.",
-            "default_value" : "7",
-            "description" : "Enter the starting date.",
-            "update_event" : graph_update_sd
-        },
-        "end_date" : {
-            "type" : "textbox",
-            "label" : "End Date",
-            "tooltip": "Enter date in the format yyyy-mm-dd or the word 'now'.",
-            "default_value" : "now",
-            "description" : "Enter the ending date.",
-            "update_event" : graph_update_ed
+        // "start_date" : {
+        //     "type" : "textbox",
+        //     "label" : "Start Date",
+        //     "tooltip": "Enter date in the format yyyy-mm-dd or a number of days you want prior to the end date.",
+        //     "default_value" : "7",
+        //     "description" : "Enter the starting date.",
+        //     "update_event" : graph_update_sd
+        // },
+        // "end_date" : {
+        //     "type" : "textbox",
+        //     "label" : "End Date",
+        //     "tooltip": "Enter date in the format yyyy-mm-dd or the word 'now'.",
+        //     "default_value" : "now",
+        //     "description" : "Enter the ending date.",
+        //     "update_event" : graph_update_ed
+        // },
+        "range" : {
+
+            "type" : "dateRange",
+            "label" : "dateRange",
+            "tooltip": "Select the Start Date and End Date",
+            "default_value" : {
+                "date_start" : "2",
+                "date_end" : "now"
+            },
+            "description" : "date range",
+            "options": {
+                "maxDate": "1"
+            },
+            "applyClick" : function(){
+                if($("#date_end").val() == "now"){
+                    $("#date_start").val($("#dr-realtime-dateStart").val());
+                }
+            },
+            "update_event":function(evt){
+                // var target = evt.target,
+                //     val = target.value;
+                // tool.configuration.message = val;
+                alert("update date range")
+            }
         },
         "data_cart" : {
             "type":"dataBrowser",
             "label" : "Data Browser",
-            "parent_tool" : "Simple_Time_Series",
+            "parent_tool" : "Single_Time_Series",
             "data_cart" : tool.configuration.data_cart,
             "update_event" : function(a){ 
 
@@ -181,41 +217,41 @@
 
     };
     
-    tool.drawgraph = function(data) {
+    // tool.drawgraph = function(data) {
 
-          var g = this.graph,
-            cols = d3.entries(data[0]);
+    //       var g = this.graph,
+    //         cols = d3.entries(data[0]);
 
-          data.forEach(function(d) {
-            d.date = g.parseDate(d.date);
-            d.data = +d[cols[1].key];
-          }); 
+    //       data.forEach(function(d) {
+    //         d.date = g.parseDate(d.date);
+    //         d.data = +d[cols[1].key];
+    //       }); 
           
-          g.x.domain(d3.extent(data, (function(d) { return d.date; })));
-          g.y.domain(d3.extent(data, (function(d) { return d.data; })));
+    //       g.x.domain(d3.extent(data, (function(d) { return d.date; })));
+    //       g.y.domain(d3.extent(data, (function(d) { return d.data; })));
           
-          g.focus.append("g")
-              .attr("id", "xAxis")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + g.height + ")")
-              .call(g.xAxis);
+    //       g.focus.append("g")
+    //           .attr("id", "xAxis")
+    //           .attr("class", "x axis")
+    //           .attr("transform", "translate(0," + g.height + ")")
+    //           .call(g.xAxis);
         
-          g.focus.append("g")
-              .attr("id", "yAxis")
-              .attr("class", "y axis")
-              .call(g.yAxis);
+    //       g.focus.append("g")
+    //           .attr("id", "yAxis")
+    //           .attr("class", "y axis")
+    //           .call(g.yAxis);
               
-          g.focus.append("path")
-              .datum(data)
-              .attr("class", "line")
-              .attr("d", g.line1)
-              .attr("fill","none")
-              .attr("stroke","#a33333")
-              .attr("stroke-width","2px");
+    //       g.focus.append("path")
+    //           .datum(data)
+    //           .attr("class", "line")
+    //           .attr("d", g.line1)
+    //           .attr("fill","none")
+    //           .attr("stroke","#a33333")
+    //           .attr("stroke-width","2px");
           
-          g.ylabel.text(cols[1].key);      
+    //       g.ylabel.text(cols[1].key);      
 
-    };    
+    // };    
     
     tool.init = function(_target) {
         this.setup(this.dom_target);
@@ -244,13 +280,13 @@
     function graph_update_sd(evt){
         var target = evt.target,
             val = target.value;
-        tool.configuration.start_date = val;
+        tool.configuration.date_start = val;
         tool.graph_update();
     }
     function graph_update_ed(evt){
         var target = evt.target,
             val = target.value;
-        tool.configuration.end_date = val;
+        tool.configuration.date_end = val;
         tool.graph_update();
     }
     
@@ -272,8 +308,8 @@
           network = config.network,
           station = config.station,
           parameter = config.parameter,
-          start = config.start_date,
-          end = config.end_date;
+          start = config.date_start,
+          end = config.date_end;
 
       return 'http://epedev.oceanobservatories.org/timeseries/data.php?' + 
           'network=' + network + 
@@ -329,8 +365,12 @@
           // update x and y axis 
           d3.select("#yAxis").call(g.yAxis);
           d3.select("#xAxis").call(g.xAxis);
+          
         }
       }
+      
+      // remove loading image
+      $(".loading-icon").remove();
 
     };
 
@@ -349,11 +389,12 @@
           .on("change", function(evt){
 
             // update network and station in config
-            if(tool.select_updateParameters())
+            if(tool.select_updateParameters()){
               tool.graph_update_sta(evt.target.value);
-
-            //tool.configuration.station = evt.target.value;
-            //alert("station changed to " + evt.target.value);
+            }
+            else{
+              alert("station change, but update parameters returns false. add visual?");
+            }
 
           })
         )
@@ -362,6 +403,17 @@
             "id" : "select-parameters"
           })
           .on("change", function(evt){
+
+            
+            // turn on loading icon, but be smart about it..
+            // use id as value, give it a class.. remove all with class, then 
+
+            // clear spinner icon
+            $(".loading-icon").remove();
+
+            $('<img class="loading-icon loading-'+ evt.target.value + ' " src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
+              .insertAfter($("#select-parameters"))
+
 
             $(".param-icon").remove();
             
@@ -431,6 +483,10 @@
       else{
 
         $("#select-stations").val(config.network + "," + config.station);
+        // remove loading image
+        
+        //alert("loading-icon here..")
+
       }
 
       //     // // value does not exist, so select the first one
