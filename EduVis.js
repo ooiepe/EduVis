@@ -1010,13 +1010,13 @@ var EduVis = (function () {
 
                 var radio_btn_click = function(a){
 
-                    var start_input = $("#config-dateRange_date_start"),
-                        start_lbl = $("#config-dateRange_date_start").parent().find("label:first"),
-                        start_button = $("#config-dateRange_date_start").parent().find("label:last"),
+                    var start_input = $("#"+id+"_date_start"),
+                        start_lbl = start_input.parent().find("label:first"),
+                        start_button = start_input.parent().find("label:last"),
 
-                        end_input = $("#config-dateRange_date_end"),
-                        end_lbl = $("#config-dateRange_date_end").parent().find("label:first"),
-                        end_button = $("#config-dateRange_date_end").parent().find("label:last");
+                        end_input = $("#"+id+"_date_end"),
+                        end_lbl = end_input.parent().find("label:first"),
+                        end_button = end_input.parent().find("label:last");
                        
 
                     if(this.value == "real_time"){
@@ -1448,10 +1448,18 @@ var EduVis = (function () {
 
                 // add the tool to the controls area
                 var tmpCtrl = EduVis.controls.create( evTool, "config-" + control_id, control),
-                    control_buttons;
+                    control_buttons,
+                    showApplyButtons;
 
-                if(typeof control.showApplyButton !== "undefined"){
+                if(typeof control.showApplyButton === "undefined"){
+                    showApplyButtons = true;
+                }
+                else{
+                    showApplyButtons = control.showApplyButton;
+                }
                     
+                if(showApplyButtons){
+
                     control_buttons = $("<div/>")
                         .append(
 
@@ -1503,7 +1511,7 @@ var EduVis = (function () {
                                     evTool.configuration[control] = control.default_value;
 
                                 })
-                        )   
+                        )
 
                 }
 
