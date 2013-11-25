@@ -430,7 +430,7 @@
 
                 break;
 
-            case  "date_range":
+            case  "dateRange":
 
                 var radio_btn_click = function(a){
 
@@ -474,7 +474,6 @@
                                 .datepicker("setDate", tool.configuration.date_end);
 
                         }
-
                     }
 
                 };
@@ -581,7 +580,7 @@
                 break;
 
 
-            case "dateRange" :
+            case "olddateRange" :
 
                 // $( "#from" ).datepicker({
                 //   defaultDate: "+1w",
@@ -872,17 +871,13 @@
                 console.log("DEFAULT VALUE", control.default_value);
 
                 // add the tool to the controls area
-                divToolControls.append(
+                var tmpCtrl = EduVis.controls.create( evTool, "config-" + control_id, control),
+                    control_buttons;
+
+                if(typeof control.showApplyButton !== "undefined"){
                     
-                    $("<div/>")
+                    control_buttons = $("<div/>")
                         .append(
-                            EduVis.controls.create( evTool, "config-" + control_id, control)
-                        )
-                        .append(
-
-                            // (function(){
-
-                            // })();
 
                             $("<button/>")
                                 .addClass("btn btn-small config-apply-button")
@@ -897,6 +892,7 @@
                                     
                                     console.log("control", control, "control_id:", control_id, "typeof: " + typeof control.default_value);
 
+                                    // 
                                     // does this have multiple 
                                     if(typeof control.default_value === "object"){
 
@@ -932,6 +928,14 @@
 
                                 })
                         )   
+
+                }
+
+                divToolControls.append(
+                   
+                    $("<div/>")
+                        .append(tmpCtrl)
+                        .append(control_buttons)
                 )
 
             });

@@ -1006,7 +1006,7 @@ var EduVis = (function () {
 
                 break;
 
-            case  "date_range":
+            case  "dateRange":
 
                 var radio_btn_click = function(a){
 
@@ -1050,9 +1050,6 @@ var EduVis = (function () {
                                 .datepicker("setDate", tool.configuration.date_end);
 
                         }
-                        
-                            
-
                     }
 
                 };
@@ -1159,7 +1156,7 @@ var EduVis = (function () {
                 break;
 
 
-            case "dateRange" :
+            case "olddateRange" :
 
                 // $( "#from" ).datepicker({
                 //   defaultDate: "+1w",
@@ -1450,17 +1447,13 @@ var EduVis = (function () {
                 console.log("DEFAULT VALUE", control.default_value);
 
                 // add the tool to the controls area
-                divToolControls.append(
+                var tmpCtrl = EduVis.controls.create( evTool, "config-" + control_id, control),
+                    control_buttons;
+
+                if(typeof control.showApplyButton !== "undefined"){
                     
-                    $("<div/>")
+                    control_buttons = $("<div/>")
                         .append(
-                            EduVis.controls.create( evTool, "config-" + control_id, control)
-                        )
-                        .append(
-
-                            // (function(){
-
-                            // })();
 
                             $("<button/>")
                                 .addClass("btn btn-small config-apply-button")
@@ -1475,6 +1468,7 @@ var EduVis = (function () {
                                     
                                     console.log("control", control, "control_id:", control_id, "typeof: " + typeof control.default_value);
 
+                                    // 
                                     // does this have multiple 
                                     if(typeof control.default_value === "object"){
 
@@ -1510,6 +1504,14 @@ var EduVis = (function () {
 
                                 })
                         )   
+
+                }
+
+                divToolControls.append(
+                   
+                    $("<div/>")
+                        .append(tmpCtrl)
+                        .append(control_buttons)
                 )
 
             });
