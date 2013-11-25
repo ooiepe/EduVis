@@ -767,9 +767,10 @@ var EduVis = (function () {
 
                 lbl = $("<label />")
                     .attr({
-                        'for': id + "_dp",
-                        'title': control.tooltip
+                      //  'for': id + "_dp",
+                        'title': control.tooltip,
                     })
+                    //.addClass("add-on")
                     .html(control.description);
 
                 // input or div
@@ -793,32 +794,50 @@ var EduVis = (function () {
                 //     //     console.log("datepicker changed")
                 //     // });
 
+                console.log("default value", control.default_value);
+
                 // set jquery datepicker settings
                 $( input )
                     .attr({
                         "id": id 
                     })
                     .datepicker({
-                        "dateFormat": "mm-dd-yy",
+                        "dateFormat": "yy-mm-dd",
+                        "showOn": "button",
                         "changeMonth": true,
                         "changeYear": true,
-                        "showButtonPanel": false,
+                        //"showButtonPanel": true,
                         "onSelect" : function(d,i){
                             console.log("datepicker changed!",d,i);
                             //tool.configuration.date_start = d;
                         },
                         "defaultDate": control.default_value
-                        //"maxDate": "0",
-                        //"showOptions": { "direction": "up" }
+
                     })
                     .val(control.default_value);
                    
                 ctrl = $("<div/>")
                     .addClass("control ctlhandle")
                     .append(lbl)
-                    .append(input);
+                    .append(input)
+                    .append(
+                        $("<label/>")
+                            .attr({
+                                "for" : id
+                            })
+                            .addClass("add-on")
+                            .css({
+                                "display":"inline"
+                            })
+                            .html(' <i class="icon-calendar"></i>')
+                            .on("click", function(){
 
-                break;
+                                //    /input.datepicker("show")
+                                input.datepicker("show");
+                            })
+                    )
+
+                 break;
 
             case "colorpicker":
 
@@ -986,6 +1005,159 @@ var EduVis = (function () {
                     .append(dataBrowserContainer)
 
                 break;
+
+            case  "date_range":
+
+                var radio_btn_click = function(a){
+
+                    var start_input = $("#config-dateRange_date_start"),
+                        start_lbl = $("#config-dateRange_date_start").parent().find("label:first"),
+                        start_button = $("#config-dateRange_date_start").parent().find("label:last"),
+
+                        end_input = $("#config-dateRange_date_end"),
+                        end_lbl = $("#config-dateRange_date_end").parent().find("label:first"),
+                        end_button = $("#config-dateRange_date_end").parent().find("label:last");
+                       
+
+                    if(this.value == "real_time"){
+
+                        start_lbl.html("<b>Days Prior</b>");
+                        //start_input.val(tool.configuration.date_start);
+
+                        end_lbl.html("<b>Current Date</b>");
+                        end_input.val("now");
+
+                        start_button.hide();
+                        end_button.hide();
+
+                    }
+                    else{
+
+                        start_button.show();
+                        end_button.show();
+                        start_lbl.html("<b>Start Date</b>");
+                        //start_input.val("1");
+                        start_input
+                            .val(tool.configuration.date_start)
+
+                        if(tool.configuration.date_end == "now"){
+
+                            end_input
+                                .datepicker("setDate", new Date() );
+                        }else{
+                            
+                            end_input
+                                .datepicker("setDate", tool.configuration.date_end);
+
+                        }
+                        
+                            
+
+                    }
+
+                };
+
+                var dr_container = $("<div/>"),
+                    dr_options = $("<div/>")
+                        .addClass("row-fluid")
+                        // two radios
+                        .append(
+                            
+                            $("<div/>")
+                                .addClass("span3")
+                                .append(
+                                    $("<input/>")
+                                        .attr({
+                                            "id": id + "_drOptionsRealTime",
+                                            "type":"radio",
+                                            "name":"dr_options",
+                                            "value":"real_time"
+                                        })
+                                        .on("change",radio_btn_click)
+                                ).append(
+                                 $("<label/>")
+                                        .attr({
+                                            "for":id + "_drOptionsRealTime"
+                                        })
+                                        .css({"display":"inline"})
+                                        .html("&nbsp;<b>Real Time</b>")
+                                )
+                        )
+                        .append(
+                            
+                            $("<div/>")
+                                .addClass("span3")
+                                .append(
+                                    $("<input/>")
+                                        .attr({
+                                            "id": id + "_drOptionsArchive",
+                                            "type":"radio",
+                                            "name":"dr_options",
+                                            "value":"archive"
+                                        })
+                                        .on("change",radio_btn_click)
+                                )
+                                .append(
+                                    $("<label/>")
+                                        .attr({
+                                            "for":id + "_drOptionsArchive"
+                                        })
+                                        .css({"display":"inline"})
+                                        .html("&nbsp<b>Archived</b>")
+                                )
+
+
+                        ),
+                    dr_inputs = $("<div/>")
+                        .addClass("row-fluid"),
+                    
+                    dr_date_start = EduVis.controls.create(this, id + "_date_start", {
+
+                            "type" : "datepicker",
+                            "label" : "Start Date",
+                            "tooltip": "The start date.",
+                            "default_value" : obj_control.default_value.date_start,
+                            "description" : "<b>Start Date<b>",
+                            //"inline" : "inline",
+                            "update_event": function(){
+                                alert("start date changed: " + $(this).val());
+                            }
+                        })
+                        .val(obj_control.default_value.date_end)
+                        .addClass("span3")
+                        .css({
+                           
+                        }),
+
+                    dr_date_end = EduVis.controls.create(this, id + "_date_end", {
+
+                            "type" : "datepicker",
+                            "label" : "Start Date",
+                            "tooltip": "The start date.",
+                            "default_value" : obj_control.default_value.date_end,
+                            "description" : "<b>End Date<b>",
+                            // "inline" : "inline",
+                            "update_event": function(){
+                                alert("start date changed: " + $(this).val());
+                            }
+                        })
+                        .val(obj_control.default_value.date_end)
+                        .addClass("span3")
+                        .css({
+                            
+                        });
+
+                dr_inputs
+                    .append(dr_date_start)
+                    .append(dr_date_end);
+
+                ctrl = dr_container
+                    .append(dr_options)
+                    .append(dr_inputs);
+
+
+                break;
+
 
             case "dateRange" :
 
@@ -1285,6 +1457,11 @@ var EduVis = (function () {
                             EduVis.controls.create( evTool, "config-" + control_id, control)
                         )
                         .append(
+
+                            // (function(){
+
+                            // })();
+
                             $("<button/>")
                                 .addClass("btn btn-small config-apply-button")
                                 .html("Apply")
@@ -1308,7 +1485,7 @@ var EduVis = (function () {
                                             // todo: include control name in config item id.. 
                                             // config_range_date_start, for example.. currently using config key
 
-                                            evTool.configuration[k] = $("#" + k).val();
+                                            //evTool.configuration[k] = $("#" + k).val();
 
                                         });
 
