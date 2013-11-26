@@ -1045,6 +1045,7 @@ var EduVis = (function () {
                     }
                 };
 
+
                 var radioArchive,
                     radioRealTime,
                     spanArchive,
