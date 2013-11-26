@@ -1008,52 +1008,48 @@ var EduVis = (function () {
 
             case  "dateRange":
 
-                var radio_btn_click = function(a){
+                var radio_btn_click = function(){
 
                     var start_input = $("#"+id+"_date_start"),
                         start_lbl = start_input.parent().find("label:first"),
                         start_button = start_input.parent().find("label:last"),
 
-                        end_input = $("#"+id+"_date_end"),
-                        end_lbl = end_input.parent().find("label:first"),
-                        end_button = end_input.parent().find("label:last");
+                        end_input = $("#"+id+"_date_end");
 
-                    if(this.value == "real_time"){
+                    if($("#" + id + "_drOptionsRealTime").prop("checked")){
 
                         start_lbl.html("<b>Days Prior</b>");
-                        //start_input.val(tool.configuration.date_start);
+                        start_button.hide();
 
-                        end_lbl.html("<b>Current Date</b>");
                         end_input.val("now");
 
-                        start_button.hide();
-                        end_button.hide();
+                        dr_date_end.hide();
 
                     }
                     else{
 
-                        start_button.show();
-                        end_button.show();
                         start_lbl.html("<b>Start Date</b>");
-                        //start_input.val("1");
-                        start_input
-                            .val(tool.configuration.date_start)
+                        start_button.show();
+
+                        start_input.val(tool.configuration.date_start);
+
+                        dr_date_end.show();
 
                         if(tool.configuration.date_end == "now"){
-
                             end_input
                                 .datepicker("setDate", new Date() );
                         }else{
-                            
                             end_input
                                 .datepicker("setDate", tool.configuration.date_end);
-
                         }
                     }
-
                 };
 
-                var dr_container = $("<div/>"),
+                var radioArchive,
+                    radioRealTime,
+                    spanArchive,
+                    spanRealTime,
+                    dr_container = $("<div/>").attr("id","drContainer"),
                     dr_options = $("<div/>")
                         .addClass("row-fluid")
                         // two radios
@@ -1062,7 +1058,7 @@ var EduVis = (function () {
                             $("<div/>")
                                 .addClass("span3")
                                 .append(
-                                    $("<input/>")
+                                    radioRealTime = $("<input/>")
                                         .attr({
                                             "id": id + "_drOptionsRealTime",
                                             "type":"radio",
@@ -1071,7 +1067,7 @@ var EduVis = (function () {
                                         })
                                         .on("change",radio_btn_click)
                                 ).append(
-                                 $("<label/>")
+                                    $("<label/>")
                                         .attr({
                                             "for":id + "_drOptionsRealTime"
                                         })
@@ -1084,7 +1080,7 @@ var EduVis = (function () {
                             $("<div/>")
                                 .addClass("span3")
                                 .append(
-                                    $("<input/>")
+                                    radioArchive = $("<input/>")
                                         .attr({
                                             "id": id + "_drOptionsArchive",
                                             "type":"radio",
@@ -1113,8 +1109,7 @@ var EduVis = (function () {
                             "label" : "Start Date",
                             "tooltip": "The start date.",
                             "default_value" : obj_control.default_value.date_start,
-                            "description" : "<b>Start Date<b>",
-                            //"inline" : "inline",
+                            "description" : obj_control.default_value.date_end === "now" ? "<b>Days Prior<b>" : "<b>Start Date<b>",
                             "update_event": function(){
                                 alert("start date changed: " + $(this).val());
                             }
@@ -1132,7 +1127,6 @@ var EduVis = (function () {
                             "tooltip": "The start date.",
                             "default_value" : obj_control.default_value.date_end,
                             "description" : "<b>End Date<b>",
-                            // "inline" : "inline",
                             "update_event": function(){
                                 alert("start date changed: " + $(this).val());
                             }
@@ -1143,6 +1137,16 @@ var EduVis = (function () {
                             
                         });
 
+                // default radio checked
+                if(obj_control.default_value.date_end == "now"){
+                    dr_date_end.hide();
+                    radioRealTime.click();
+                }
+                else{
+                    dr_date_end.show();
+                    radioArchive.click();
+                }
+
                 dr_inputs
                     .append(dr_date_start)
                     .append(dr_date_end);
@@ -1150,7 +1154,6 @@ var EduVis = (function () {
                 ctrl = dr_container
                     .append(dr_options)
                     .append(dr_inputs);
-
 
                 break;
 
@@ -1171,7 +1174,6 @@ var EduVis = (function () {
         }
 
         return ctrl;
-
 
     },
 
