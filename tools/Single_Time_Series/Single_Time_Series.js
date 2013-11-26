@@ -37,15 +37,15 @@
               }
             ],
             "stylesheets" : [
-               {
-                   "name" : "Single_Time_Series_css",
-                   "src" : "Single_Time_Series.css"
-               },
-               {
+             {
+                 "name" : "Single_Time_Series_css",
+                 "src" : "Single_Time_Series.css"
+             },
+             {
 
-                 "name" : "jquery-ui-css",
-                  "src" : "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
-                }
+               "name" : "jquery-ui-css",
+                "src" : "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+              }
             ],
             "datasets" : []            
         },
@@ -91,6 +91,19 @@
         //     "description" : "Enter the ending date.",
         //     "update_event" : graph_update_ed
         // },
+        
+        "data_cart" : {
+            "type":"dataBrowser",
+            "label" : "Data Browser",
+            "parent_tool" : "Single_Time_Series",
+            "data_cart" : tool.configuration.data_cart,
+            "update_event" : function(a){ 
+
+              tool.select_updateStations();
+              tool.select_updateParameters();
+            },
+            "showApplyButton":false
+        },
         "range" : {
 
             "type" : "dateRange",
@@ -105,28 +118,19 @@
                 "maxDate": "1"
             },
             "applyClick" : function(){
-                if($("#date_end").val() == "now"){
-                    $("#date_start").val($("#dr-realtime-dateStart").val());
-                }
-            },
-            "update_event":function(evt){
-                // var target = evt.target,
-                //     val = target.value;
-                // tool.configuration.message = val;
-                alert("update date range")
+              tool.configuration.date_start = $("#config-range_date_start").val();
+              tool.configuration.date_end = $("#config-range_date_end").val();
             }
-        },
-        "data_cart" : {
-            "type":"dataBrowser",
-            "label" : "Data Browser",
-            "parent_tool" : "Single_Time_Series",
-            "data_cart" : tool.configuration.data_cart,
-            "update_event" : function(a){ 
+            // ,
+            // "update_event":function(evt){
+            //     // var target = evt.target,
+            //     //     val = target.value;
+            //     // tool.configuration.message = val;
+            //     alert("update date range")
+            // }
 
-              tool.select_updateStations();
-              tool.select_updateParameters();
-            }
-        }
+
+        },
     };
 
     tool.setup = function( _target ){
@@ -273,6 +277,8 @@
 
     tool.graph_update_param = function(parameter){
 
+        //tool.configuration.station = "";
+
         tool.configuration.parameter = parameter;
         tool.graph_update();
     };
@@ -324,8 +330,10 @@
       if(typeof data === "undefined"){
 
         // insert an icon to let user know to select param
-        $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
-          .insertAfter($("#select-parameters"));
+
+        $("#tool-status").html(
+          $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
+        )
 
       }
       else{
@@ -333,8 +341,10 @@
         if(data.length == 0){
 
             // insert an icon to let user know to select param
-          $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
-            .insertAfter($("#select-parameters"));
+          $("#tool-status").html(
+            $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
+          );
+            
 
         }
         else{
@@ -375,53 +385,70 @@
     };
 
     tool.select_createDropdowns = function(_target){
-
-      // add dropdowns for stations and networks
-      var tool_dropdowns = $("<div/>")
-        .attr({
-          "id": "tool-dropdowns"
+     
+      var tool_controls = $("<div/>")
+        .css({
+          "text-align" : "center",
+          "height" : "50px"
         })
         .append(
-          $("<select></select>")
-          .attr({
-            "id" : "select-stations"
-          })
-          .on("change", function(evt){
+          $("<div/>")
+            .attr({
+              "id": "tool-dropdowns"
+            })
+            .append("Station: ")
+            .append(
+              $("<select></select>")
+              .attr({
+                "id" : "select-stations"
+              })
+              .on("change", function(evt){
 
-            // update network and station in config
-            if(tool.select_updateParameters()){
-              tool.graph_update_sta(evt.target.value);
-            }
-            else{
-              alert("station change, but update parameters returns false. add visual?");
-            }
-          })
+                // update network and station in config
+                if(tool.select_updateParameters()){
+                  tool.graph_update_sta(evt.target.value);
+                }
+                else{
+                  // set option shere
+
+                  $("#tool-status")
+                    .html(
+                      $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
+                    )
+                }
+              })
+            )
+            .append("&nbsp;&nbsp;&nbsp;Parameter: ")
+            .append(
+              $("<select></select>")
+              .attr({
+                "id" : "select-parameters"
+              })
+              .on("change", function(evt){
+                
+                // clear loading icon
+                $(".loading-icon").remove();
+
+                $('<img class="loading-icon loading-'+ evt.target.value + '" src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
+                  .appendTo($("#tool-status"))
+
+                $(".param-icon").remove();
+                
+                tool.graph_update_param(evt.target.value)
+
+              })
+            )
         )
         .append(
-          $("<select>").attr({
-            "id" : "select-parameters"
-          })
-          .on("change", function(evt){
-            
-            // turn on loading icon, but be smart about it..
-            // use id as value, give it a class.. remove all with class, then 
 
-            // clear spinner icon
-            $(".loading-icon").remove();
-
-            $('<img class="loading-icon loading-'+ evt.target.value + ' " src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
-              .insertAfter($("#select-parameters"))
-
-            $(".param-icon").remove();
-            
-            tool.graph_update_param(evt.target.value)
-
-          })
-        );
-
-      $("#"+_target).append(
-        tool_dropdowns
-      );
+          $("<div/>")
+            .attr({
+              "id" : "tool-status"
+            })
+        )
+        .appendTo(
+          $("#"+_target)
+        )
 
     };
 
@@ -547,6 +574,7 @@
           });
         });
 
+      // clear loading indicator and append options
       $("#select-parameters")
         .empty()
         .append(options);
@@ -560,11 +588,16 @@
 
       if(selected_param.length == 0){
 
-//        $(".param-icon").remove();
+        // update the configuration network and station 
+        var net_sta = $("#select-stations").val().split(",");
+        
+        config.network = net_sta[0];
+        config.station = net_sta[1];
 
-        // insert an icon to let user know to select param
-        $('<i class="icon-exclamation-sign param-icon"></i>')
-          .insertBefore($("#select-parameters"));
+        $("#tool-status")
+          .html(
+            $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
+          )
 
         $("<option>(choose one)</option>")
           .prop("selected", true)
