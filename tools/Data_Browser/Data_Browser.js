@@ -141,6 +141,13 @@
             fillOpacity: 0.6
         },
 
+        "styleStationClicked" : { 
+            weight: 8,
+            color: '#ff0000',
+            dashArray: '',
+            fillOpacity: 0.7
+        },
+
         "styleStationReset" : {
 
             radius: 6,
@@ -594,7 +601,8 @@
     // initialize leaflet map
         this.map = L.map('db-map', {
             center: [38.5,-78.2],
-            zoom: 3
+            zoom: 3,
+            noWrap : true
         });
 
         // set esri tile service url for ocean basemap
@@ -923,12 +931,18 @@
 
                     station_feature.on({
 
-                        "click": function(){
+                        "click": function(e){
                             //alert("Name:" + station.properties.name);
 
                             // network and station name are needed for the station pull
                             //http://ooi.dev/epe/data-services/stations/CO-OPS/UNI1024
                             
+                            //todo: show station being clicked.. epedev-232
+                            var layer = e.target;
+                            layer.setStyle(tool.styleStationClicked);
+
+                            setTimeout(function(){layer.setStyle(tool.styleStationReset);},2000);
+
                             tool.stationWindowUpdate(station);
 
                         },
@@ -1216,7 +1230,6 @@
                 // if exists, check for presence of current network/station
 
                 // move to function to add to station dropdown.. also add to object to track additions / subtractions
-                //
                 var dom_station_window = $("<div></div>")
                     .attr({
                         "id" : station_dom_id
@@ -1269,7 +1282,8 @@
                         .addClass("title")
                         .html("Network: (" + station.properties.network + ") " + station.properties.name)
                 )
-                .append(dom_station_window);
+                .append(dom_station_window)
+                .scrollTop(0);
 
             });
         }
