@@ -430,7 +430,7 @@
 
                 break;
 
-            case  "dateRange":
+            case  "dateRangeOrig":
 
                 var radio_btn_click = function(){
 
@@ -581,9 +581,167 @@
 
                 break;
 
+            case  "dateRange":
+                
+                // test for current date_type.. realtime or archive
+
+                var radio_btn_click = function(){
+
+                    if($("#" + id + "_drOptionsRealTime").prop("checked")){
+                        dr_archive.hide();
+                        dr_realTime.show();
+                        tool.configuration.date_type = "realtime";
+                    }
+                    else{
+                        dr_realTime.hide();
+                        dr_archive.show();
+                        tool.configuration.date_type = "archived";
+                    }
+                },
+                radioRealTime,
+                radioArchive,
+
+                dr_container = $("<div/>")
+                    .attr("id","drContainer")
+                    .css({"overflow":"auto"}),
+
+                dr_options = $("<div/>")
+                    .addClass("row-fluid")
+                    // two radios
+                    .append(
+                        
+                        $("<div/>")
+                            .addClass("span3")
+                            .append(
+                                radioRealTime = $("<input/>")
+                                    .attr({
+                                        "id": id + "_drOptionsRealTime",
+                                        "type":"radio",
+                                        "name":"dr_options",
+                                        "value":"real_time"
+                                    })
+                                    .on("change",radio_btn_click)
+                            ).append(
+                                $("<label/>")
+                                    .attr({
+                                        "for":id + "_drOptionsRealTime"
+                                    })
+                                    .css({"display":"inline"})
+                                    .html("&nbsp;<b>Real Time</b>")
+                            )
+                    )
+                    .append(
+                        
+                        $("<div/>")
+                            .addClass("span3")
+                            .append(
+                                radioArchive = $("<input/>")
+                                    .attr({
+                                        "id": id + "_drOptionsArchive",
+                                        "type":"radio",
+                                        "name":"dr_options",
+                                        "value":"archive"
+                                    })
+                                    .on("change",radio_btn_click)
+                            )
+                            .append(
+                                $("<label/>")
+                                    .attr({
+                                        "for":id + "_drOptionsArchive"
+                                    })
+                                    .css({"display":"inline"})
+                                    .html("&nbsp<b>Archived</b>")
+                            )
+
+
+                    ),
+
+                dr_realTime = $("<div/>"),
+                dr_archive = $("<div/>"),
+                dr_inputs = $("<div/>"),
+
+                dr_realTime_days = EduVis.controls.create(this, id + "_rt_days", {
+
+                        "type" : "textbox",
+                        "label" : "<b>Days Prior</b>",
+                        "tooltip": "Number of days for realtime data.",
+                        "default_value" : obj_control.default_value.rt_days,
+                        "description" : "<b>Days Prior<b>",
+                        "update_event": function(){
+                            alert("start date changed: " + $(this).val());
+                        }
+                    })
+                    .val(obj_control.default_value.rt_days),
+
+
+                dr_archive_start_date = EduVis.controls.create(this, id + "_start_date", {
+
+                        "type" : "datepicker",
+                        "label" : "Start Date",
+                        "tooltip": "The start date.",
+                        "default_value" : obj_control.default_value.start_date,
+                        "description" : "<b>Start Date<b>",
+                        "update_event": function(){
+                            alert("rt days changed: " + $(this).val());
+                        }
+                    })
+                    .val(obj_control.default_value.start_date)
+                    .addClass("span3")
+                    .css({
+                       
+                    }),
+
+                dr_archive_end_date = EduVis.controls.create(this, id + "_end_date", {
+
+                        "type" : "datepicker",
+                        "label" : "Start Date",
+                        "tooltip": "The start date.",
+                        "default_value" : obj_control.default_value.end_date,
+                        "description" : "<b>End Date<b>",
+                        "update_event": function(){
+                            alert("end date changed: " + $(this).val());
+                        }
+                    })
+                    .val(obj_control.default_value.end_date)
+                    .addClass("span3")
+                    .css({
+                        
+                    });
+
+                dr_realTime
+                    .append(dr_realTime_days);
+
+                dr_archive
+                    .append(dr_archive_start_date)
+                    .append(dr_archive_end_date);
+
+
+                ctrl = dr_container
+                    .append(dr_options)
+                    .append(
+                        $("<div/>")
+                        .append(dr_realTime)
+                        .append(dr_archive)
+                    );
+
+                if(obj_control.default_value.date_type == "realtime"){
+                    alert("realtime");
+                    dr_archive.hide();
+                    dr_realTime.show();
+                    radioRealTime.click();
+                }
+                else{
+                    dr_realTime.hide();
+                    dr_archive.show();
+                    radioArchive.click();
+                }
+                    
+
+                break;
+
             default:
                 // empty div if nothing is passed
-                ctrl = $("<div></div>");
+                ctrl = $("<div/>");
                 break;
         }
 

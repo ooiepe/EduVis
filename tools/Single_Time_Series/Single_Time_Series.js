@@ -51,11 +51,13 @@
         },
 
         "configuration" : {
-          "station" : "44025",
-          "network" : "NDBC",
+          "station" : "2695540",
+          "network" : "CO-OPS",
           "parameter" : "air_temperature",
-          "date_start" : "2",
-          "date_end" : "now",
+          "rt_days" : "2",
+          "start_date" : "",
+          "end_date" : "",
+          "date_type" : "realtime",
           "data_cart" : 
             {"NDBC":{"44025":{"parameters":{"air_pressure":{},"air_temperature":{}}}},"CO-OPS":{"2695540":{"parameters":{"air_pressure":{},"air_temperature":{},"measured_tide":{}}}}}
         },
@@ -67,30 +69,6 @@
     };
 
     tool.controls = {
-        // "station" : {
-        //     "type" : "textbox",
-        //     "label" : "Station",
-        //     "tooltip": "Enter a NDBC Station ID.",
-        //     "default_value" : "44025",
-        //     "description" : "Enter a NDBC Station ID.",
-        //     "update_event" : graph_update_sta
-        // },
-        // "start_date" : {
-        //     "type" : "textbox",
-        //     "label" : "Start Date",
-        //     "tooltip": "Enter date in the format yyyy-mm-dd or a number of days you want prior to the end date.",
-        //     "default_value" : "7",
-        //     "description" : "Enter the starting date.",
-        //     "update_event" : graph_update_sd
-        // },
-        // "end_date" : {
-        //     "type" : "textbox",
-        //     "label" : "End Date",
-        //     "tooltip": "Enter date in the format yyyy-mm-dd or the word 'now'.",
-        //     "default_value" : "now",
-        //     "description" : "Enter the ending date.",
-        //     "update_event" : graph_update_ed
-        // },
         
         "data_cart" : {
             "type":"dataBrowser",
@@ -110,16 +88,20 @@
             "label" : "dateRange",
             "tooltip": "Select the Start Date and End Date",
             "default_value" : {
-                "date_start" : "2",
-                "date_end" : "now"
+                "rt_days" : "2",
+                "start_date" : "",
+                "end_date" : "",
+                "date_type" : "realtime"
             },
             "description" : "date range",
             "options": {
                 "maxDate": "1"
             },
             "applyClick" : function(){
-              tool.configuration.date_start = $("#config-range_date_start").val();
-              tool.configuration.date_end = $("#config-range_date_end").val();
+              tool.configuration.start_date = $("#config-range_start_date").val();
+              tool.configuration.end_date = $("#config-range_end_date").val();
+
+              tool.graph_update();
             }
             // ,
             // "update_event":function(evt){
@@ -128,7 +110,6 @@
             //     // tool.configuration.message = val;
             //     alert("update date range")
             // }
-
 
         },
     };
@@ -286,13 +267,13 @@
     function graph_update_sd(evt){
         var target = evt.target,
             val = target.value;
-        tool.configuration.date_start = val;
+        tool.configuration.start_date = val;
         tool.graph_update();
     }
     function graph_update_ed(evt){
         var target = evt.target,
             val = target.value;
-        tool.configuration.date_end = val;
+        tool.configuration.end_date = val;
         tool.graph_update();
     }
     
@@ -314,8 +295,17 @@
           network = config.network,
           station = config.station,
           parameter = config.parameter,
-          start = config.date_start,
-          end = config.date_end;
+          start,
+          end;
+
+          if(config.date_type == "realtime"){
+            start = config.rt_days,
+            end = "now";  
+          }
+          else{
+            start = config.start_date,
+            end = config.end_date;
+          }
 
       return 'http://epedev.oceanobservatories.org/timeseries/data.php?' + 
           'network=' + network + 
@@ -348,6 +338,8 @@
 
         }
         else{
+
+          // todo: parse out date for chart domain..
 
           var g = this.graph,
               cols = d3.entries(data[0]);
