@@ -387,9 +387,7 @@
         //                    $("<div></div>").append( el_selections )
         //                )
 
-
                 break;
-
 
             case "slider":
 
@@ -430,157 +428,6 @@
 
                 break;
 
-            case  "dateRangeOrig":
-
-                var radio_btn_click = function(){
-
-                    var start_input = $("#"+id+"_date_start"),
-                        start_lbl = start_input.parent().find("label:first"),
-                        start_button = start_input.parent().find("label:last"),
-
-                        end_input = $("#"+id+"_date_end");
-
-                    if($("#" + id + "_drOptionsRealTime").prop("checked")){
-
-                        start_lbl.html("<b>Days Prior</b>");
-                        start_button.hide();
-
-                        end_input.val("now");
-
-                        dr_date_end.hide();
-
-                    }
-                    else{
-
-                        start_lbl.html("<b>Start Date</b>");
-                        start_button.show();
-
-                        start_input.val(tool.configuration.date_start);
-
-                        dr_date_end.show();
-
-                        if(tool.configuration.date_end == "now"){
-                            end_input
-                                .datepicker("setDate", new Date() );
-                        }else{
-                            end_input
-                                .datepicker("setDate", tool.configuration.date_end);
-                        }
-                    }
-                };
-
-                var radioArchive,
-                    radioRealTime,
-                    spanArchive,
-                    spanRealTime,
-                    dr_container = $("<div/>").attr("id","drContainer"),
-                    dr_options = $("<div/>")
-                        .addClass("row-fluid")
-                        // two radios
-                        .append(
-                            
-                            $("<div/>")
-                                .addClass("span3")
-                                .append(
-                                    radioRealTime = $("<input/>")
-                                        .attr({
-                                            "id": id + "_drOptionsRealTime",
-                                            "type":"radio",
-                                            "name":"dr_options",
-                                            "value":"real_time"
-                                        })
-                                        .on("change",radio_btn_click)
-                                ).append(
-                                    $("<label/>")
-                                        .attr({
-                                            "for":id + "_drOptionsRealTime"
-                                        })
-                                        .css({"display":"inline"})
-                                        .html("&nbsp;<b>Real Time</b>")
-                                )
-                        )
-                        .append(
-                            
-                            $("<div/>")
-                                .addClass("span3")
-                                .append(
-                                    radioArchive = $("<input/>")
-                                        .attr({
-                                            "id": id + "_drOptionsArchive",
-                                            "type":"radio",
-                                            "name":"dr_options",
-                                            "value":"archive"
-                                        })
-                                        .on("change",radio_btn_click)
-                                )
-                                .append(
-                                    $("<label/>")
-                                        .attr({
-                                            "for":id + "_drOptionsArchive"
-                                        })
-                                        .css({"display":"inline"})
-                                        .html("&nbsp<b>Archived</b>")
-                                )
-
-
-                        ),
-                    dr_inputs = $("<div/>")
-                        .addClass("row-fluid"),
-                    
-                    dr_date_start = EduVis.controls.create(this, id + "_date_start", {
-
-                            "type" : "datepicker",
-                            "label" : "Start Date",
-                            "tooltip": "The start date.",
-                            "default_value" : obj_control.default_value.date_start,
-                            "description" : obj_control.default_value.date_end === "now" ? "<b>Days Prior<b>" : "<b>Start Date<b>",
-                            "update_event": function(){
-                                alert("start date changed: " + $(this).val());
-                            }
-                        })
-                        .val(obj_control.default_value.date_end)
-                        .addClass("span3")
-                        .css({
-                           
-                        }),
-
-                    dr_date_end = EduVis.controls.create(this, id + "_date_end", {
-
-                            "type" : "datepicker",
-                            "label" : "Start Date",
-                            "tooltip": "The start date.",
-                            "default_value" : obj_control.default_value.date_end,
-                            "description" : "<b>End Date<b>",
-                            "update_event": function(){
-                                alert("start date changed: " + $(this).val());
-                            }
-                        })
-                        .val(obj_control.default_value.date_end)
-                        .addClass("span3")
-                        .css({
-                            
-                        });
-
-                // default radio checked
-                if(obj_control.default_value.date_end == "now"){
-                    dr_date_end.hide();
-                    radioRealTime.click();
-                }
-                else{
-                    dr_date_end.show();
-                    radioArchive.click();
-                }
-
-                dr_inputs
-                    .append(dr_date_start)
-                    .append(dr_date_end);
-
-                ctrl = dr_container
-                    .append(dr_options)
-                    .append(dr_inputs);
-
-                break;
-
             case  "dateRange":
                 
                 // test for current date_type.. realtime or archive
@@ -602,16 +449,17 @@
                 radioArchive,
 
                 dr_container = $("<div/>")
+                .addClass("row-fluid")
                     .attr("id","drContainer")
                     .css({"overflow":"auto"}),
 
                 dr_options = $("<div/>")
-                    .addClass("row-fluid")
+                    .addClass("span2")
                     // two radios
                     .append(
                         
                         $("<div/>")
-                            .addClass("span3")
+                            //.addClass("span3")
                             .append(
                                 radioRealTime = $("<input/>")
                                     .attr({
@@ -633,7 +481,7 @@
                     .append(
                         
                         $("<div/>")
-                            .addClass("span3")
+                            //.addClass("span3")
                             .append(
                                 radioArchive = $("<input/>")
                                     .attr({
@@ -725,7 +573,6 @@
                     );
 
                 if(obj_control.default_value.date_type == "realtime"){
-                    alert("realtime");
                     dr_archive.hide();
                     dr_realTime.show();
                     radioRealTime.click();
@@ -839,6 +686,7 @@
                 if(showApplyButtons){
 
                     control_buttons = $("<div/>")
+                        .css({"padding":"5px"})
                         .append(
 
                             $("<button/>")
@@ -890,12 +738,13 @@
 
                                 })
                         )
-
                 }
 
                 divToolControls.append(
                    
                     $("<div/>")
+                        .css({"margin":"3px","padding":"5px","border":"1px solid #000000"})
+                        .append($("<h4/>").html(control.label === "undefined" ? "": control.label))
                         .append(tmpCtrl)
                         .append(control_buttons)
                 )
