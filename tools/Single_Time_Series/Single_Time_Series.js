@@ -70,22 +70,10 @@
 
     tool.controls = {
         
-        "data_cart" : {
-            "type":"dataBrowser",
-            "label" : "Data Browser",
-            "parent_tool" : "Single_Time_Series",
-            "data_cart" : tool.configuration.data_cart,
-            "update_event" : function(a){ 
-
-              tool.select_updateStations();
-              tool.select_updateParameters();
-            },
-            "showApplyButton":false
-        },
         "range" : {
 
             "type" : "dateRange",
-            "label" : "dateRange",
+            "label" : "Date Range",
             "tooltip": "Select the Start Date and End Date",
             "default_value" : {
                 "rt_days" : "2",
@@ -93,11 +81,12 @@
                 "end_date" : "",
                 "date_type" : "realtime"
             },
-            "description" : "date range",
+            "description" : "Date Range",
             "options": {
                 "maxDate": "1"
             },
             "applyClick" : function(){
+              tool.configuration.rt_days = $("#config-range_rt_days").val();
               tool.configuration.start_date = $("#config-range_start_date").val();
               tool.configuration.end_date = $("#config-range_end_date").val();
 
@@ -112,6 +101,19 @@
             // }
 
         },
+        "data_cart" : {
+            "type":"dataBrowser",
+            "label" : "Data Browser",
+            "parent_tool" : "Single_Time_Series",
+            "data_cart" : tool.configuration.data_cart,
+            "update_event" : function(a){ 
+
+              tool.select_updateStations();
+              tool.select_updateParameters();
+            },
+            "showApplyButton":false
+        },
+        
     };
 
     tool.setup = function( _target ){
@@ -443,7 +445,6 @@
         )
 
     };
-
 
     tool.select_updateStations = function(){
 
