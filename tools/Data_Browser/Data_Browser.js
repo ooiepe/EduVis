@@ -66,13 +66,12 @@
                     "name": "leaflet-markercluster-default",
                     "src": "css/MarkerCluster.Default.css"
                 },
-            
+                {
+                    "name" : "jquery-ui-css",
+                    "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
+                },
                 {   "name": "jquery-smoothness",
                     "src": "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
-                },
-                {
-                    "name" : "jquery-ui",
-                    "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
                 },
                 {
                     "name": "leaflet-css",
@@ -291,41 +290,36 @@
                             "id":"db-select-times"
                         })
                         .append("<h3>Date Range</h3>")
+                        
                         .append(
-                            $("<div/>")
-                                .append(
-                                    $("<label/>",{
-                                        "for":"db-date-start"
-                                    })
-                                    .html("Start Date: ")
-                                )
-                                .append(
-                                    $("<input/>",{
-                                        "type":"text",
-                                        "id":"db-date-start",
-                                        "name":"db-date-start"          /// date_start
-                                    })
-                                )
-                                .append("<br />")
-                                .append(
-                                    $("<label/>",{
-                                        "for":"db-date-end"
-                                    })
-                                    .html("End Date: ")
-                                )
-                                .append(
-                                    $("<input/>",{
-                                        "type":"text",
-                                        "id":"db-date-end",
-                                        "name":"db-date-end"            /// date_end
-                                    })
-                                )
-                                .append(
-                                    $("<label/>",{
-                                        "id":"db-date-details"
-                                    })
-                                )
+                                                                                /// date_start control
+                            EduVis.controls.create(tool, "db-date-start", {
+
+                                "type" : "datepicker",
+                                "label" : "Start Date",
+                                "tooltip": "The start date.",
+                                "default_value" : "",
+                                "description" : "<b>Start Date<b>"
+                            })        
                         )
+                        .append(
+                                                                                // date_end control
+                             EduVis.controls.create(tool, "db-date-end", {
+
+                                "type" : "datepicker",
+                                "label" : "End Date",
+                                "tooltip": "The end date.",
+                                "default_value" : "",
+                                "description" : "<b>End Date<b>"
+                            })
+
+                        )
+                        .append(
+                            $("<label/>",{
+                                "id":"db-date-details"
+                            })
+                        )
+                        
                     )
                     .append(
                         
@@ -480,7 +474,7 @@
                     .hover(
                         function() {
                             var sta = $(this);
-                            console.log("sta****", sta);
+                            //console.log("sta****", sta);
 
                             // is there already a span element? if so, remove it
                             if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
@@ -619,36 +613,6 @@
             // set resize timer for window 
             resizeTimer;
 
-        // initialize the date picker for start date
-        $( "#db-date-start" ).datepicker({
-            defaultDate: "+1w",
-            changeMonth: true,
-            changeYear: true,
-            numberOfMonths: 1,
-            showButtonPanel: true,
-            showOtherMonths: true,
-            selectOtherMonths: true,
-            dateFormat:"yy-mm-ddT00:00Z",
-
-            onClose: function( selectedDate ) {
-                $( "#db-date-end" ).datepicker( "option", "minDate", selectedDate );
-            }
-        });
-
-        // initialize the date picker for end date
-        $( "#db-date-end" ).datepicker({
-            defaultDate: "+1w",
-            changeMonth: true,
-            changeYear: true,
-            numberOfMonths: 1,
-            showButtonPanel: true,
-            showOtherMonths: true,
-            selectOtherMonths: true,
-            dateFormat:"yy-mm-ddT00:00Z",
-            onClose: function( selectedDate ) {
-                $( "#db-date-start" ).datepicker( "option", "maxDate", selectedDate );
-            }
-        });
 
 //
 // PARAMETERS
