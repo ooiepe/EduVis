@@ -198,16 +198,24 @@
                     .html(control.description);
 
                 // input or div
-                if(typeof control.inline === "undefined"){
+                if(typeof control.inline !== "undefined"){
+
+                    if(control.inline == "inline"){
+                        input = $("<div/>");    
+                    }
+                    else{
+                        input = $("<input />")
+                            .attr({
+                                "type": "text"
+                            })
+                    }
+                }
+                else{
 
                     input = $("<input />")
                         .attr({
                             "type": "text"
                         })
-                  
-                }
-                else{
-                    input = $("<div/>");
                 }
 
                 // input 
@@ -223,8 +231,10 @@
                 // set jquery datepicker settings
                 $( input )
                     .attr({
-                        "id": id 
+                        "id": id,
+                        "name":id
                     })
+                    .addClass('datepicker')
                     .datepicker({
                         "dateFormat": "yy-mm-dd",
                         "showOn": "button",
@@ -256,8 +266,24 @@
                             .html(' <i class="icon-calendar"></i>')
                             .on("click", function(){
 
-                                //    /input.datepicker("show")
-                                input.datepicker("show");
+                                $("#ui-datepicker-div").remove();
+
+                                $('.hasDatepicker')
+                                     .datepicker('destroy')
+                                     .datepicker({
+                                        "dateFormat": "yy-mm-dd",
+                                        //"showOn": "button",
+                                        "changeMonth": true,
+                                        "changeYear": true,
+                                        //"showButtonPanel": true,
+                                        "onSelect" : function(d,i){
+                                            console.log("datepicker changed!",d,i);
+                                            //tool.configuration.date_start = d;
+                                        },
+
+                                    })
+
+                                $(input).datepicker("show");    
                             })
                     )
 
@@ -528,7 +554,7 @@
                         "label" : "Start Date",
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.start_date,
-                        "description" : "<b>Start Date<b>",
+                        "description" : "<b>Start Date</b>",
                         "update_event": function(){
                             alert("rt days changed: " + $(this).val());
                         }
@@ -545,7 +571,7 @@
                         "label" : "Start Date",
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.end_date,
-                        "description" : "<b>End Date<b>",
+                        "description" : "<b>End Date</b>",
                         "update_event": function(){
                             alert("end date changed: " + $(this).val());
                         }
