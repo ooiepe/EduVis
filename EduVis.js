@@ -1,4 +1,4 @@
-//Date Compiled: December 04 2013 14:18:49
+//Date Compiled: December 05 2013 19:35:55
 /*  *  *  *  *  *  *  *
 *
 * EduVis - Educational Visualition Framework
@@ -775,16 +775,24 @@ var EduVis = (function () {
                     .html(control.description);
 
                 // input or div
-                if(typeof control.inline === "undefined"){
+                if(typeof control.inline !== "undefined"){
+
+                    if(control.inline == "inline"){
+                        input = $("<div/>");    
+                    }
+                    else{
+                        input = $("<input />")
+                            .attr({
+                                "type": "text"
+                            })
+                    }
+                }
+                else{
 
                     input = $("<input />")
                         .attr({
                             "type": "text"
                         })
-                  
-                }
-                else{
-                    input = $("<div/>");
                 }
 
                 // input 
@@ -800,8 +808,10 @@ var EduVis = (function () {
                 // set jquery datepicker settings
                 $( input )
                     .attr({
-                        "id": id 
+                        "id": id,
+                        "name":id
                     })
+                    .addClass('datepicker')
                     .datepicker({
                         "dateFormat": "yy-mm-dd",
                         "showOn": "button",
@@ -833,8 +843,24 @@ var EduVis = (function () {
                             .html(' <i class="icon-calendar"></i>')
                             .on("click", function(){
 
-                                //    /input.datepicker("show")
-                                input.datepicker("show");
+                                $("#ui-datepicker-div").remove();
+
+                                $('.hasDatepicker')
+                                     .datepicker('destroy')
+                                     .datepicker({
+                                        "dateFormat": "yy-mm-dd",
+                                        //"showOn": "button",
+                                        "changeMonth": true,
+                                        "changeYear": true,
+                                        //"showButtonPanel": true,
+                                        "onSelect" : function(d,i){
+                                            console.log("datepicker changed!",d,i);
+                                            //tool.configuration.date_start = d;
+                                        },
+
+                                    })
+
+                                $(input).datepicker("show");    
                             })
                     )
 
@@ -1105,7 +1131,7 @@ var EduVis = (function () {
                         "label" : "Start Date",
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.start_date,
-                        "description" : "<b>Start Date<b>",
+                        "description" : "<b>Start Date</b>",
                         "update_event": function(){
                             alert("rt days changed: " + $(this).val());
                         }
@@ -1122,7 +1148,7 @@ var EduVis = (function () {
                         "label" : "Start Date",
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.end_date,
-                        "description" : "<b>End Date<b>",
+                        "description" : "<b>End Date</b>",
                         "update_event": function(){
                             alert("end date changed: " + $(this).val());
                         }
@@ -1315,7 +1341,6 @@ var EduVis = (function () {
 
                                 })
                         )
-
                 }
 
                 divToolControls.append(
