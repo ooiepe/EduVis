@@ -262,7 +262,10 @@
             // ),
             ,
             db_wrap = $("<div>",{
-                id:"data-browser-wrap"
+                id:"data-browser-wrap",
+                "css":{
+                    "height":"600px"
+                }
             }),
 
             db_sidebar_left = $("<div/>",{
@@ -408,13 +411,13 @@
                 $("<div/>", {
                     "id":"db-data-cart-apply",
                 })
-                .css({
-                    "margin":"0 30% 0 30%"
-                })
                 .append(
                     $("<a/>", {
                         "type":"button",
-                        "class":"btn btn-large",
+                        "class":"btn btn-medium",
+                    })
+                    .css({
+                        "width": "12em"
                     })
                     .html("Apply")
                     .on("click",function(){
@@ -450,7 +453,7 @@
         header = $("#db-header").height(),
         footer = $("#db-footer").height(),
         mainHeight = height - header - footer - 2,
-        winStationHeight = (mainHeight/2-50), // now compensate for Apply button original->(mainHeight/2-20)
+        winStationHeight = (mainHeight/2-60), // now compensate for Apply button original->(mainHeight/2-20)
         winCartHeight = winStationHeight,
         winApplyHeight = 60;
 
@@ -634,7 +637,7 @@
 //
 
     // get the parameters from the json file.
-     $.getJSON( "http://ooi.dev/epe/epedev/deploy2/sites/all/modules/custom/epe_ev/parameters.json", function( data ) {
+     $.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
         
             //var parameters = this.db_data.parameters,
             var parameters = data.parameters,
