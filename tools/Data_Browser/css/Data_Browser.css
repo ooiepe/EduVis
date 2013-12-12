@@ -74,12 +74,12 @@ h4.db-title{
 
 #db-sidebar-right {
 	position: absolute;
-	width: 220px;
+	width: 210px;
 	right: 0;
 	top: 0;
 	bottom: 0;
-	padding: 0 0 10px;
-	margin:0;
+	padding: 0 0 0 10px;
+	margin-left:10px;
 	background: #eee;
 }
                       

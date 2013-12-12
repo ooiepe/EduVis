@@ -160,47 +160,47 @@
 
         "db_data" : {
             "parameters": [
-                {
-                    "name": "air_pressure",
-                    "category": "atmospheric",
-                    "description": "Pressure exerted by overlying air",
-                    "units": "hPa",
-                    "cf_parameter": "",
-                    "ioos_parameter": "",
-                    "modified": "0000-00-00 00:00:00"
-                },
-                {
-                    "name": "air_temperature",
-                    "category": "atmospheric",
-                    "description": "Temperature of air in situ.",
-                    "units": "celcius",
-                    "cf_parameter": "",
-                    "ioos_parameter": "",
-                    "modified": "0000-00-00 00:00:00"
-                },
-                {
-                    "name": "salinity",
-                    "category": "water_property",
-                    "description": "The salt content of a water sample or body of water.",
-                    "units": "siemens | uS",
-                    "cf_parameter": "",
-                    "ioos_parameter": "",
-                    "modified": "0000-00-00 00:00:00"
-                },
-                {
-                    "name": "water_temperature",
-                    "category": "water_property",
-                    "description": "Temperature of water in situ."
-                },
-                {
-                    "name": "significant_wave_height",
-                    "description": "The mean height of the hightest third of the waves recorded during the sampling period."
-                },
-                {
-                    "name": "wind_speed",
-                    "category": "atmospheric",
-                    "description": "Magnitude of wind velocity."
-                }
+                // {
+                //     "name": "air_pressure",
+                //     "category": "atmospheric",
+                //     "description": "Pressure exerted by overlying air",
+                //     "units": "hPa",
+                //     "cf_parameter": "",
+                //     "ioos_parameter": "",
+                //     "modified": "0000-00-00 00:00:00"
+                // },
+                // {
+                //     "name": "air_temperature",
+                //     "category": "atmospheric",
+                //     "description": "Temperature of air in situ.",
+                //     "units": "celcius",
+                //     "cf_parameter": "",
+                //     "ioos_parameter": "",
+                //     "modified": "0000-00-00 00:00:00"
+                // },
+                // {
+                //     "name": "salinity",
+                //     "category": "water_property",
+                //     "description": "The salt content of a water sample or body of water.",
+                //     "units": "siemens | uS",
+                //     "cf_parameter": "",
+                //     "ioos_parameter": "",
+                //     "modified": "0000-00-00 00:00:00"
+                // },
+                // {
+                //     "name": "water_temperature",
+                //     "category": "water_property",
+                //     "description": "Temperature of water in situ."
+                // },
+                // {
+                //     "name": "significant_wave_height",
+                //     "description": "The mean height of the hightest third of the waves recorded during the sampling period."
+                // },
+                // {
+                //     "name": "wind_speed",
+                //     "category": "atmospheric",
+                //     "description": "Magnitude of wind velocity."
+                // }
             ],
 
             "networks": [
@@ -256,11 +256,11 @@
         var db_header = $("<div>",{
                 id : "data-browser-header"
             })
-            .append(
-                $("<div/>", { "class":"header-title"})
-                    .html("EPE Data Browser")
-            ),
-
+            // .append(
+            //     $("<div/>", { "class":"header-title"})
+            //         .html("EPE Data Browser")
+            // ),
+            ,
             db_wrap = $("<div>",{
                 id:"data-browser-wrap"
             }),
@@ -276,20 +276,29 @@
                         $("<div/>", {
                             "id":"db-select-parameters"
                         })
-                        .html("<h3>Parameters</h3>")
+                        .html(
+                            $("<h5>Parameters</h5>")
+                                .css({"border-bottom":"1px solid #CCCCCC"})
+                        )
+
                     )
                     .append(
                         $("<div/>", {
                             "id":"db-select-networks"
                         })
-                        .html("<h3>Networks</h3>")
+                        .html($("<h5>Networks</h5>")
+                                .css({"border-bottom":"1px solid #CCCCCC"})
+                        )
                     )
                     .append(
                         
                         $("<div/>", {
                             "id":"db-select-times"
                         })
-                        .append("<h3>Date Range</h3>")
+                        .append(
+                            $("<h5>Date Range</h5>")
+                                .css({"border-bottom":"1px solid #CCCCCC"})
+                        )
                         
                         .append(
                                                                                 /// date_start control
@@ -362,8 +371,11 @@
                     "id":"db-station-window"
                 })
                 .append(
-                    $("<h4/>", {
-                        "class":"db-title"
+                    $("<h5/>", {
+                        "class":"db-title",
+                        "css":{
+                            "border-bottom":"1px solid #CCCCCC"
+                        }
                     })
                     .html("Station Details")
                 )
@@ -378,8 +390,11 @@
                     "id":"db-data-cart-window"
                 })
                 .append(
-                    $("<h4/>", {
-                        "class":"db-title"
+                    $("<h5/>", {
+                        "class":"db-title",
+                        "css":{
+                            "border-bottom":"1px solid #CCCCCC"
+                        }
                     })
                     .html("Selected Station List")
                 )
@@ -618,10 +633,11 @@
 // PARAMETERS
 //
 
-        // get the parameters from the json file.
-//      $.getJSON( "json/parameters.json", function( data ) {
+    // get the parameters from the json file.
+     $.getJSON( "http://ooi.dev/epe/epedev/deploy2/sites/all/modules/custom/epe_ev/parameters.json", function( data ) {
         
-            var parameters = this.db_data.parameters,
+            //var parameters = this.db_data.parameters,
+            var parameters = data.parameters,
             selects = [];
 
             $.each( parameters, function( params, param) {
@@ -657,18 +673,28 @@
          
           $( "<div/>", {
             "class": "db-select-list",
-            html: selects
-          }).appendTo( "#db-select-parameters" );
 
-//      });
+            html: selects
+          })
+          .css({
+            "max-height":"140px",
+            "overflow-y":"scroll"
+          })
+          .appendTo( "#db-select-parameters" );
+
+     });
 
 // //
 // // networks
 // //
 
-//      $.getJSON( "json/networks.json", function( data ) {
+      $.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
         
-            var networks = this.db_data.networks,
+
+        //{ "networks": [ { "id": "ndbc", "name": "NDBC", "description": "National Data Buoy Center", "url": "http://sdf.ndbc.noaa.gov/" }, { "id": "co-ops", "name": "CO-OPS", "description": "Center for Operational Oceanographic Products and Services", "url": "http://opendap.co-ops.nos.noaa.gov/" } ] }
+        
+            //var networks = this.db_data.networks,
+            var networks = data.networks,
             selects = [];
 
             $.each( networks, function( networks, network) {
@@ -705,7 +731,7 @@
                 html: selects
             }).appendTo( "#db-select-networks" );
 
-//      });
+      });
 
 //
 // STATIONS
