@@ -149,12 +149,21 @@
         .attr("id", "xAxis")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
-        .call(g.xAxis);
+        .call(g.xAxis).style({
+          "stroke": "#000",
+          "stroke-width": ".5",
+          "shape-rendering": "crispEdges"
+        });
         
       g.focus.append("g")
         .attr("id", "yAxis")
         .attr("class", "y axis")
-        .call(g.yAxis);
+        .call(g.yAxis)
+        .style({
+          "stroke": "#000",
+          "stroke-width": ".5",
+          "shape-rendering": "crispEdges"
+        });
       
       g.focus.append("path")
               //.datum(data)
@@ -309,7 +318,7 @@
             end = config.end_date;
           }
 
-      return 'http://epedev.oceanobservatories.org/timeseries/data.php?' + 
+      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
           'network=' + network + 
           '&station=' + station + 
           '&parameter=' + parameter + 
