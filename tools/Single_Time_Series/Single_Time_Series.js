@@ -132,12 +132,12 @@
       g.yAxis = d3.svg.axis().scale(g.y).orient("left").tickSize(-g.width,0,0);
       
       g.svg = d3.select("#"+_target).append("svg")
-          .attr("id","svggraph")
+          .attr("id",_target+"_svggraph")
           .attr("width", g.width + g.margin.left + g.margin.right)
           .attr("height", g.height + g.margin.top + g.margin.bottom);
       
       g.svg.append("defs").append("clipPath")
-          .attr("id", "clip")
+          .attr("id", _target+"_clip")
         .append("rect")
           .attr("width", g.width)
           .attr("height", g.height);
@@ -146,23 +146,24 @@
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
       g.focus.append("g")
-        .attr("id", "xAxis")
+        .attr("id", _target+"_xAxis")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
         .call(g.xAxis).style({
           "stroke": "#000",
           "stroke-width": ".5",
-          "shape-rendering": "crispEdges"
+          "shape-rendering": "crispEdges",
+          "stroke-opacity": ".4"
         });
         
       g.focus.append("g")
-        .attr("id", "yAxis")
+        .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
-        .call(g.yAxis)
-        .style({
+        .call(g.yAxis).style({
           "stroke": "#000",
           "stroke-width": ".5",
-          "shape-rendering": "crispEdges"
+          "shape-rendering": "crispEdges",
+          "stroke-opacity": ".4"
         });
       
       g.focus.append("path")
@@ -188,7 +189,7 @@
           .text( this.configuration.network + " Station " + this.configuration.station);
       
       g.ylabel = g.svg.append("text")
-          .attr("id", "ylabel")
+          .attr("id", _target+"_ylabel")
           .attr("class", "glabel")
           .attr("text-anchor", "middle")
           .attr("font-size", "14")
@@ -212,42 +213,6 @@
       });
 
     };
-    
-    // tool.drawgraph = function(data) {
-
-    //       var g = this.graph,
-    //         cols = d3.entries(data[0]);
-
-    //       data.forEach(function(d) {
-    //         d.date = g.parseDate(d.date);
-    //         d.data = +d[cols[1].key];
-    //       }); 
-          
-    //       g.x.domain(d3.extent(data, (function(d) { return d.date; })));
-    //       g.y.domain(d3.extent(data, (function(d) { return d.data; })));
-          
-    //       g.focus.append("g")
-    //           .attr("id", "xAxis")
-    //           .attr("class", "x axis")
-    //           .attr("transform", "translate(0," + g.height + ")")
-    //           .call(g.xAxis);
-        
-    //       g.focus.append("g")
-    //           .attr("id", "yAxis")
-    //           .attr("class", "y axis")
-    //           .call(g.yAxis);
-              
-    //       g.focus.append("path")
-    //           .datum(data)
-    //           .attr("class", "line")
-    //           .attr("d", g.line1)
-    //           .attr("fill","none")
-    //           .attr("stroke","#a33333")
-    //           .attr("stroke-width","2px");
-          
-    //       g.ylabel.text(cols[1].key);      
-
-    // };    
     
     tool.init = function(_target) {
         this.setup(this.dom_target);
@@ -332,7 +297,7 @@
 
         // insert an icon to let user know to select param
 
-        $("#tool-status").html(
+        $("#"+_tool.dom_target+"_tool-status").html(
           $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
         )
 
@@ -342,7 +307,7 @@
         if(data.length == 0){
 
             // insert an icon to let user know to select param
-          $("#tool-status").html(
+          $("#"+_tool.dom_target+"_tool-status").html(
             $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
           );
             
@@ -376,8 +341,8 @@
           g.title.text( this.configuration.network + " Station " + this.configuration.station);
 
           // update x and y axis 
-          d3.select("#yAxis").call(g.yAxis);
-          d3.select("#xAxis").call(g.xAxis);
+          d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
+          d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
           
         }
       }
@@ -397,13 +362,13 @@
         .append(
           $("<div/>")
             .attr({
-              "id": "tool-dropdowns"
+              "id": _target+"_tool-dropdowns"
             })
             .append("Station: ")
             .append(
               $("<select></select>")
               .attr({
-                "id" : "select-stations"
+                "id" : _target+"_select-stations"
               })
               .on("change", function(evt){
 
@@ -414,7 +379,7 @@
                 else{
                   // set option shere
 
-                  $("#tool-status")
+                  $("#"+_target+"_tool-status")
                     .html(
                       $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
                     )
@@ -425,7 +390,7 @@
             .append(
               $("<select></select>")
               .attr({
-                "id" : "select-parameters"
+                "id" : _target + "_select-parameters"
               })
               .on("change", function(evt){
                 
@@ -433,7 +398,7 @@
                 $(".loading-icon").remove();
 
                 $('<img class="loading-icon loading-'+ evt.target.value + '" src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
-                  .appendTo($("#tool-status"))
+                  .appendTo($("#"+_target+"_tool-status"))
 
                 $(".param-icon").remove();
                 
@@ -446,7 +411,7 @@
 
           $("<div/>")
             .attr({
-              "id" : "tool-status"
+              "id" : _target+"_tool-status"
             })
         )
         .appendTo(
@@ -461,7 +426,7 @@
         options = [];
 
       // clear the current stations
-      $("#select-stations").empty();
+      $("#"+tool.dom_target+"_select-stations").empty();
 
       // build the stations
       $.each(tool.configuration.data_cart, function(network, network_obj){
@@ -486,53 +451,32 @@
 
       // find network-station in dropdown.. if not exists.. choose one
 
-      $("#select-stations")
+      $("#"+tool.dom_target+"_select-stations")
         .append(options);
 
 
       // check if value is in list
       // if not, change configuration to the first item in the list.
 
-      if($("#select-stations option[value='" + config.network + "," + config.station + "']").val() === undefined){
+      if($("#"+tool.dom_target+"_select-stations option[value='" + config.network + "," + config.station + "']").val() === undefined){
 
-        $("#select-stations option:first")
+        $("#"+tool.dom_target+"_select-stations option:first")
           .prop("selected", "selected");
           
-          var net_sta = $("#select-stations").val().split(",");
+          var net_sta = $("#"+tool.dom_target+"_select-stations").val().split(",");
             
           config.network = net_sta[0];
           config.station = net_sta[1];
 
-          //alert("check values " + $("#select-stations").val());
-
       }
       else{
 
-        $("#select-stations").val(config.network + "," + config.station);
+        $("#"+tool.dom_target+"_select-stations").val(config.network + "," + config.station);
         // remove loading image
         
         //alert("loading-icon here..")
 
       }
-
-      //     // // value does not exist, so select the first one
-      //     // $("#select-stations option:first")
-      //     //   .prop("selected", "selected");
-      //     //alert("check values " + $("#select-stations").val());
-
-      //     // var net_sta = $("#select-stations").val().split(",");
-      //     // alert($("#select-stations").val());
-          
-      //     // config.network = net_sta[0];
-      //     // config.station = net_sta[1];
-
-      // }
-      // else{
-      //   //alert($("#select-stations").val());
-
-      //   $("#select-stations").val(config.network + "," + config.station);
-
-      // } 
 
       console.log("*****" + config.network + "," + config.station);
 
@@ -540,9 +484,9 @@
 
     tool.select_updateParameters = function(){
 
-      console.log($("#select-stations").val());
+      console.log($("#"+tool.dom_target+"_select-stations").val());
 
-      var net_sta = $("#select-stations").val().split(","),
+      var net_sta = $("#"+tool.dom_target+"_select-stations").val().split(","),
           network = net_sta[0],
           station = net_sta[1],
           config = tool.configuration,
@@ -556,7 +500,7 @@
       
       $(".param-icon").remove();
 
-      $("#select-parameters")
+      $("#"+tool.dom_target+"_select-parameters")
         .empty()
         .append("<option>..updating..</option>");
 
@@ -577,11 +521,11 @@
         });
 
       // clear loading indicator and append options
-      $("#select-parameters")
+      $("#"+tool.dom_target+"_select-parameters")
         .empty()
         .append(options);
 
-      selected_param = $("#select-parameters option")
+      selected_param = $("#"+tool.dom_target+"_select-parameters option")
           .filter(function(){
             console.log("config param", config.parameter);
             return ($(this).val() == config.parameter);
@@ -591,19 +535,19 @@
       if(selected_param.length == 0){
 
         // update the configuration network and station 
-        var net_sta = $("#select-stations").val().split(",");
+        var net_sta = $("#"+tool.dom_target+"_select-stations").val().split(",");
         
         config.network = net_sta[0];
         config.station = net_sta[1];
 
-        $("#tool-status")
+        $("#"+tool.dom_target+"_tool-status")
           .html(
             $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
           )
 
         $("<option>(choose one)</option>")
           .prop("selected", true)
-          .insertBefore($("#select-parameters option:first"))
+          .insertBefore($("#"+tool.dom_target+"_select-parameters option:first"))
 
         return false;
       }
