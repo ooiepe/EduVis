@@ -209,7 +209,19 @@
       var url = tool.createUrl();
       
       d3.csv(url, function(error, data) {
-        tool.updategraph(data);
+
+        if(typeof data !== "undefined"){
+          tool.updategraph(data);  
+        }
+        else{
+          if(typeof error !== "undefined"){
+
+            $("#"+tool.dom_target+"_tool-status").html(
+              $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not currently available for this Station.</i>')
+            )
+
+          }
+        }
       });
 
     };
@@ -258,9 +270,17 @@
       var url = tool.createUrl();        
       
       d3.csv(url, function(error, data) {
-
-        tool.updategraph(data);
-
+      
+        if(typeof data !== "undefined"){
+          tool.updategraph(data);  
+        }
+        else{
+          if(typeof error !== "undefined"){
+            $("#"+tool.dom_target+"_tool-status").html(
+              $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not currently available for this Station.</i>')
+            )
+          }
+        }
       });
 
     };
@@ -310,7 +330,6 @@
           $("#"+_tool.dom_target+"_tool-status").html(
             $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
           );
-            
 
         }
         else{
