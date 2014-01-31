@@ -1,4 +1,4 @@
-//Date Compiled: December 05 2013 19:35:55
+//Date Compiled: December 08 2013 09:38:51
 /*  *  *  *  *  *  *  *
 *
 * EduVis - Educational Visualition Framework
@@ -665,7 +665,7 @@ var EduVis = (function () {
                         'rows':5
                     })
                     .html(control.default_value)
-                    .change(function(){
+                    .change(function() {
                         //self.customization_update();
                     });
 
@@ -720,7 +720,7 @@ var EduVis = (function () {
                 ctrl = $('<div></div>');
                 //.addClass("control");
 
-                if (control.nolabel !== "true" ){
+                if (control.nolabel !== "true" ) {
                     ctrl.append( lbl );
                 }
 
@@ -742,7 +742,7 @@ var EduVis = (function () {
                         //'value':control.default_value,
                         'title': control.tooltip,
                         'maxlength': typeof (control.maxlength) === "undefined" ? "" : control.maxlength
-                        //'onclick':function(){alert("test");}
+                        //'onclick':function() {alert("test");}
                     });
 
                 if ( control.selected ) {
@@ -775,9 +775,9 @@ var EduVis = (function () {
                     .html(control.description);
 
                 // input or div
-                if(typeof control.inline !== "undefined"){
+                if(typeof control.inline !== "undefined") {
 
-                    if(control.inline == "inline"){
+                    if(control.inline == "inline") {
                         input = $("<div/>");    
                     }
                     else{
@@ -818,7 +818,7 @@ var EduVis = (function () {
                         "changeMonth": true,
                         "changeYear": true,
                         //"showButtonPanel": true,
-                        "onSelect" : function(d,i){
+                        "onSelect" : function(d,i) {
                             console.log("datepicker changed!",d,i);
                             //tool.configuration.date_start = d;
                         },
@@ -841,7 +841,7 @@ var EduVis = (function () {
                                 "display":"inline"
                             })
                             .html(' <i class="icon-calendar"></i>')
-                            .on("click", function(){
+                            .on("click", function() {
 
                                 $("#ui-datepicker-div").remove();
 
@@ -853,7 +853,7 @@ var EduVis = (function () {
                                         "changeMonth": true,
                                         "changeYear": true,
                                         //"showButtonPanel": true,
-                                        "onSelect" : function(d,i){
+                                        "onSelect" : function(d,i) {
                                             console.log("datepicker changed!",d,i);
                                             //tool.configuration.date_start = d;
                                         },
@@ -942,12 +942,12 @@ var EduVis = (function () {
                 var el_button = $("<a></a>")
                     .addClass("btn next")
                     .html("Add")
-                    .on("click",function(){ alert("clicked");} );
+                    .on("click",function() { alert("clicked");} );
 
                 var el_selections = $("<ul></ul>")
                     .attr("id", id + "observations-selected");
 
-                $.each( control.selectedItems, function(  item, itemObj ){
+                $.each( control.selectedItems, function(  item, itemObj ) {
 
                         el_selections.append(
                             $("<li></li>").html( itemObj.name )
@@ -1011,7 +1011,7 @@ var EduVis = (function () {
                         //"value" : "btn-data-browser"
                     })
                     .html("Load Data Browser")
-                    .on("click", function(){
+                    .on("click", function() {
                         
                         EduVis.tool.load({
                             "name" : "Data_Browser",
@@ -1035,9 +1035,9 @@ var EduVis = (function () {
                 
                 // test for current date_type.. realtime or archive
 
-                var radio_btn_click = function(){
+                var radio_btn_click = function() {
 
-                    if($("#" + id + "_drOptionsRealTime").prop("checked")){
+                    if($("#" + id + "_drOptionsRealTime").prop("checked")) {
                         dr_archive.hide();
                         dr_realTime.show();
                         tool.configuration.date_type = "realtime";
@@ -1118,7 +1118,7 @@ var EduVis = (function () {
                         "tooltip": "Number of days for realtime data.",
                         "default_value" : obj_control.default_value.rt_days,
                         "description" : "<b>Days Prior<b>",
-                        "update_event": function(){
+                        "update_event": function() {
                             alert("start date changed: " + $(this).val());
                         }
                     })
@@ -1132,7 +1132,7 @@ var EduVis = (function () {
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.start_date,
                         "description" : "<b>Start Date</b>",
-                        "update_event": function(){
+                        "update_event": function() {
                             alert("rt days changed: " + $(this).val());
                         }
                     })
@@ -1149,7 +1149,7 @@ var EduVis = (function () {
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.end_date,
                         "description" : "<b>End Date</b>",
-                        "update_event": function(){
+                        "update_event": function() {
                             alert("end date changed: " + $(this).val());
                         }
                     })
@@ -1175,7 +1175,7 @@ var EduVis = (function () {
                         .append(dr_archive)
                     );
 
-                if(obj_control.default_value.date_type == "realtime"){
+                if(obj_control.default_value.date_type == "realtime") {
                     dr_archive.hide();
                     dr_realTime.show();
                     radioRealTime.click();
@@ -1215,11 +1215,11 @@ var EduVis = (function () {
 
     },
 
-    _control_load_tool_control_values = function(tool_config){
+    _control_load_tool_control_values = function(tool_config) {
 
         var control_obj = {};
 
-        $.each(tool_config,function(config_item,config_value){
+        $.each(tool_config,function(config_item,config_value) {
 
             control_obj[config_item] = $("#config-" + config_item).val();
 
@@ -1229,9 +1229,9 @@ var EduVis = (function () {
 
     },
 
-    _control_drupal_edit_controls = function(divToolControls, evTool){
+    _control_drupal_edit_controls = function(divToolControls, evTool) {
 
-        if(typeof evTool.controls !== "object"){
+        if(typeof evTool.controls !== "object") {
                     
             // if there are no controls, tell the user
             divToolControls.append(
@@ -1249,13 +1249,13 @@ var EduVis = (function () {
                 console.log("control_count:", control_count++, control_id);
                 // override default value with form based value, if exists
                 
-                if(typeof control.default_value === "object"){
+                if(typeof control.default_value === "object") {
 
                     // rebuild multiple items object
                     var tmp_obj = {};
                     $.each(control.default_value, function(index, val) {
 
-                        //if(index == control_id){
+                        //if(index == control_id) {
                             tmp_obj[index] = evTool.configuration[index];   
                         //}
 
@@ -1279,14 +1279,14 @@ var EduVis = (function () {
                     control_buttons,
                     showApplyButtons;
 
-                if(typeof control.showApplyButton === "undefined"){
+                if(typeof control.showApplyButton === "undefined") {
                     showApplyButtons = true;
                 }
                 else{
                     showApplyButtons = control.showApplyButton;
                 }
                     
-                if(showApplyButtons){
+                if(showApplyButtons) {
 
                     control_buttons = $("<div/>")
                         .css({"padding":"5px"})
@@ -1295,11 +1295,11 @@ var EduVis = (function () {
                             $("<button/>")
                                 .addClass("btn btn-small config-apply-button")
                                 .html("Apply")
-                                .on("click", function(a){
+                                .on("click", function(a) {
 
                                     a.preventDefault();
 
-                                    if(typeof control.applyClick !== "undefined"){
+                                    if(typeof control.applyClick !== "undefined") {
                                         control.applyClick();
                                     }
                                     
@@ -1307,9 +1307,9 @@ var EduVis = (function () {
 
                                     // 
                                     // does this have multiple 
-                                    if(typeof control.default_value === "object"){
+                                    if(typeof control.default_value === "object") {
 
-                                        $.each(control.default_value,function(k,v){
+                                        $.each(control.default_value,function(k,v) {
 
                                             console.log("k,v",k,v);
 
@@ -1332,7 +1332,7 @@ var EduVis = (function () {
                             $("<button/>")
                                 .addClass("btn btn-small config-apply-button")
                                 .html("Reset")
-                                .on("click", function(a){
+                                .on("click", function(a) {
                                     a.preventDefault();
                                     //console.log("this:", this);
                                     console.log("----control configuration----", a);
