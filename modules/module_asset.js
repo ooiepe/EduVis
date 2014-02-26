@@ -8,8 +8,6 @@
 * Asset loading.. scripts and stylesheets
 *
 * @class asset
-* @constructor
-
 
 * to do: inline documentation 
 */
@@ -20,56 +18,6 @@
 
   var _asset_version = "0.0.1",
 
-  _asset_stylesheet_load = function(){
-
-    var sheet = document.createElement("link");
-
-      var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathTools() + "/" + _tool + "/" + _obj_stylesheet.src; 
-      //EduVis.Environment.getPath() +_obj_stylesheet.src;
-
-      sheet.setAttribute('type', 'text/css');
-      sheet.setAttribute('href',  sheet_href);
-      sheet.setAttribute('rel','stylesheet')
-
-      if (sheet.readyState){  //internet explorer
-          sheet.onreadystatechange = function(){
-              if (sheet.readyState == "loaded" || sheet.readyState == "complete"){
-                  
-                  sheet.onreadystatechange = null;
-
-                  //_resource_queue_remove(_obj_stylesheet);
-
-                  // remove resource from resource queue
-                  // setTimeout("_resource_queue_remove(_obj_stylesheet)");
-                  //     (function(){                            
-                  //         console.log("remove STYLESHEET from queue....")
-                  //         ;
-
-                  //     })()
-                  // );
-              }
-          };
-      } else {  // other browsers
-          sheet.onload = function(){
-
-              console.log(".....sheet onload......")
-              //_resource_queue_remove(_obj_stylesheet);
-
-              // setTimeout( "_resource_queue_remove(_obj_stylesheet)");
-                  // (function(){
-                      
-                  //     // remove resource from resource queue
-                  //     console.log("remove STYLESHEET from queue....")
-                  //     _resource_queue_remove(_obj_stylesheet);
-
-                  // })()
-              //);
-          }
-      }
-
-      document.getElementsByTagName('head')[0].appendChild(sheet);
-
-  },
   _asset_getStatus = function(a){
     if(typeof a.status === "undefined"){
       a.status = "";
@@ -91,13 +39,9 @@
 
   _asset_hasDependency = function(a){
     if(typeof a.dependsOn !== "undefined"){
-      if(a.dependsOn.length > 0){
-        return true;
-      }
+      if(a.dependsOn.length > 0){ return true; }
     }
-    else{
-      a.dependsOn = [];
-    }
+    else{ a.dependsOn = []; }
     return false;
   },
 
@@ -181,8 +125,6 @@
 
         }
         
-        //alert(asset_path);
-
         //ajax request for script
         $.getScript( asset_path )
           
@@ -205,7 +147,6 @@
             sao.error = exception;
 
           });
-    
 
       }
     }
@@ -214,13 +155,10 @@
 
       var sheet = document.createElement("link");
 
-      //console.log( "get path resources" , EduVis.Environment.getPathRoot() );
-
       // if http, we assume external.. set stylesheet src
       // if not http, build the resource path and append the src.. append the tool name for folder
 
       var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathTools() + "/" + _tool + "/" + _obj_stylesheet.src; 
-      //EduVis.Environment.getPath() +_obj_stylesheet.src;
 
       sheet.setAttribute('type', 'text/css');
       sheet.setAttribute('href',  sheet_href);

@@ -38,15 +38,23 @@
         obj_tool.tool_container_div = typeof obj_tool.tool_container_div === "undefined" ? "body" : "#"+obj_tool.tool_container_div;
         obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
-        console.log("----Tool target --> ", obj_tool.tool_container_div);
+        var isEdit;
+
+        if(typeof obj_tool.isEdit === "undefined"){
+            isEdit = false;
+        }
+        else{
+            if(obj_tool.isEdit){ isEdit = true; }
+            else{isEdit = false;}
+        }
                         
-        var tool_container_div = $(obj_tool.tool_container_div)
+        var tool_container_div = $(obj_tool.tool_container_div);
         //dom_target = $("#" + obj_tool.dom_target);
 
         var tool_container = $("<div></div>")
             .addClass("tool-container")
             .append(
-                $("<div></div>").attr("id", obj_tool.dom_target)
+                $("<div/>").attr("id", obj_tool.dom_target)
             )
             .appendTo(
                 tool_container_div
@@ -54,7 +62,7 @@
 
         // create loading div
 
-        var loading_div = $("<div></div>")
+        var loading_div = $("<div/>")
             .addClass("loading")
             .attr("id", obj_tool.dom_target + "_loading")
             .append(
@@ -75,32 +83,34 @@
         $.getScript( EduVis.Environment.getPathTools() + obj_tool.name + "/" + obj_tool.name + '.js', function() {
             
             console.log("....tool notify....")
+
+            var isControlEdit;
+          
+
             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
 
-            //console.log("....tool queue....");
-            //EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
-            EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
+            if(isEdit){
+                //alert("is edit.. show controls.")
+                EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources.controls, obj_tool.name);
+            }
+        
+            EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources.tool, obj_tool.name);
 
             console.log("....tool instance....");
             
-            //if(typeof obj_tool.instance_id !== "undefined"){
-            
-            // if(typeof obj_tool.instance_config =="object"){
-            //     console.log('tool config injected: ', obj_tool.instance_config);
-
-            // }
-            // else 
-
             if(obj_tool.instance_id !== "default"){
                 
+                alert('non default instance?..');
+
                 console.log("....tool instance request....");
                 EduVis.configuration.request_instance(obj_tool);
 
                 // note: tool initialized in request_instance function.
             }else{
 
-                console.log("....tool instance init default....");
+                console.log("....tool instance init default....", "is Control edit");
                 EduVis.tool.init( obj_tool );
+               
             }
 
         });
@@ -158,9 +168,9 @@
 */  
     _tool_isReady = function( _obj_tool ){
 
-        console.log("are loaded", EduVis.asset.areAssetsLoaded(_obj_tool.resources.scripts));
+        console.log("are loaded", EduVis.asset.areAssetsLoaded(_obj_tool.resources.tool.scripts));
 
-        if(EduVis.asset.areAssetsLoaded(_obj_tool.resources.scripts)){
+        if(EduVis.asset.areAssetsLoaded(_obj_tool.resources.tool.scripts)){
             return true;
             console.log();console.log();
             console.log( "******** TOOL IS READY TO LOAD ********");
@@ -176,7 +186,7 @@
         // test if all resources have been loaded for the tool
         var r = _tool_find_resources(_obj_tool),
             i = 0,
-            scripts = r.scripts,
+            scripts = r.tool.scripts,
             stylesheets = r.stylesheets,
             scripts_length = scripts.length,
             stylesheets_length = stylesheets.length;
@@ -213,70 +223,70 @@
 * @return {Object} tool_resources 
 * deprecated and replaced with asset module
 */  
-    _tool_find_resources = function(_obj_tool){
+    // _tool_find_resources = function(_obj_tool){
 
-        var resources = _obj_tool.resources,
-            scr_ext = resources.scripts_external,
-            scr_ext_length = scr_ext.length,
+    //     var resources = _obj_tool.resources,
+    //         scr_ext = resources.scripts_external,
+    //         scr_ext_length = scr_ext.length,
 
-            scr_local = resources.scripts_local,
-            scr_local_length = scr_local.length,
+    //         scr_local = resources.scripts_local,
+    //         scr_local_length = scr_local.length,
 
-            //sty_ext = resources.stylesheets_external,
-            //sty_ext_length = sty_ext.length,
+    //         //sty_ext = resources.stylesheets_external,
+    //         //sty_ext_length = sty_ext.length,
 
-            //sty_local = resources.stylesheets_local,
-            //sty_local_length = sty_local.length,
+    //         //sty_local = resources.stylesheets_local,
+    //         //sty_local_length = sty_local.length,
 
-            stylesheets = resources.stylesheets,
-            stylesheets_length = stylesheets.length,
+    //         stylesheets = resources.stylesheets,
+    //         stylesheets_length = stylesheets.length,
 
-            scripts = [],
-            styles = [],
-            i = 0, j=0, k=0, l=0,
-            _tool_resources = {
-                "scripts" : [],
-                "stylesheets" : []
-            },
-            scripts = _tool_resources.scripts,
-            //styles = _tool_resources.stylesheets,
+    //         scripts = [],
+    //         styles = [],
+    //         i = 0, j=0, k=0, l=0,
+    //         _tool_resources = {
+    //             "scripts" : [],
+    //             "stylesheets" : []
+    //         },
+    //         scripts = _tool_resources.scripts,
+    //         //styles = _tool_resources.stylesheets,
 
-            script_count = 0,
-            style_count = 0;
+    //         script_count = 0,
+    //         style_count = 0;
 
-        for(; i<scr_ext_length; i++){
+    //     for(; i<scr_ext_length; i++){
 
-            scripts[script_count] = scr_ext[i].name;
-            script_count+=1;
-        }
+    //         scripts[script_count] = scr_ext[i].name;
+    //         script_count+=1;
+    //     }
 
-        for(; j<scr_local_length; j++){
-            scripts[script_count] = scr_local[j].name;
-            script_count+=1;
-        }
+    //     for(; j<scr_local_length; j++){
+    //         scripts[script_count] = scr_local[j].name;
+    //         script_count+=1;
+    //     }
 
-        // for(; k<sty_ext_length; k++){
+    //     // for(; k<sty_ext_length; k++){
 
-        //     stylesheets[style_count] = sty_ext[k].name;
-        //     style_count+=1;
-        // }
+    //     //     stylesheets[style_count] = sty_ext[k].name;
+    //     //     style_count+=1;
+    //     // }
 
-        // for(; l<sty_local_length; l++){
-        //     stylesheets[style_count] = sty_local[l].name;
-        //     style_count+=1;
-        // }
+    //     // for(; l<sty_local_length; l++){
+    //     //     stylesheets[style_count] = sty_local[l].name;
+    //     //     style_count+=1;
+    //     // }
         
-        console.log("stylesheets", stylesheets);
+    //     console.log("stylesheets", stylesheets);
         
-        for(; k<stylesheets_length; k++){
+    //     for(; k<stylesheets_length; k++){
 
-            styles[style_count] = stylesheets[k].name;
-            style_count+=1;
-        }
+    //         styles[style_count] = stylesheets[k].name;
+    //         style_count+=1;
+    //     }
 
 
-        return _tool_resources;
-    },
+    //     return _tool_resources;
+    // },
 
 /** initialize the tool. override configuration with appropriate instance configuration
 * 
@@ -287,9 +297,19 @@
     _tool_init = function(obj_tool){
 
         var name = obj_tool.name,
-            Tool = EduVis.tool.tools[name];
+            Tool = EduVis.tool.tools[name],
+            isEdit;
 
             Tool.objDef = obj_tool;
+            
+
+        if(typeof obj_tool.isEdit === "undefined"){
+            isEdit = false;
+        }
+        else{
+            if(obj_tool.isEdit){ isEdit = true; }
+            else{ isEdit = false; }
+        }
 
         console.log("--> Tool", Tool);
         console.log("--> Tool Name", name, "tool object", obj_tool);
@@ -298,12 +318,11 @@
         
         if(typeof Tool === "object"){
 
-            //if( _tool_is_ready( Tool ) ){
             if( _tool_isReady( Tool ) ){
 
                 var instance_id = obj_tool.instance_id;
 
-                // not a very elegant solution to dealing with multiple instances with the same instances configuration
+                // not a very elegant solution to deal with multiple instances with the same instances configuration
                 if(typeof EduVis.tool.instances[name] === "object" ){
 
                     if(typeof EduVis.tool.instances[name][instance_id] === "object"){
@@ -335,7 +354,14 @@
                 console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", obj_tool.instance_config);
 
                 // initialize tool instance
-                EduVis.tool.instances[name][instance_id].init();
+                EduVis.tool.instances[name][instance_id].init_tool();
+
+                
+                if(isEdit){
+                    console.log("is edit.. INIT! controls.")
+                    EduVis.tool.instances[name][instance_id].init_controls("#vistool-controls");
+                }
+
             }
             else{
                 
@@ -439,36 +465,39 @@
 * @return {Object} _object a bare tools object structure
 */    
     // todo: add constructor to tool base
-    _tool_base_template = function(){
+    // _tool_base_template = function(){
 
-        return {
+    //     return {
 
-            "name" : "_undefined_tool_name_",
-            "description" : "__undefined_description_",
-            "url" : "helpfile does not exist",
-            "instance":"", 
+    //         "name" : "_undefined_tool_name_",
+    //         "description" : "__undefined_description_",
+    //         "url" : "helpfile does not exist",
+    //         "instance":"", 
 
-            "version" : "",
-            "authors" : [],        
-            "resources" : {
+    //         "version" : "",
+    //         "authors" : [],        
+    //         "resources" : 
 
-                "scripts_local" : [],
-                "scripts_external" : [],
-                "stylesheets_local" : [],
-                "stylesheets_external" : [],
-                "datasets" : [] 
-            },
+    //             "tool":{
 
-            "configuration" : {},
-            "instance_configuration" : {},
-            "controls" : {},
-            "data" : {},
-            "div_target" : "__undefined_target__",
-            "tools" : {},
-            "instances" : {}
+    //                 "scripts_local" : [],
+    //                 "scripts_external" : [],
+    //                 "stylesheets_local" : [],
+    //                 "stylesheets_external" : [],
+    //                 "datasets" : [] 
+    //             }
+    //         }
 
-        };
-    },
+    //         "configuration" : {},
+    //         "instance_configuration" : {},
+    //         "controls" : {},
+    //         "data" : {},
+    //         "div_target" : "__undefined_target__",
+    //         "tools" : {},
+    //         "instances" : {}
+
+    //     };
+    // },
 
 /** Request the tool listing via getJSON and display thumbnails and links for the tools.
 * 
@@ -554,8 +583,8 @@
         version : _tool_version,
         notify : _tool_notify,
         is_ready : _tool_is_ready,
-        find_resources : _tool_find_resources,
-        template : _tool_base_template,
+        //find_resources : _tool_find_resources,
+        //template : _tool_base_template,
         customize : _tool_customize,
         load_complete : _tool_loading_complete,
         tools : {},
