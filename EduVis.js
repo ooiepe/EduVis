@@ -1,4 +1,4 @@
-//Date Compiled: December 08 2013 09:38:51
+//Date Compiled: February 10 2014 14:34:28
 /*  *  *  *  *  *  *  *
 *
 * EduVis - Educational Visualition Framework
@@ -40,8 +40,6 @@ var EduVis = (function () {
 * Asset loading.. scripts and stylesheets
 *
 * @class asset
-* @constructor
-
 
 * to do: inline documentation 
 */
@@ -52,56 +50,6 @@ var EduVis = (function () {
 
   var _asset_version = "0.0.1",
 
-  _asset_stylesheet_load = function(){
-
-    var sheet = document.createElement("link");
-
-      var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathTools() + "/" + _tool + "/" + _obj_stylesheet.src; 
-      //EduVis.Environment.getPath() +_obj_stylesheet.src;
-
-      sheet.setAttribute('type', 'text/css');
-      sheet.setAttribute('href',  sheet_href);
-      sheet.setAttribute('rel','stylesheet')
-
-      if (sheet.readyState){  //internet explorer
-          sheet.onreadystatechange = function(){
-              if (sheet.readyState == "loaded" || sheet.readyState == "complete"){
-                  
-                  sheet.onreadystatechange = null;
-
-                  //_resource_queue_remove(_obj_stylesheet);
-
-                  // remove resource from resource queue
-                  // setTimeout("_resource_queue_remove(_obj_stylesheet)");
-                  //     (function(){                            
-                  //         console.log("remove STYLESHEET from queue....")
-                  //         ;
-
-                  //     })()
-                  // );
-              }
-          };
-      } else {  // other browsers
-          sheet.onload = function(){
-
-              console.log(".....sheet onload......")
-              //_resource_queue_remove(_obj_stylesheet);
-
-              // setTimeout( "_resource_queue_remove(_obj_stylesheet)");
-                  // (function(){
-                      
-                  //     // remove resource from resource queue
-                  //     console.log("remove STYLESHEET from queue....")
-                  //     _resource_queue_remove(_obj_stylesheet);
-
-                  // })()
-              //);
-          }
-      }
-
-      document.getElementsByTagName('head')[0].appendChild(sheet);
-
-  },
   _asset_getStatus = function(a){
     if(typeof a.status === "undefined"){
       a.status = "";
@@ -123,13 +71,9 @@ var EduVis = (function () {
 
   _asset_hasDependency = function(a){
     if(typeof a.dependsOn !== "undefined"){
-      if(a.dependsOn.length > 0){
-        return true;
-      }
+      if(a.dependsOn.length > 0){ return true; }
     }
-    else{
-      a.dependsOn = [];
-    }
+    else{ a.dependsOn = []; }
     return false;
   },
 
@@ -213,8 +157,6 @@ var EduVis = (function () {
 
         }
         
-        //alert(asset_path);
-
         //ajax request for script
         $.getScript( asset_path )
           
@@ -237,7 +179,6 @@ var EduVis = (function () {
             sao.error = exception;
 
           });
-    
 
       }
     }
@@ -246,13 +187,10 @@ var EduVis = (function () {
 
       var sheet = document.createElement("link");
 
-      //console.log( "get path resources" , EduVis.Environment.getPathRoot() );
-
       // if http, we assume external.. set stylesheet src
       // if not http, build the resource path and append the src.. append the tool name for folder
 
       var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathTools() + "/" + _tool + "/" + _obj_stylesheet.src; 
-      //EduVis.Environment.getPath() +_obj_stylesheet.src;
 
       sheet.setAttribute('type', 'text/css');
       sheet.setAttribute('href',  sheet_href);
@@ -412,169 +350,6 @@ var EduVis = (function () {
 
 // };
 
-/*  *  *  *  *  *  *  
-*
-* EduVis.Configuration
-*
-*/
-
-/**
-@namespace EduVis
-**/
-
-/**
-* The configuration module...
-*
-* @class Configuration
-* @constructor
-*/
-
-
-(function (eduVis) {
-
-    "use strict";
-
-/**
-* Path to the instance configuration web service. This will ultimatly be adapted as a Drupal component.
-* 
-* @property _config_instance_ws
-* @type {string}
-* @default ""
-*/
-
-    var 
-    //_config_instance_ws = EduVis.Environment.path + "custom_instance.php",
-
-/** Parse a Configuration file from the tools default configuration
-* 
-* @method _config_parse
-* @param {String} tool name for reference
-* @param {String} tool instance ID for reference
-* @return {String} The reversed string 
-*/
-
-    _config_parse = function( _tool_reference ) {
-
-        // Load a configuration
-        var self = this,
-            ref = EduVis.tool.tools[tool_reference].configuration;
-
-        console.log("...Tool Reference...");
-        console.log(_tool_reference);
-        console.log(ref);
-
-        return true;
-
-    },
-
-/**
-* Validate a json configuration
-*
-* @method _config_validate
-* @param {Object} _config Tool Configuration
-* @param {Object} _tool Tool Reference
-* @return {Boolean} Returns true on success
-*/
-    _config_validate = function( _config, _tool) {
-
-        // this Tool
-        // Preview a configuration in new window?.. in div?
-
-        return true;
-
-    },
-
-/**
-* Writes the configuration object of an instance to the console and returns the configuration object.
-*
-* @method _config_export
-* @param {String} _tool_reference The tool name
-* @param {String} _instance_reference The instance name or id
-* @return {Boolean} Returns true on success
-*/
-    _config_export = function( _tool_reference, _instance_reference ){
-
-        var instanceConfiguration = EduVis.tool.instances[_tool_reference][_instance_reference].configuration;
-        console.log(".. Instance Configuration .. ", instanceConfiguration);
-        return instanceConfiguration;
-    },
-
-/**
-* Update the configuration settings of an instance.
-*
-* @method _config_settings_update
-* @param {String} _tool_reference The tool name
-* @param {String} _instance_reference The instance name or id
-* @param {Object} _configuration_object
-
-* @return {Boolean} Returns true on success
-*/
-    _config_settings_update = function(_tool_reference, _instance_reference, _configuration_object){
-
-       // EduVis.tool.instances[_tool_reference][_instance_reference].configuration;
-
-       //$.map(obj, function(element,index) {return index})
-
-    },
-
-    _config_set_state = function(){
-
-    },
-
-    _config_get_state = function(){
-
-    },
-
-/**
-* Triggers Ajax request for an instance configuration of a tool creation object. 
-* This is triggerd when a tool instance id is provided on the load tool call... EduVis.tool.load().
-* On a successful Ajax response, the tool is initialized with EduVis.tool.init( _tool_object ) 
-*
-* @method _config_request_instance
-* @param {Object} _tool_object The tool object
-
-* @return {null} 
-*/
-    _config_request_instance = function(_tool_object){
-
-        var self = this,
-            toolName = _tool_object.name,
-            toolInstance = _tool_object.instance_id;
-
-        // request instance configuration
-        $.getJSON( EduVis.Environment.path_webservice + "?iid=" + toolInstance, function(data){
-                
-            // set tool object instance configuration
-            _tool_object.instance_config = data;
-
-            // initialize tool with requested configuration
-            EduVis.tool.init( _tool_object );
-        });
-    },
-
-    _config_apply_instance_configuration = function( _tool_name, _tool_instance, _configuration){
-
-        // we may need to create a new tool object here using tool name, instance id, and set the configuration
-        var tool_object = {
-            "name" : _tool_name,
-            "instance_id" : _tool_instance,
-            "instance_config" : _configuration
-        };
-
-        EduVis.tool.init( tool_object );
-    };
-
-    eduVis.configuration = {
-        parse: _config_parse,
-        validate: _config_validate,
-        tool: _config_parse,
-        //instance: _config_parse_instance_config,
-        request_instance : _config_request_instance,
-        apply_instance_config : _config_apply_instance_configuration
-
-    };
-
-}(EduVis));
 
 /*  *  *  *  *  *  *  
 *
@@ -665,7 +440,7 @@ var EduVis = (function () {
                         'rows':5
                     })
                     .html(control.default_value)
-                    .change(function() {
+                    .change(function(){
                         //self.customization_update();
                     });
 
@@ -720,7 +495,7 @@ var EduVis = (function () {
                 ctrl = $('<div></div>');
                 //.addClass("control");
 
-                if (control.nolabel !== "true" ) {
+                if (control.nolabel !== "true" ){
                     ctrl.append( lbl );
                 }
 
@@ -742,7 +517,7 @@ var EduVis = (function () {
                         //'value':control.default_value,
                         'title': control.tooltip,
                         'maxlength': typeof (control.maxlength) === "undefined" ? "" : control.maxlength
-                        //'onclick':function() {alert("test");}
+                        //'onclick':function(){alert("test");}
                     });
 
                 if ( control.selected ) {
@@ -775,9 +550,9 @@ var EduVis = (function () {
                     .html(control.description);
 
                 // input or div
-                if(typeof control.inline !== "undefined") {
+                if(typeof control.inline !== "undefined"){
 
-                    if(control.inline == "inline") {
+                    if(control.inline == "inline"){
                         input = $("<div/>");    
                     }
                     else{
@@ -818,7 +593,7 @@ var EduVis = (function () {
                         "changeMonth": true,
                         "changeYear": true,
                         //"showButtonPanel": true,
-                        "onSelect" : function(d,i) {
+                        "onSelect" : function(d,i){
                             console.log("datepicker changed!",d,i);
                             //tool.configuration.date_start = d;
                         },
@@ -841,7 +616,7 @@ var EduVis = (function () {
                                 "display":"inline"
                             })
                             .html(' <i class="icon-calendar"></i>')
-                            .on("click", function() {
+                            .on("click", function(){
 
                                 $("#ui-datepicker-div").remove();
 
@@ -853,7 +628,7 @@ var EduVis = (function () {
                                         "changeMonth": true,
                                         "changeYear": true,
                                         //"showButtonPanel": true,
-                                        "onSelect" : function(d,i) {
+                                        "onSelect" : function(d,i){
                                             console.log("datepicker changed!",d,i);
                                             //tool.configuration.date_start = d;
                                         },
@@ -942,12 +717,12 @@ var EduVis = (function () {
                 var el_button = $("<a></a>")
                     .addClass("btn next")
                     .html("Add")
-                    .on("click",function() { alert("clicked");} );
+                    .on("click",function(){ alert("clicked");} );
 
                 var el_selections = $("<ul></ul>")
                     .attr("id", id + "observations-selected");
 
-                $.each( control.selectedItems, function(  item, itemObj ) {
+                $.each( control.selectedItems, function(  item, itemObj ){
 
                         el_selections.append(
                             $("<li></li>").html( itemObj.name )
@@ -1011,7 +786,7 @@ var EduVis = (function () {
                         //"value" : "btn-data-browser"
                     })
                     .html("Load Data Browser")
-                    .on("click", function() {
+                    .on("click", function(){
                         
                         EduVis.tool.load({
                             "name" : "Data_Browser",
@@ -1035,9 +810,9 @@ var EduVis = (function () {
                 
                 // test for current date_type.. realtime or archive
 
-                var radio_btn_click = function() {
+                var radio_btn_click = function(){
 
-                    if($("#" + id + "_drOptionsRealTime").prop("checked")) {
+                    if($("#" + id + "_drOptionsRealTime").prop("checked")){
                         dr_archive.hide();
                         dr_realTime.show();
                         tool.configuration.date_type = "realtime";
@@ -1118,7 +893,7 @@ var EduVis = (function () {
                         "tooltip": "Number of days for realtime data.",
                         "default_value" : obj_control.default_value.rt_days,
                         "description" : "<b>Days Prior<b>",
-                        "update_event": function() {
+                        "update_event": function(){
                             alert("start date changed: " + $(this).val());
                         }
                     })
@@ -1132,7 +907,7 @@ var EduVis = (function () {
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.start_date,
                         "description" : "<b>Start Date</b>",
-                        "update_event": function() {
+                        "update_event": function(){
                             alert("rt days changed: " + $(this).val());
                         }
                     })
@@ -1149,7 +924,7 @@ var EduVis = (function () {
                         "tooltip": "The start date.",
                         "default_value" : obj_control.default_value.end_date,
                         "description" : "<b>End Date</b>",
-                        "update_event": function() {
+                        "update_event": function(){
                             alert("end date changed: " + $(this).val());
                         }
                     })
@@ -1175,7 +950,7 @@ var EduVis = (function () {
                         .append(dr_archive)
                     );
 
-                if(obj_control.default_value.date_type == "realtime") {
+                if(obj_control.default_value.date_type == "realtime"){
                     dr_archive.hide();
                     dr_realTime.show();
                     radioRealTime.click();
@@ -1215,11 +990,11 @@ var EduVis = (function () {
 
     },
 
-    _control_load_tool_control_values = function(tool_config) {
+    _control_load_tool_control_values = function(tool_config){
 
         var control_obj = {};
 
-        $.each(tool_config,function(config_item,config_value) {
+        $.each(tool_config,function(config_item,config_value){
 
             control_obj[config_item] = $("#config-" + config_item).val();
 
@@ -1229,9 +1004,9 @@ var EduVis = (function () {
 
     },
 
-    _control_drupal_edit_controls = function(divToolControls, evTool) {
+    _control_drupal_edit_controls = function(divToolControls, evTool){
 
-        if(typeof evTool.controls !== "object") {
+        if(typeof evTool.controls !== "object"){
                     
             // if there are no controls, tell the user
             divToolControls.append(
@@ -1249,13 +1024,13 @@ var EduVis = (function () {
                 console.log("control_count:", control_count++, control_id);
                 // override default value with form based value, if exists
                 
-                if(typeof control.default_value === "object") {
+                if(typeof control.default_value === "object"){
 
                     // rebuild multiple items object
                     var tmp_obj = {};
                     $.each(control.default_value, function(index, val) {
 
-                        //if(index == control_id) {
+                        //if(index == control_id){
                             tmp_obj[index] = evTool.configuration[index];   
                         //}
 
@@ -1276,80 +1051,85 @@ var EduVis = (function () {
 
                 // add the tool to the controls area
                 var tmpCtrl = EduVis.controls.create( evTool, "config-" + control_id, control),
-                    control_buttons,
-                    showApplyButtons;
+                    control_buttons, btnApply;
+                //    ,showApplyButtons;
 
-                if(typeof control.showApplyButton === "undefined") {
-                    showApplyButtons = true;
-                }
-                else{
-                    showApplyButtons = control.showApplyButton;
-                }
+                // if(typeof control.showApplyButton === "undefined"){
+                //     showApplyButtons = true;
+                // }
+                // else{
+                //     showApplyButtons = control.showApplyButton;
+                // }
                     
-                if(showApplyButtons) {
+                // if(showApplyButtons){
 
-                    control_buttons = $("<div/>")
-                        .css({"padding":"5px"})
-                        .append(
+                //     control_buttons = $("<div/>")
+                //         .css({"padding":"5px"})
+                //         .append(
 
-                            $("<button/>")
-                                .addClass("btn btn-small config-apply-button")
-                                .html("Apply")
-                                .on("click", function(a) {
+                //             $("<button/>")
+                //                 .addClass("btn btn-small config-apply-button")
+                //                 .html("Apply")
+                //                 .on("click", function(a){
 
-                                    a.preventDefault();
+                //                     a.preventDefault();
 
-                                    if(typeof control.applyClick !== "undefined") {
-                                        control.applyClick();
-                                    }
+                //                     if(typeof control.applyClick !== "undefined"){
+                //                         control.applyClick();
+                //                     }
                                     
-                                    console.log("control", control, "control_id:", control_id, "typeof: " + typeof control.default_value);
+                //                     console.log("control", control, "control_id:", control_id, "typeof: " + typeof control.default_value);
 
-                                    // 
-                                    // does this have multiple 
-                                    if(typeof control.default_value === "object") {
+                //                     // 
+                //                     // does this have multiple 
+                //                     if(typeof control.default_value === "object"){
 
-                                        $.each(control.default_value,function(k,v) {
+                //                         $.each(control.default_value,function(k,v){
 
-                                            console.log("k,v",k,v);
+                //                             console.log("k,v",k,v);
 
-                                            // todo: include control name in config item id.. 
-                                            // config_range_date_start, for example.. currently using config key
+                //                             // todo: include control name in config item id.. 
+                //                             // config_range_date_start, for example.. currently using config key
 
-                                            //evTool.configuration[k] = $("#" + k).val();
+                //                             //evTool.configuration[k] = $("#" + k).val();
 
-                                        });
+                //                         });
 
-                                    }
-                                    else{
-                                        console.log("else", control_id, control);   
-                                        evTool.configuration[control_id] = $("#config-" + control_id).val();
-                                    }
-                                })
-                        )
+                //                     }
+                //                     else{
+                //                         console.log("else", control_id, control);   
+                //                         evTool.configuration[control_id] = $("#config-" + control_id).val();
+                //                     }
+                //                 })
+                //         )
                                 
-                        .append(
-                            $("<button/>")
-                                .addClass("btn btn-small config-apply-button")
-                                .html("Reset")
-                                .on("click", function(a) {
-                                    a.preventDefault();
-                                    //console.log("this:", this);
-                                    console.log("----control configuration----", a);
+                //         .append(
+                //             $("<button/>")
+                //                 .addClass("btn btn-small config-apply-button")
+                //                 .html("Reset")
+                //                 .on("click", function(a){
+                //                     a.preventDefault();
+                //                     //console.log("this:", this);
+                //                     console.log("----control configuration----", a);
 
-                                    evTool.configuration[control] = control.default_value;
+                //                     evTool.configuration[control] = control.default_value;
 
-                                })
-                        )
-                }
+                //                 })
+                //         )
+                // }
+
+                btnApply = $("<button/>")
+                    .addClass("btn config-apply-button")
+                    .html("Apply")
+                    .on("click", function(a){alert("now loop through and apply config elements")});
 
                 divToolControls.append(
-                   
                     $("<div/>")
                         .css({"margin":"3px","padding":"5px","border":"1px solid #000000"})
                         .append($("<h4/>").html(control.label === "undefined" ? "": control.label))
                         .append(tmpCtrl)
                         .append(control_buttons)
+                        .append(btnApply)
                 )
 
             });
@@ -1647,377 +1427,6 @@ var EduVis = (function () {
     };
 
 }(EduVis));
-/*  *  *  *  *  *  *  
-*
-* EduVis.resource
-*
-*/
-
-/**
-Provides the base resource queue, loading, and updating functionality.
-
-@module Resource
-**/
-
-/**
-* The resource module...
-*
-* @class resource
-* @constructor
-*/
-
-(function (eduVis) {
-
-    "use strict";
-
-    var _resource_version = "0.0.1",
-        _resource_path = EduVis.Environment.getPathResources(), 
-        _resource_path_js = _resource_path + "js/",             // path to javascript resources
-        _version_jquery = "1.10.1",
-        _version_d3 = "3.0.8",
-        _resources_loaded = {},
-        _resources_queued = {},
-
-/** Queue and load tool resources based on the tool resource object
-* 
-* @method _resource_queue
-* @param {Object} _obj_resources The tool resources object
-* @param {Object} _tool_name  A reference to the tool name
-* @return none 
-*/
-
-    _resource_queue = function( _obj_resources, _tool_name){
-
-        console.log("obj resources in _resource_queue", _obj_resources);
-
-        var d = _obj_resources,
-            scr_local = d.scripts_local,
-            scr_external =  d.scripts_external,
-            //sty_local = d.stylesheets_local,
-            //sty_ext = d.stylesheets_external,
-            stylesheets = d.stylesheets,
-            queued = _resources_queued,
-            q = queued[_tool_name];
- 
-        q = typeof q !== "object" ? {} : q;
-        
-        // all all resources to queue
-        $.each(scr_local, function(i,v){
-            
-            q[v.name] = i;
-            q["applies_to_tool"] = _tool_name;
-
-            console.log("..internal queued..", i, q);
-
-            // load resource
-            _resource_load_local( v );
-
-        });
-
-        $.each(scr_external, function(i,v){
-            
-            console.log("..external queued..", i, v,  q);
-
-            q[v.name] = i;
-            q["applies_to_tool"] = _tool_name;
-
-            _resource_load_external( v );
-
-        });
-
-        // $.each(sty_local, function(i,v){
-            
-        //     q[v.name] = i;
-        //     q["applies_to_tool"] = _tool_name;
-
-        //     console.log("..local style queued..", i, q);
-        // });
-
-        // $.each(sty_ext, function(i,v){
-            
-        //     q[v.name] = i;
-        //     q["applies_to_tool"] = _tool_name;
-
-        //     console.log("..external style queued..", i, q);
-        // });
-
-        $.each(stylesheets, function(i,v){
-            
-            //q[v.name] = i;
-            //q["applies_to_tool"] = _tool_name;
-
-            console.log(".. style queued..", i, q);
-
-            _resource_load_stylesheet( v, _tool_name );
-
-        });
-
-
-        // load queued resources
-
-        // $.each(scr_local,function(i,v){
-        //     console.log(".. scr_local  resource .. " + i + " - " , v);
-        //     _resource_load_local( v );
-        // });
-
-        // $.each(scr_external,function(i,v){
-        //     console.log(".. scr_external resource .. " + i + " - " , v);
-        //     _resource_load_external( v );
-        // });
-
-        // $.each(sty_local,function(i,v){
-        //     _resource_load_stylesheet( v );
-        // });
-
-        // $.each(sty_ext,function(i,v){
-        //     _resource_load_stylesheet( v );
-        // });
-
-        // $.each(stylesheets,function(i,stylesheet){
-        //     _resource_load_stylesheet( stylesheet, _tool_name );
-        // });
-
-        
-
-    },
-
-/** Log to the console when a script has loaded
-* 
-* @method _resource_notify
-* @param {Object} _obj_resource The tool resource
-* @return {} 
-*/
-
-    _resource_notify = function( _obj_resource){
-
-        // log to EV debug object.. 
-        console.log("script " + _obj_resource.name + " has loaded;");
-    },
-
-/** Load a JavaScript dependency (local resource that has been tested) from the resources folder. 
-* 
-* @method _resource_load_local
-* @param {Object} _obj_resource an object with the dependency name, file name, 
-* @return {} 
-*/
-    _resource_load_local = function ( _obj_resource ) {
-
-        // test if local resource is available
-
-        //var url = _obj_resource.resource_path || _resource_path_js;
-        var url = EduVis.Environment.getPathResources() + "js/";
-        //var url = _obj_resource.resource_path || _resource_path_js;
-
-        console.log(".....");
-        console.log("Resource load local.", url, _obj_resource);
-        console.log(".....");
-
-        _resource_inject({
-            "name" : _obj_resource.name,
-            "url" : url + _obj_resource.resource_file_name,
-            "validation": _obj_resource.validation || _obj_resource.name,
-            "global_reference" : _obj_resource.global_reference,
-            "attributes" : _obj_resource.attributes || {}
-        });
-    },
-
-/** Load an external JavaScript dependency.. object is standarized and _resource_inject is called
-* 
-* @method _resource_load_external
-* @param {Object} _obj_resource an object with the dependency name, file name, 
-* @return {} 
-*/
-    _resource_load_external = function ( _obj_resource ) {
-
-        // test if external resource is available
-        _resource_inject({
-            "name" : _obj_resource.name,
-            "url" : _obj_resource.url,
-            "validation": _obj_resource.validation || _obj_resource.name,
-            "global_reference" : _obj_resource.global_reference,
-            "version": _obj_resource.version,
-            "attributes" : _obj_resource.attributes
-        });
-
-    },
-
-/** Load a css style sheet via an ajax call and inject into DOM head
-* 
-* @method _resource_load_stylesheet
-* @param {Object} _obj_stylesheet an object with the dependency name, file name, 
-* @return {} 
-*/
-
-    _resource_load_stylesheet = function( _obj_stylesheet, _tool){
-
-        var sheet = document.createElement("link");
-
-        //console.log( "get path resources" , EduVis.Environment.getPathRoot() );
-
-        // if http, we assume external.. set stylesheet src
-        // if not http, build the resource path and append the src.. append the tool name for folder
-
-        var sheet_href = _obj_stylesheet.src.indexOf("http")==0 ? _obj_stylesheet.src : EduVis.Environment.getPathTools() + "/" + _tool + "/" + _obj_stylesheet.src; 
-        //EduVis.Environment.getPath() +_obj_stylesheet.src;
-
-        sheet.setAttribute('type', 'text/css');
-        sheet.setAttribute('href',  sheet_href);
-        sheet.setAttribute('rel','stylesheet')
-
-        if (sheet.readyState){  //internet explorer
-            sheet.onreadystatechange = function(){
-                if (sheet.readyState == "loaded" || sheet.readyState == "complete"){
-                    
-                    sheet.onreadystatechange = null;
-
-                    //_resource_queue_remove(_obj_stylesheet);
-
-                    // remove resource from resource queue
-                    // setTimeout("_resource_queue_remove(_obj_stylesheet)");
-                    //     (function(){                            
-                    //         console.log("remove STYLESHEET from queue....")
-                    //         ;
-
-                    //     })()
-                    // );
-                        
-                }
-            };
-        } else {  // other browsers
-            sheet.onload = function(){
-
-                console.log(".....sheet onload......")
-                //_resource_queue_remove(_obj_stylesheet);
-
-                // setTimeout( "_resource_queue_remove(_obj_stylesheet)");
-                    // (function(){
-                        
-                    //     // remove resource from resource queue
-                    //     console.log("remove STYLESHEET from queue....")
-                    //     _resource_queue_remove(_obj_stylesheet);
-
-                    // })()
-                //);
-            }
-        }
-
-        document.getElementsByTagName('head')[0].appendChild(sheet);
-    },
-
-    /** 
-    * Load a JavaScript dependency (local and tested) from the resources folder
-    * 
-    * @param {Object} an object with the dependency name, file name, 
-    * @return {Object} a standarized object to be used in _resource_inject
-    no return value. a callback is set and executed on load of script
-    */
-
-/** Load a script resource via jquery ajax request. Remove the resource from the resource queue 
-* when the script is returned.
-* 
-* @method _resource_inject
-* @param {Object} _obj_resource a resource object containing information on the resource to request
-* @return {} 
-*/
-    _resource_inject = function(_obj_resource){
-
-        console.log("......injecting resource.....", _obj_resource);
-
-        $.getScript( _obj_resource.url, function(){
-
-             console.log("......now remove the script resource from queue....." , _obj_resource.name );
-
-             _resource_queue_remove( _obj_resource );
-
-        });
-
-    },
-
-/** Remove a resource from the resource loading queue
-* 
-* @method _resource_queue_remove
-* @param {Object} _obj_resource a resource object containing information on the resource to request
-* @return {} 
-*/
-    _resource_queue_remove = function(_obj_resource){
-
-        console.log("resource remove...", _obj_resource.name );
-
-        // remove from queue object
-        delete _resources_queued[ _obj_resource.name ];
-
-        // add the dependency as an available resource
-        _resources_loaded[ _obj_resource.name ] = _obj_resource;
-
-    },
-
-/** Test if a resource is currently loaded.
-* 
-* @method _resource_is_loaded
-* @param {String} _resource_name a resource name to be checked for load status
-* @return {Boolean} 
-*/
-    _resource_is_loaded = function( _resource_name ){
-
-        console.log("..IS this resource loaded.. ", _resource_name);
-        return typeof _resources_loaded[ _resource_name ] === "object" ? true : false;
-
-    },
-
-/** Find the version of a resource
-* 
-* @method _resource_version_loaded
-* @param {String} _resource_name a resource name to be version checked
-* @return {String}  
-*/
-
-    _resource_version_loaded = function( _resource_name ){
-
-        var ver = _resoures_loaded[_resource_name];
-
-        if( typeof ver === "object" || typeof ver === "Object"){
-            if(ver.hasOwnProperty("version")){
-                return ver["version"];
-            }
-         }
-
-        return "default";
-    };
-
-    eduVis.resource = {
-
-        // resource loading for scripts
-        resource_path : _resource_path,
-        resource_path_js : _resource_path_js,
-
-        load : _resource_load_local,
-        load_external : _resource_load_external,
-        load_stylesheet : _resource_load_stylesheet,
-        //loaded : (function(){return _resources_loaded;})(),
-
-        loaded : _resources_loaded,
-
-        queue : _resource_queue,
-        //queued : (function(){return _resources_queued;})(),
-        queued : _resources_queued,
-        
-        // identify : _resource_identify,
-        notify : _resource_notify,
-
-        is_loaded : _resource_is_loaded,
-
-        version : _resource_version_loaded
-    };
-
-}(EduVis));
-
-/*
-* TO DO:
-*
-* todo: path will move to resources
-* todo: load tool tests on script request callback
-
-*/
 
 /*  *  *  *  *  *  *  *
 *
@@ -2058,15 +1467,23 @@ Provides the base resource queue, loading, and updating functionality.
         obj_tool.tool_container_div = typeof obj_tool.tool_container_div === "undefined" ? "body" : "#"+obj_tool.tool_container_div;
         obj_tool.dom_target = obj_tool.name + "_" + obj_tool.instance_id;
 
-        console.log("----Tool target --> ", obj_tool.tool_container_div);
+        var isEdit;
+
+        if(typeof obj_tool.isEdit === "undefined"){
+            isEdit = false;
+        }
+        else{
+            if(obj_tool.isEdit){ isEdit = true; }
+            else{isEdit = false;}
+        }
                         
-        var tool_container_div = $(obj_tool.tool_container_div)
+        var tool_container_div = $(obj_tool.tool_container_div);
         //dom_target = $("#" + obj_tool.dom_target);
 
         var tool_container = $("<div></div>")
             .addClass("tool-container")
             .append(
-                $("<div></div>").attr("id", obj_tool.dom_target)
+                $("<div/>").attr("id", obj_tool.dom_target)
             )
             .appendTo(
                 tool_container_div
@@ -2074,7 +1491,7 @@ Provides the base resource queue, loading, and updating functionality.
 
         // create loading div
 
-        var loading_div = $("<div></div>")
+        var loading_div = $("<div/>")
             .addClass("loading")
             .attr("id", obj_tool.dom_target + "_loading")
             .append(
@@ -2095,32 +1512,34 @@ Provides the base resource queue, loading, and updating functionality.
         $.getScript( EduVis.Environment.getPathTools() + obj_tool.name + "/" + obj_tool.name + '.js', function() {
             
             console.log("....tool notify....")
+
+            var isControlEdit;
+          
+
             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
 
-            //console.log("....tool queue....");
-            //EduVis.resource.queue( EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
-            EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources, obj_tool.name);
+            if(isEdit){
+                //alert("is edit.. show controls.")
+                EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources.controls, obj_tool.name);
+            }
+        
+            EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources.tool, obj_tool.name);
 
             console.log("....tool instance....");
             
-            //if(typeof obj_tool.instance_id !== "undefined"){
-            
-            // if(typeof obj_tool.instance_config =="object"){
-            //     console.log('tool config injected: ', obj_tool.instance_config);
-
-            // }
-            // else 
-
             if(obj_tool.instance_id !== "default"){
                 
+                alert('non default instance?..');
+
                 console.log("....tool instance request....");
                 EduVis.configuration.request_instance(obj_tool);
 
                 // note: tool initialized in request_instance function.
             }else{
 
-                console.log("....tool instance init default....");
+                console.log("....tool instance init default....", "is Control edit");
                 EduVis.tool.init( obj_tool );
+               
             }
 
         });
@@ -2178,9 +1597,9 @@ Provides the base resource queue, loading, and updating functionality.
 */  
     _tool_isReady = function( _obj_tool ){
 
-        console.log("are loaded", EduVis.asset.areAssetsLoaded(_obj_tool.resources.scripts));
+        console.log("are loaded", EduVis.asset.areAssetsLoaded(_obj_tool.resources.tool.scripts));
 
-        if(EduVis.asset.areAssetsLoaded(_obj_tool.resources.scripts)){
+        if(EduVis.asset.areAssetsLoaded(_obj_tool.resources.tool.scripts)){
             return true;
             console.log();console.log();
             console.log( "******** TOOL IS READY TO LOAD ********");
@@ -2196,7 +1615,7 @@ Provides the base resource queue, loading, and updating functionality.
         // test if all resources have been loaded for the tool
         var r = _tool_find_resources(_obj_tool),
             i = 0,
-            scripts = r.scripts,
+            scripts = r.tool.scripts,
             stylesheets = r.stylesheets,
             scripts_length = scripts.length,
             stylesheets_length = stylesheets.length;
@@ -2233,70 +1652,70 @@ Provides the base resource queue, loading, and updating functionality.
 * @return {Object} tool_resources 
 * deprecated and replaced with asset module
 */  
-    _tool_find_resources = function(_obj_tool){
+    // _tool_find_resources = function(_obj_tool){
 
-        var resources = _obj_tool.resources,
-            scr_ext = resources.scripts_external,
-            scr_ext_length = scr_ext.length,
+    //     var resources = _obj_tool.resources,
+    //         scr_ext = resources.scripts_external,
+    //         scr_ext_length = scr_ext.length,
 
-            scr_local = resources.scripts_local,
-            scr_local_length = scr_local.length,
+    //         scr_local = resources.scripts_local,
+    //         scr_local_length = scr_local.length,
 
-            //sty_ext = resources.stylesheets_external,
-            //sty_ext_length = sty_ext.length,
+    //         //sty_ext = resources.stylesheets_external,
+    //         //sty_ext_length = sty_ext.length,
 
-            //sty_local = resources.stylesheets_local,
-            //sty_local_length = sty_local.length,
+    //         //sty_local = resources.stylesheets_local,
+    //         //sty_local_length = sty_local.length,
 
-            stylesheets = resources.stylesheets,
-            stylesheets_length = stylesheets.length,
+    //         stylesheets = resources.stylesheets,
+    //         stylesheets_length = stylesheets.length,
 
-            scripts = [],
-            styles = [],
-            i = 0, j=0, k=0, l=0,
-            _tool_resources = {
-                "scripts" : [],
-                "stylesheets" : []
-            },
-            scripts = _tool_resources.scripts,
-            //styles = _tool_resources.stylesheets,
+    //         scripts = [],
+    //         styles = [],
+    //         i = 0, j=0, k=0, l=0,
+    //         _tool_resources = {
+    //             "scripts" : [],
+    //             "stylesheets" : []
+    //         },
+    //         scripts = _tool_resources.scripts,
+    //         //styles = _tool_resources.stylesheets,
 
-            script_count = 0,
-            style_count = 0;
+    //         script_count = 0,
+    //         style_count = 0;
 
-        for(; i<scr_ext_length; i++){
+    //     for(; i<scr_ext_length; i++){
 
-            scripts[script_count] = scr_ext[i].name;
-            script_count+=1;
-        }
+    //         scripts[script_count] = scr_ext[i].name;
+    //         script_count+=1;
+    //     }
 
-        for(; j<scr_local_length; j++){
-            scripts[script_count] = scr_local[j].name;
-            script_count+=1;
-        }
+    //     for(; j<scr_local_length; j++){
+    //         scripts[script_count] = scr_local[j].name;
+    //         script_count+=1;
+    //     }
 
-        // for(; k<sty_ext_length; k++){
+    //     // for(; k<sty_ext_length; k++){
 
-        //     stylesheets[style_count] = sty_ext[k].name;
-        //     style_count+=1;
-        // }
+    //     //     stylesheets[style_count] = sty_ext[k].name;
+    //     //     style_count+=1;
+    //     // }
 
-        // for(; l<sty_local_length; l++){
-        //     stylesheets[style_count] = sty_local[l].name;
-        //     style_count+=1;
-        // }
+    //     // for(; l<sty_local_length; l++){
+    //     //     stylesheets[style_count] = sty_local[l].name;
+    //     //     style_count+=1;
+    //     // }
         
-        console.log("stylesheets", stylesheets);
+    //     console.log("stylesheets", stylesheets);
         
-        for(; k<stylesheets_length; k++){
+    //     for(; k<stylesheets_length; k++){
 
-            styles[style_count] = stylesheets[k].name;
-            style_count+=1;
-        }
+    //         styles[style_count] = stylesheets[k].name;
+    //         style_count+=1;
+    //     }
 
 
-        return _tool_resources;
-    },
+    //     return _tool_resources;
+    // },
 
 /** initialize the tool. override configuration with appropriate instance configuration
 * 
@@ -2307,9 +1726,19 @@ Provides the base resource queue, loading, and updating functionality.
     _tool_init = function(obj_tool){
 
         var name = obj_tool.name,
-            Tool = EduVis.tool.tools[name];
+            Tool = EduVis.tool.tools[name],
+            isEdit;
 
             Tool.objDef = obj_tool;
+            
+
+        if(typeof obj_tool.isEdit === "undefined"){
+            isEdit = false;
+        }
+        else{
+            if(obj_tool.isEdit){ isEdit = true; }
+            else{ isEdit = false; }
+        }
 
         console.log("--> Tool", Tool);
         console.log("--> Tool Name", name, "tool object", obj_tool);
@@ -2318,12 +1747,11 @@ Provides the base resource queue, loading, and updating functionality.
         
         if(typeof Tool === "object"){
 
-            //if( _tool_is_ready( Tool ) ){
             if( _tool_isReady( Tool ) ){
 
                 var instance_id = obj_tool.instance_id;
 
-                // not a very elegant solution to dealing with multiple instances with the same instances configuration
+                // not a very elegant solution to deal with multiple instances with the same instances configuration
                 if(typeof EduVis.tool.instances[name] === "object" ){
 
                     if(typeof EduVis.tool.instances[name][instance_id] === "object"){
@@ -2355,7 +1783,14 @@ Provides the base resource queue, loading, and updating functionality.
                 console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", obj_tool.instance_config);
 
                 // initialize tool instance
-                EduVis.tool.instances[name][instance_id].init();
+                EduVis.tool.instances[name][instance_id].init_tool();
+
+                
+                if(isEdit){
+                    console.log("is edit.. INIT! controls.")
+                    EduVis.tool.instances[name][instance_id].init_controls("#vistool-controls");
+                }
+
             }
             else{
                 
@@ -2459,36 +1894,39 @@ Provides the base resource queue, loading, and updating functionality.
 * @return {Object} _object a bare tools object structure
 */    
     // todo: add constructor to tool base
-    _tool_base_template = function(){
+    // _tool_base_template = function(){
 
-        return {
+    //     return {
 
-            "name" : "_undefined_tool_name_",
-            "description" : "__undefined_description_",
-            "url" : "helpfile does not exist",
-            "instance":"", 
+    //         "name" : "_undefined_tool_name_",
+    //         "description" : "__undefined_description_",
+    //         "url" : "helpfile does not exist",
+    //         "instance":"", 
 
-            "version" : "",
-            "authors" : [],        
-            "resources" : {
+    //         "version" : "",
+    //         "authors" : [],        
+    //         "resources" : 
 
-                "scripts_local" : [],
-                "scripts_external" : [],
-                "stylesheets_local" : [],
-                "stylesheets_external" : [],
-                "datasets" : [] 
-            },
+    //             "tool":{
 
-            "configuration" : {},
-            "instance_configuration" : {},
-            "controls" : {},
-            "data" : {},
-            "div_target" : "__undefined_target__",
-            "tools" : {},
-            "instances" : {}
+    //                 "scripts_local" : [],
+    //                 "scripts_external" : [],
+    //                 "stylesheets_local" : [],
+    //                 "stylesheets_external" : [],
+    //                 "datasets" : [] 
+    //             }
+    //         }
 
-        };
-    },
+    //         "configuration" : {},
+    //         "instance_configuration" : {},
+    //         "controls" : {},
+    //         "data" : {},
+    //         "div_target" : "__undefined_target__",
+    //         "tools" : {},
+    //         "instances" : {}
+
+    //     };
+    // },
 
 /** Request the tool listing via getJSON and display thumbnails and links for the tools.
 * 
@@ -2574,8 +2012,8 @@ Provides the base resource queue, loading, and updating functionality.
         version : _tool_version,
         notify : _tool_notify,
         is_ready : _tool_is_ready,
-        find_resources : _tool_find_resources,
-        template : _tool_base_template,
+        //find_resources : _tool_find_resources,
+        //template : _tool_base_template,
         customize : _tool_customize,
         load_complete : _tool_loading_complete,
         tools : {},
