@@ -1,27 +1,16 @@
 /*  *  *  *  *  *  *  *
 *
-* TOOL TEMPLATE
+* HELLO WORLD
 *
 */
 
 (function (eduVis) {
 
-    function hello_message_update(evt){
+    // function hello_message_update(evt){
 
-        var target = evt.target,
-            val = target.value;
+       
 
-        // update tool configuration value for hello_message
-        tool.configuration.hello_message = val;
-
-        console.log("tool", tool);
-        console.log("evt",evt);
-        console.log("this",this);
-
-        // update visual
-        d3.select("#hello-world-tool-svg-text").text(val);
-
-    }
+    // }
 
 
     "use strict";
@@ -46,20 +35,54 @@
         
         "resources" : {
 
-           "scripts" : [
-                {
-                    "name" : "d3",
-                    "url" : "http://d3js.org/d3.v3.min.js",
-                    "global_reference" : "d3"
-                }
-            ],
+            "tool": {
 
-            "stylesheets" : [
-               {
-                    "name" : "toolstyle",
-                    "src" : "Hello_World.css"
-                }
-            ],
+               "scripts" : [
+                    {
+                        "name" : "d3",
+                        "url" : "http://d3js.org/d3.v3.min.js",
+                        "global_reference" : "d3"
+                    }
+                ],
+
+                "stylesheets" : [
+                   {
+                        "name" : "toolstyle",
+                        "src" : "Hello_World.css"
+                    }
+                ]
+            },
+
+            "controls": {
+
+               "scripts" : [
+                    {
+                        "name" : "d3",
+                        "url" : "http://d3js.org/d3.v3.min.js",
+                        "global_reference" : "d3"
+                    },
+
+                    {
+                        "resource_type" : "tool",
+                        "name": "leaflet_js",
+                        "url" : "js/leaflet.js",
+                        "namespace" : "L",
+                        "attributes":{}
+                    }
+
+                ],
+
+                "stylesheets" : [
+                    {
+                        "name": "leaflet-markercluster-css",
+                        "src": "css/MarkerCluster.css"
+                    },
+                    {
+                        "name": "leaflet-markercluster-default",
+                        "src": "css/MarkerCluster.Default.css"
+                    },
+                ]
+            },
 
             "datasets" : []
             
@@ -71,26 +94,15 @@
 
         },
 
-        "controls" : {
-
-            "hello_message" : {
-
-                "type" : "textbox",
-                "label" : "Hello Message",
-                "tooltip": "Enter your hello world message?",
-                "default_value" : "Hello, World!",
-                "description" : "Modify your hello world message.",
-                "update_event" : hello_message_update
-            }
-        },
         "data" : {},
         "target_div" : "Hello_World",
         "tools" : {}
 
     };
 
-    tool.Hello_World = function( _target ){
+    tool.Hello_World = function( _target, identifier ){
 
+        //this.control.hello_world = 
         d3.select("#"+_target)
             .append("svg")
                 .attr(
@@ -111,26 +123,89 @@
                     )
                     .text(tool.configuration.hello_message);
 
-        // $("#"+_target).append(
-   
-        //     $("<h2/>",{
-        //         id : "hello-world-tool-text",
-        //         html: tool.configuration.hello_message
-        //     })
-                
-        // );
-
-        //alert("instance loaded from folder non relative path.");
 
         EduVis.tool.load_complete(this);
 
     };
 
-    tool.init = function() {
 
+    tool.init_tool = function() {
+
+        // run additional tool setup functions here
+
+        // activate Hello World tool
         this.Hello_World(this.dom_target);
 
     };
+
+    tool.init_controls = function(target_div){
+
+        // do we create and return a full DOM element.. or draw to the provided div target?
+        // hello_message
+        
+        var ctrl_hello_input,
+
+            hello_message = $("<div/>")
+            .append(
+
+                //label 
+
+                $("<label />")
+                    .attr({
+                        'for': 'hello_world_textbox'
+                    })
+                    .html("Hello Message")
+
+            )
+            .append(
+
+                //hello_world_textbox
+                
+               ctrl_hello_input = $("<input />")
+                    .attr({
+                        'id': 'hello_world_textbox',
+                        'type': 'textbox',
+                        'value': tool.configuration.hello_message,
+                        'title': 'Enter text for the Hello Word message.',
+                        'maxlength': '100'
+                    })
+                    .addClass("span2")
+                    // .on("change", function (a) {
+                        
+                        
+                    // })
+            )
+            .append(
+                
+                $("<input>")
+                    .attr({
+                        'id': 'hello_world_btn',
+                        'type': 'button',
+                        'title': 'Apply Configuration',
+                        'value': 'Apply'
+                    })
+                    .addClass("btn")
+                    
+                    .on("click", function (evt) {
+
+                        var target = $(ctrl_hello_input),
+                            val = target.val();
+
+                        // update tool configuration value for hello_message
+                        tool.configuration.hello_message = val;
+
+                        // update visual
+                        d3.select("#hello-world-tool-svg-text").text(val);
+
+
+                    })
+            )
+
+        $(target_div).append(hello_message);
+
+    };
+
+
 
     // extend base object with tool..
     EduVis.tool.tools[tool.name] = tool;
