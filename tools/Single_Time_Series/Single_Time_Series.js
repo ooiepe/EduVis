@@ -1,5 +1,6 @@
-/* Single Time Series Tool
- * Revised 10/22/2013
+/* OOI EPE - Single Time Series Tool
+ * Revised 3/7/2014
+ * Written by Mike Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
     "use strict";
@@ -103,8 +104,8 @@
           "datasets" : []            
         },
 
-        "configuration" : {
         // default chart properties
+        "configuration" : {
         // updated by visualization
         "station" : "44033",
         "network" : "NDBC",
@@ -197,22 +198,24 @@
     tool.setup = function( _target ){
       var g = this.graph;
 
-      g.margin = {top: 26, right: 25, bottom: 20, left: 60};
+      g.margin = {top: 26, right: 25, bottom: 40, left: 60};
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
       
       g.parseDate = d3.time.format.iso.parse;
       
-      g.x = d3.time.scale().range([0, g.width]);
+      g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
       
       g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(12).tickSize(5,0,0);
       g.yAxis = d3.svg.axis().scale(g.y).orient("left").tickSize(-g.width,0,0);
       
       g.svg = d3.select("#"+_target).append("svg")
-          .attr("id",_target+"_svggraph")
-          .attr("width", g.width + g.margin.left + g.margin.right)
-          .attr("height", g.height + g.margin.top + g.margin.bottom);
+        .attr("id",_target+"_svggraph")
+        .attr("width", g.width + g.margin.left + g.margin.right)
+        .attr("height", g.height + g.margin.top + g.margin.bottom)
+        .style("font-size","11px")
+        .style("font-family","Tahoma, Geneva, sans-serif");
       
       g.svg.append("defs").append("clipPath")
           .attr("id", _target+"_clip")
@@ -227,54 +230,63 @@
         .attr("id", _target+"_xAxis")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
-        .call(g.xAxis).style({
-          "stroke": "#000",
-          "stroke-width": ".5",
-          "shape-rendering": "crispEdges",
-          "stroke-opacity": ".4"
-        });
+        .call(g.xAxis);
         
       g.focus.append("g")
         .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
-        .call(g.yAxis).style({
-          "stroke": "#000",
-          "stroke-width": ".5",
-          "shape-rendering": "crispEdges",
-          "stroke-opacity": ".4"
-        });
+        .call(g.yAxis);
       
       g.focus.append("path")
-              //.datum(data)
-              .attr("class", "line")
-              .attr("d", g.line1)
-              .attr("fill","none")
-              .attr("stroke","#a33333")
-              .attr("stroke-width","2px");
+        //.datum(data)
+        .attr("class", "line")
+        .attr("d", g.line1)
+        .style("fill","none")
+        .style("stroke","#a33333")
+        .style("stroke-width","2px");
 
       g.line1 = d3.svg.line()
-          .interpolate("monotone")
-          .x(function(d) { return g.x(d.date); })
-          .y(function(d) { return g.y(d.data); });
+        .interpolate("monotone")
+        .x(function(d) { return g.x(d.date); })
+        .y(function(d) { return g.y(d.data); });
       
       g.title = g.svg.append("text")
-          .attr("class", "gtitle")
-          .attr("text-anchor", "middle")
-          .attr("font-size", "18")
-          .attr("y", 0)
-          .attr("dy", ".75em")
-          .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
-          .text( this.configuration.network + " Station " + this.configuration.station);
+        .attr("class", "gtitle")
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .attr("y", 0)
+        .attr("dy", ".75em")
+        .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
+        .text( this.configuration.network + " Station " + this.configuration.station);
       
       g.ylabel = g.svg.append("text")
-          .attr("id", _target+"_ylabel")
-          .attr("class", "glabel")
-          .attr("text-anchor", "middle")
-          .attr("font-size", "14")
-          .attr("y", 0)
-          .attr("dy", "1em")
-          .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
-          .text( this.configuration.parameter);
+        .attr("id", _target+"_ylabel")
+        .attr("class", "glabel")
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        //.style("fill", "#999")
+        .attr("y", 0)
+        .attr("dy", "1em")
+        .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
+        .text( this.configuration.parameter);
+
+      g.xlabel = g.svg.append("text")
+        .attr("id", _target+"_xlabel")
+        .attr("class", "glabel")
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("dy", "-6px")
+        .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
+        .text( "Date Range");
+
+      g.stats = g.svg.append("text")
+        .attr("id", _target+"_stats")
+        .attr("class", "glabel")
+        .attr("text-anchor", "end")
+        .style("font-size", "11px")
+        .attr("dy", "-6px")
+        .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
+        .text( "Statistics");
 
       tool.select_createDropdowns(_target);
       tool.select_updateStations();
@@ -415,12 +427,14 @@
             d.data = +d[cols[1].key];
           }); 
 
-          // update the g.x.domain with date range from the tool, not the returned datasets
-          // if real time
-
-          // update the timeseries path
-          g.x.domain(d3.extent(data, (function(d) { return d.date; })));
-          g.y.domain(d3.extent(data, (function(d) { return d.data; })));
+          // Update X domain to use date range from the tool when in archive mode, otherwise use the range of the returned data.
+          if(this.configuration.date_type == "realtime"){
+            g.x.domain(d3.extent(data, (function(d) { return d.date; })));
+          } else {
+            g.x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
+          }
+          // Updte the Y domain to use the range of the returned data.
+          g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
           
           g.svg.selectAll("path.line")
           .data([data])
@@ -429,14 +443,26 @@
           .ease("linear")
           .attr("d", g.line1);
           
-          //d3.select('#ylabel').text(cols[1].key);
-          g.ylabel.text(cols[1].key);
           g.title.text( this.configuration.network + " Station " + this.configuration.station);
+          g.ylabel.text(cols[1].key);
+          var datelimits = g.x.domain();
+          g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
+          var stats = tool.average(data);
+          g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
+          console.log(stats);
 
           // update x and y axis 
           d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
           d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
           
+          d3.selectAll('.axis line, .axis path')
+            .style("fill","none")
+            .style("stroke","#999")
+            .style("stroke-width","1px")
+            //.style("shape-rendering","crispEdges")
+          d3.selectAll('.y.axis line')
+            .style("stroke-opacity",".4")
+
         }
       }
       
@@ -444,6 +470,18 @@
       $(".loading-icon").remove();
 
     };
+    
+    // Calculates general statistics.  This should be replaced by d3.deviation when implemented.
+    tool.average = function(data) {
+      var a=Array();
+      data.forEach(function(d) {
+        a.push(d.data);
+      });
+      var r = {mean: 0, variance: 0, deviation: 0}, t = a.length;
+      for(var m, s = 0, l = t; l--; s += a[l]);
+      for(m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
+      return r.deviation = Math.sqrt(r.variance = s / t), r;
+    }
 
     tool.select_createDropdowns = function(_target){
      
