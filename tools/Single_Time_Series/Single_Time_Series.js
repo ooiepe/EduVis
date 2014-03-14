@@ -1,23 +1,24 @@
-/* OOI EPE - Single Time Series Tool
- * Revised 3/7/2014
+/**
+ * OOI EPE - Single Time Series (STS)
+ * Revised 3/14/2014
  * Written by Mike Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
     "use strict";
     var tool = {
         "name" : "Single_Time_Series",
-        "description" : "The Hello World of EV.",
-        "version" : "0.1",
+        "version" : "0.3",
+        "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
                 "name" : "Sage Lichtenwalner",
                 "association" : "Rutgers University",
-                "url" : "http://marine.rutgers.edu/~sage"
+                "url" : "http://rucool.marine.rutgers.edu"
             },
             {
                 "name" : "Michael Mills",
                 "association" : "Rutgers University",
-                "url" : "http://marine.rutgers.edu/~mmills"
+                "url" : "http://rucool.marine.rutgers.edu"
             }
         ],
         "resources" : {
@@ -106,31 +107,26 @@
 
         // default chart properties
         "configuration" : {
-        // updated by visualization
-        "station" : "44033",
-        "network" : "NDBC",
-        "parameter" : "water_temperature",
-        
-        // update by browser
-        "realtime_days" : "2",
-        "start_date": "2013-01-01",
-        "end_date": "2013-12-31",
-        "date_type" : "archived",
-        "data_cart" : 
-          {
-            "NDBC":
-            { "44033":
-              { 
-                "parameters":
-                {
+          // updated by visualization
+          "station" : "44033",
+          "network" : "NDBC",
+          "parameter" : "water_temperature",
+          
+          // update by browser
+          "realtime_days" : "2",
+          "start_date": "2013-01-01",
+          "end_date": "2013-12-31",
+          "date_type" : "archived",
+          "data_cart" : {
+            "NDBC": { 
+              "44033": { 
+                "parameters": {
                   "water_temperature":{},
                   "air_temperature":{}
                 }
               },
-              "44025":
-              { 
-                "parameters":
-                {
+              "44025": { 
+                "parameters": {
                   "water_temperature":{},
                   "air_temperature":{}
                 }
@@ -185,7 +181,6 @@
       },
 
       "styleStationReset" : {
-
           radius: 6,
           color: "#000",
           weight: 1,
@@ -194,7 +189,11 @@
       }
         
     };
-
+    
+    /**
+     * Initial setup of visualization tool
+     * Called by init_tool
+     */
     tool.setup = function( _target ){
       var g = this.graph;
 
@@ -294,6 +293,10 @@
 
     };
 
+    /**
+     * Draw first dataset following initial tool setup 
+     * Called by init_tool
+     */
     tool.draw = function() {
       var url = tool.createUrl();
       
@@ -315,6 +318,9 @@
 
     };
 
+    /**
+     * Update graph and config when station pulldown is changed 
+     */
     tool.graph_update_sta = function(network_station){
         var net_sta = network_station.split(","),
             network = net_sta[0],
@@ -327,6 +333,9 @@
         tool.graph_update();
     };
 
+    /**
+     * Update graph and config when parameter pulldown is changed 
+     */
     tool.graph_update_param = function(parameter){
 
         //tool.configuration.station = "";
@@ -335,19 +344,31 @@
         tool.graph_update();
     };
 
+    /**
+     * Update graph and config when start date is changed 
+     * Not currently used?
+     */
     function graph_update_sd(evt){
         var target = evt.target,
             val = target.value;
         tool.configuration.start_date = val;
         tool.graph_update();
     }
+    /**
+     * Update graph and config when end date is changed 
+     * Not currently used?
+     */
     function graph_update_ed(evt){
         var target = evt.target,
             val = target.value;
         tool.configuration.end_date = val;
         tool.graph_update();
     }
-    
+
+    /**
+     * Update visualization with new settings
+     * Called by graph_update_sta and graph_update_param
+     */    
     tool.graph_update = function() {
       
       var url = tool.createUrl();        
@@ -368,6 +389,10 @@
 
     };
 
+    /**
+     * Create the URL to request timeseries data
+     * Called by draw and graph_update
+     */    
     tool.createUrl = function(){
 
       var config = this.configuration,
@@ -386,7 +411,7 @@
         end = config.end_date;
       }
 
-      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
+      return 'http://epedata.oceanobservatories.org/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -394,6 +419,10 @@
         '&end_time=' + end;
     }
     
+    /**
+     * Update visualization with new data
+     * Called by draw and graph_update
+     */    
     tool.updategraph = function(data) {
 
       if(typeof data === "undefined"){
@@ -423,7 +452,7 @@
               cols = d3.entries(data[0]);
 
           data.forEach(function(d) {
-            d.date = g.parseDate(d.date);
+            d.date = g.parseDate(d[cols[0].key]);
             d.data = +d[cols[1].key];
           }); 
 
@@ -449,7 +478,7 @@
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
           g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-          console.log(stats);
+          //console.log(stats);
 
           // update x and y axis 
           d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
@@ -471,7 +500,11 @@
 
     };
     
-    // Calculates general statistics.  This should be replaced by d3.deviation when implemented.
+    /**
+     * Calculates general statistics on data
+     * Called by updategraph
+     * This should be replaced by d3.deviation and other related functions when (if?) implemented.
+     */
     tool.average = function(data) {
       var a=Array();
       data.forEach(function(d) {
@@ -483,6 +516,10 @@
       return r.deviation = Math.sqrt(r.variance = s / t), r;
     }
 
+    /**
+     * Generate station and parameter pulldowns
+     * Called by setup
+     */
     tool.select_createDropdowns = function(_target){
      
       var tool_controls = $("<div/>")
@@ -551,6 +588,10 @@
 
     };
 
+    /**
+     * Update station pulldown to match config
+     * Called by setup and init_controls
+     */
     tool.select_updateStations = function(){
 
       var config = tool.configuration,
@@ -609,13 +650,17 @@
 
       }
 
-      console.log("*****" + config.network + "," + config.station);
+      //console.log("*****" + config.network + "," + config.station);
 
     };
 
+    /**
+     * Update parameter pulldown to match config
+     * Called by setup, init_controls (when apply is clicked) and select_createDropdowns
+     */
     tool.select_updateParameters = function(){
 
-      console.log($("#"+tool.dom_target+"_select-stations").val());
+      //console.log($("#"+tool.dom_target+"_select-stations").val());
 
       var net_sta = $("#"+tool.dom_target+"_select-stations").val().split(","),
           network = net_sta[0],
@@ -658,7 +703,7 @@
 
       selected_param = $("#"+tool.dom_target+"_select-parameters option")
         .filter(function(){
-          console.log("config param", config.parameter);
+          //console.log("config param", config.parameter);
           return ($(this).val() == config.parameter);
         })
         .prop('selected', true);
@@ -687,12 +732,20 @@
 
     };
 
+    /**
+     * Initialize tool
+     * Called automatically by EduVis
+     */
     tool.init_tool = function(_target) {
       this.setup(this.dom_target);
       this.draw();
       EduVis.tool.load_complete(this);
     };
 
+    /**
+     * Initial setup of tool configuration panel
+     * Called automatically by EduVis when edit is enabled
+     */
     tool.init_controls = function(){
        
       // place data browser in provided Dom, otherwise add to body
@@ -809,7 +862,7 @@
                       "changeYear": true,
                       //"showButtonPanel": true,
                       "onSelect" : function(d,i){
-                          console.log("datepicker changed!",d,i);
+                          //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
                       },
                       "defaultDate": tool.configuration.start_date
@@ -843,7 +896,7 @@
                       "changeYear": true,
                       //"showButtonPanel": true,
                       "onSelect" : function(d,i){
-                          console.log("datepicker changed!",d,i);
+                          //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
                       },
                       "defaultDate": tool.configuration.end_date
@@ -1115,7 +1168,7 @@
 //
 
     // get the parameters from the json file.
-     $.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
+     $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
         
         //var parameters = this.db_data.parameters,
         var parameters = data.parameters,
@@ -1162,7 +1215,7 @@
 // // networks
 // //
 
-      $.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
+      $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
 
         //{ "networks": [ { "id": "ndbc", "name": "NDBC", "description": "National Data Buoy Center", "url": "http://sdf.ndbc.noaa.gov/" }, { "id": "co-ops", "name": "CO-OPS", "description": "Center for Operational Oceanographic Products and Services", "url": "http://opendap.co-ops.nos.noaa.gov/" } ] }
         
@@ -1215,6 +1268,10 @@
 
     };
 
+    /**
+     * ???
+     * Not currently used?
+     */
     tool.controls.processDateTime = function(){
 
       // get reference to date elements
@@ -1222,10 +1279,14 @@
           el_date_end = $("#db-date-end"),
           el_date_label = $("#db-date-details");
 
-      console.log("el_date_start: " +el_date_start.val());
-      console.log("el_date_end: " +el_date_end.val());
+      //console.log("el_date_start: " +el_date_start.val());
+      //console.log("el_date_end: " +el_date_end.val());
     };
 
+    /**
+     * Perform delayed station search
+     * Attached to search button in init_controls 
+     */
     tool.controls.searchQueue = function(){
 
         var self = this,
@@ -1264,13 +1325,17 @@
 
     };
 
+    /**
+     * Station search
+     * Called by searchQueue
+     */
     tool.controls.searchData = function (){
 
         if(tool.controls.map.hasLayer(tool.controls.layer_station_markers)){
             tool.controls.map.removeLayer(tool.controls.layer_station_markers);
         }
 
-        var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + tool.controls.stationSearch();
+        var search_stations_query = "http://epedata.oceanobservatories.org" + tool.controls.stationSearch();
 
         $.getJSON( search_stations_query, function(geodata){
 
@@ -1312,7 +1377,7 @@
 
                             var layer = e.target;
 
-                            console.log("dev: need to hightlight station in station window, if present");
+                            //console.log("dev: need to hightlight station in station window, if present");
 
                             layer.setStyle(tool.controls.styleStationHighlight);
 
@@ -1356,11 +1421,12 @@
         });
     };
 
-    /* @method data_cart_add_param add the network,station,parameter 
-    *  @param station station object from geojson.. includes geometry
-    *  @param param parameter
-    */
-
+    /**
+     * Add a network,station,parameter to the data cart
+     * Attached to Add button in Station Window
+     * @param station station object from geojson, includes geometry
+     * @param param parameter
+     */
     tool.controls.data_cart_add_param = function(station, param){
 
         var sp = station.properties,
@@ -1369,7 +1435,11 @@
 
         tool.controls.dataCartAddParam(network,station,param);
     };
-
+    
+    /**
+     * Adds a network,station,parameter to the configuration
+     * Called by data_cart_add_param and stationWindowUpdate_fromCart
+     */
     tool.controls.dataCartAddParam = function(network,station,param){
         
       var data_cart_item = {};
@@ -1383,13 +1453,12 @@
       $.extend(true, tool.configuration.data_cart, data_cart_item);
     }
 
-    /** 
-    * 
-    * @method searchMapBounds 
-    * @param {object} reference to global map
-    * @return {String} the map bounding box string "lng_min,lat_min,lng_max,lat_max" - bbox 
-    */
-
+    /**
+     * Extracts the bounds of the current map view 
+     * Called by stationSearch
+     * @param {object} reference to global map
+     * @return {String} the map bounding box string "lng_min,lat_min,lng_max,lat_max" - bbox 
+     */
     tool.controls.searchMapBounds = function(_map){
       // example return bbox string "-73.970947265625,40.54720023441049,-71.28753662109375,41.88592102814744"
 
@@ -1397,11 +1466,10 @@
     };
 
     /** 
-    * 
-    * @method highlightFeature set a style of the feature to prove interaction
-    * @param {event click object e} 
-    * 
-    */
+     * Set a style of the feature to prove interaction
+     * Not currently used?
+     * @param {event click object e} 
+     */
     tool.controls.highlightFeature = function(){
         var layer = e.target;
 
@@ -1420,12 +1488,12 @@
         //map.info.update(layer.feature.properties); // Update infobox
     };
 
-    /* 
-    @method getSelections
-    @param selectionType network or parameter
-    generate comma separated list of selected parameters from:  parameters,networks
-
-    */
+    /**
+     * Identify checked networks or parameters
+     * Called by stationSearch
+     * @param selectionType network or parameter
+     * generate comma separated list of selected parameters from:  parameters,networks
+     */
     tool.controls.getSelections = function(selectionType){
 
         var selections = [];
@@ -1441,11 +1509,10 @@
     };
 
     /*
-    *   @method stationWindowUpdate load the station details into the station window div
-    *   @param station station object
-    */
-
-
+     * Update the station window div with station details when a dot is clicked
+     * Attached to map dots in searchData
+     *   @param station station object
+     */
     tool.controls.stationWindowUpdate = function(station){
 
         //console.log("station", station);
@@ -1455,7 +1522,7 @@
         if( $("#" + station_dom_id).length > 0){
 
             // item already exists in DOM, no need for request, just set visibility of div
-            console.log("station already present")
+            //console.log("station already present")
 
         }
         else{
@@ -1471,7 +1538,7 @@
         
             // request station from data-services
 
-            $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + station.properties.network + "/" + station.properties.name, function( data ) {
+            $.getJSON( "http://epedata.oceanobservatories.org/stations/" + station.properties.network + "/" + station.properties.name, function( data ) {
 
                 // get reference to drop down
                 // if exists, check for presence of current network/station
@@ -1484,7 +1551,7 @@
 
                 $.each(data.parameters, function(parameters, param){
                     
-                    console.log("param",param);
+                    //console.log("param",param);
 
                     dom_station_window.append( $("<div/>") 
                         
@@ -1536,20 +1603,11 @@
         }
     };
 
+    /**
+     * Create the URL to query available stations
+     * Called by searchData
+     */
     tool.controls.stationSearch = function (){
-
-         /* Station Search 
-         *  (returns only stations with valid parameter matches)
-         * Path: /stations/search
-         * Accepted parameters:
-         *   location: lon_min,lat_min,lon_max,lat_max
-         *   start_time: Either 0000-00-00T00:00Z or number of days before end_time
-         *   end_time: Either 0000-00-00T00:00Z or now
-         *   parameters: comma separated list of desired parameters (returns any matches, i.e. not just intersecting matches)
-         *   networks: comma separated list of desired networks
-         * Test URL: http://api.localhost/stations/search?location=-77,35,-69,42&start_time=1&end_time=now&networks=CO-OPS&parameters=salinity
-         */
-
         var location = tool.controls.searchMapBounds(tool.controls.map),
             start_time = "1",
             end_time = "now",
@@ -1585,11 +1643,15 @@
             "&networks=" + networks+
             "&parameters=" + params;
 
-        console.log("service_url: " + service_url);
+        //console.log("service_url: " + service_url);
 
         return service_url;
     };
 
+    /**
+     * Update the Data Cart div
+     * Called by init_controls, stationWindowUpdate and stationWindowUpdate_fromCart
+     */
     tool.controls.dataCart = function(){
 
       var dc = $("#data-cart"),
@@ -1632,7 +1694,7 @@
 
               .on("click", function(evt_station_remove_click){
 
-                console.log("station remove click");
+                //console.log("station remove click");
 
                 evt_station_remove_click.stopImmediatePropagation();
 
@@ -1680,7 +1742,7 @@
 
                   .on("click", function(evt_param_remove_click){
 
-                    console.log("param remove click");
+                    //console.log("param remove click");
                     
                     // click of remove button will delete the item from the cart
                     // do we want an ok prompt?
@@ -1725,19 +1787,23 @@
 
     };
 
+    /**
+     * Update the station window div with details when a parameter is clicked in the cart
+     * Called by dataCart
+     */
     tool.controls.stationWindowUpdate_fromCart = function(network,station){
 
       var station_dom_id = "station-" + network + "-"+station;
 
       if( $("#" + station_dom_id).length > 0){
           // item already exists in DOM, no need for request, just set visibility of div
-          console.log("station already present")
+          //console.log("station already present")
       }
       else{
 
-        $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
+        $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
 
-          console.log("**** station data **** ", data);
+          //console.log("**** station data **** ", data);
 
           var stationObj = data;
 
@@ -1753,7 +1819,7 @@
 
           $.each(data.parameters, function(parameters, param){
               
-            console.log("param",param);
+            //console.log("param",param);
 
             dom_station_window.append( 
 
