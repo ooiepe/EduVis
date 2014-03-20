@@ -68,8 +68,7 @@
             .append(
                 $("<div></div>")
                     .html(
-                        "<h1>Educational Visualization</h1>"+
-                        "<h2>"+ obj_tool.name+"</h2>"
+                        "<p><em>Loading... " + obj_tool.name + "</em><p>"
                     )
             )
             .append(
@@ -82,10 +81,9 @@
         // Ajax request for tool javascript source. on success, queue up the tool resources. If an instance id is provided, call Configuraiton.request_instance.
         $.getScript( EduVis.Environment.getPathTools() + obj_tool.name + "/" + obj_tool.name + '.js', function() {
             
-            console.log("....tool notify....")
+            //c onsole.log("....tool notify....")
 
             var isControlEdit;
-          
 
             EduVis.tool.notify( {"name":obj_tool.name,"tool_load":"complete"});
 
@@ -95,22 +93,16 @@
             }
         
             EduVis.asset.queue_assets(EduVis.tool.tools[obj_tool.name].resources.tool, obj_tool.name);
-
-            console.log("....tool instance....");
             
             if(obj_tool.instance_id !== "default"){
-                
-                alert('non default instance?..');
 
-                console.log("....tool instance request....");
+                // request the tool instance
                 EduVis.configuration.request_instance(obj_tool);
 
                 // note: tool initialized in request_instance function.
             }else{
-
-                console.log("....tool instance init default....", "is Control edit");
-                EduVis.tool.init( obj_tool );
-               
+                //load default instance
+                EduVis.tool.init( obj_tool );              
             }
 
         });
@@ -134,8 +126,6 @@
 * @return {null} 
 */
     _tool_loading_complete = function(_obj_tool){
-
-        //console.log("Obj_tool", _obj_tool);
         
         //fade out loading div for a specific tool instance
         var div_loading = _obj_tool.dom_target + "_loading";
@@ -168,20 +158,13 @@
 */  
     _tool_isReady = function( _obj_tool ){
 
-        console.log("are loaded", EduVis.asset.areAssetsLoaded(_obj_tool.resources.tool.scripts));
-
+        // test if all assets are loaded, if so, the tool is ready
         if(EduVis.asset.areAssetsLoaded(_obj_tool.resources.tool.scripts)){
             return true;
-            console.log();console.log();
-            console.log( "******** TOOL IS READY TO LOAD ********");
-            console.log();console.log();
         }
-
     },
 
     _tool_is_ready = function( _obj_tool ){
-
-        console.log("Tool Obj", _obj_tool);
 
         // test if all resources have been loaded for the tool
         var r = _tool_find_resources(_obj_tool),
@@ -193,9 +176,8 @@
 
         for (;i<scripts_length; i++) {
 
+            // the the loaded resource a script object. if so, its loaded
             if(typeof EduVis.resource.loaded[scripts[i]] !== "object"){
-
-                console.log("returned FALSE! -> ", scripts[i])
                 return false;
             }
         }
@@ -203,10 +185,8 @@
         i=0;
         for (;i<stylesheets_length; i++) {
 
+            // is the stylesheet an object, if so, its loaded
             if(typeof EduVis.resource.loaded[stylesheets[i]] !== "object"){
-
-                console.log("returned FALSE! -> ", stylesheets[i])
-
                 return false;
             }
         }
@@ -215,78 +195,6 @@
         return true;
 
     },
-
-/** check to see if all the dependencies of a tool are loaded 
-* 
-* @method _tool_find_resources
-* @param {Object} _obj_tool a tool object. 
-* @return {Object} tool_resources 
-* deprecated and replaced with asset module
-*/  
-    // _tool_find_resources = function(_obj_tool){
-
-    //     var resources = _obj_tool.resources,
-    //         scr_ext = resources.scripts_external,
-    //         scr_ext_length = scr_ext.length,
-
-    //         scr_local = resources.scripts_local,
-    //         scr_local_length = scr_local.length,
-
-    //         //sty_ext = resources.stylesheets_external,
-    //         //sty_ext_length = sty_ext.length,
-
-    //         //sty_local = resources.stylesheets_local,
-    //         //sty_local_length = sty_local.length,
-
-    //         stylesheets = resources.stylesheets,
-    //         stylesheets_length = stylesheets.length,
-
-    //         scripts = [],
-    //         styles = [],
-    //         i = 0, j=0, k=0, l=0,
-    //         _tool_resources = {
-    //             "scripts" : [],
-    //             "stylesheets" : []
-    //         },
-    //         scripts = _tool_resources.scripts,
-    //         //styles = _tool_resources.stylesheets,
-
-    //         script_count = 0,
-    //         style_count = 0;
-
-    //     for(; i<scr_ext_length; i++){
-
-    //         scripts[script_count] = scr_ext[i].name;
-    //         script_count+=1;
-    //     }
-
-    //     for(; j<scr_local_length; j++){
-    //         scripts[script_count] = scr_local[j].name;
-    //         script_count+=1;
-    //     }
-
-    //     // for(; k<sty_ext_length; k++){
-
-    //     //     stylesheets[style_count] = sty_ext[k].name;
-    //     //     style_count+=1;
-    //     // }
-
-    //     // for(; l<sty_local_length; l++){
-    //     //     stylesheets[style_count] = sty_local[l].name;
-    //     //     style_count+=1;
-    //     // }
-        
-    //     console.log("stylesheets", stylesheets);
-        
-    //     for(; k<stylesheets_length; k++){
-
-    //         styles[style_count] = stylesheets[k].name;
-    //         style_count+=1;
-    //     }
-
-
-    //     return _tool_resources;
-    // },
 
 /** initialize the tool. override configuration with appropriate instance configuration
 * 
@@ -302,7 +210,6 @@
 
             Tool.objDef = obj_tool;
             
-
         if(typeof obj_tool.isEdit === "undefined"){
             isEdit = false;
         }
@@ -311,8 +218,8 @@
             else{ isEdit = false; }
         }
 
-        console.log("--> Tool", Tool);
-        console.log("--> Tool Name", name, "tool object", obj_tool);
+        //c onsole.log("--> Tool", Tool);
+        //c onsole.log("--> Tool Name", name, "tool object", obj_tool);
 
         Tool.dom_target = obj_tool.dom_target;
         
@@ -349,23 +256,22 @@
                 // update instance configuration 
                 $.extend(EduVis.tool.instances[name][instance_id].configuration, obj_tool.instance_config);
 
-                console.log(" .... Instance! ....");
-                console.log(EduVis.tool.instances[name][instance_id]);
-                console.log("Initializing " + name + " with instance_id " + instance_id + " and instance:", obj_tool.instance_config);
+                // instance
+                // EduVis.tool.instances[name][instance_id]
+                //" + name, instance_id, obj_tool.instance_config);
 
                 // initialize tool instance
                 EduVis.tool.instances[name][instance_id].init_tool();
 
-                
+                // test to see if the tool is in edit mode
                 if(isEdit){
-                    console.log("is edit.. INIT! controls.")
                     EduVis.tool.instances[name][instance_id].init_controls("#vistool-controls");
                 }
 
             }
             else{
                 
-                console.log("Tool Not ready to load. Still waiting on some dependencies..");
+                // This tool is not ready to load. Still waiting on some dependencies..
 
                 setTimeout((function(){
 
@@ -381,7 +287,7 @@
             }
         }
         else{
-            alert("..no tool object..")
+            alert("function: _tool_init.... ..no tool object..");
         }
     },
 
@@ -405,9 +311,6 @@
 
             divControls = $("<div></div>")
                 .addClass("tool-control")
-
-            console.log("...TOOL CUSTOMIZE....")
-            console.log("tool->",tool);
 
         // create a div and write out all controls for editing a specific tool configuration file
         // the tool does not need to be loaded as an instance, but must be loaded into object
@@ -511,11 +414,7 @@
 
         var domTarget = (typeof _target_div === "undefined") ? "body" : "#" + _target_div; 
 
-        console.log("tool listing", _target_div, domTarget);
-
         $.getJSON( EduVis.Environment.getPathTools() + "tools.json" , function(tools) {
-
-            console.log("TOOLS --->", tools)
 
             // set up dom element and add title
             var toolsHeading = $("<div></div>")

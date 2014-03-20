@@ -43,11 +43,12 @@
         _environment_path_tools = (_tools || "");// + "tools/";
         _environment_path_resources = (_resources || "");// + "resources/";
 
-        console.log("....  P A T H S .....", _root);
-        console.log("root path", _environment_path_root);
-        console.log("tools path", _environment_path_tools);
-        console.log("resources path", _environment_path_resources);
-
+        /*
+            console.log("....  P A T H S .....", _root);
+            console.log("root path", _environment_path_root);
+            console.log("tools path", _environment_path_tools);
+            console.log("resources path", _environment_path_resources);
+        */
     },
 
     _environment_set_path_tools = function( _path_tools ) {
@@ -89,39 +90,6 @@
 
     },
 
-    // Color Depth 
-	color_depth = function() {
-
-		var color_depth, bits = 0;
-
-		if (window.screen) {
-
-			bits = screen.colorDepth;
-			// DEAL WITH BUG IN NETSCAPE 4
-			bits = (( bits==14 || bits==18) && bname=="Netscape") ? bits-10 : bits;
-			color_depth = bits + " bits per pixel"; 
-		}
-		else{
-			color_depth = "Only available on browsers v4 or greater";
-		}
-		if (bits == 4){
-			color_depth += " (16 colors)";
-		}
-		else if (bits == 8){
-			color_depth += " (256 colors)";
-		}
-		else if (bits == 16){
-			color_depth += " (65,536 colors -- High Color)";
-		}
-		else if (bits == 24){
-			color_depth += " (16,777,216 colors -- True Color)";
-		}
-		else if (bits == 32){
-			color_depth += " (16,777,216 colors -- True Color [_not_ 4,294,967,296 colors!])"; 
-		}
-		return (color_depth); 
-	},
-
 	// Document Referrer
 	_environment_referrer = function() {
 		if ( self == top ) return document.referrer;
@@ -156,4 +124,3 @@
     };
 
 }(EduVis));
-

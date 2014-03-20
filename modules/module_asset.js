@@ -130,7 +130,6 @@
           
           .done(function( script, textStatus ) {
 
-            console.log( sao.name + " loaded via getScript");
             sao.status = "loaded";
 
             // test if all assets are loaded.. if not, call asset queue
@@ -141,13 +140,10 @@
           })
           
           .fail(function( jqxhr, settings, exception ) {
-            
-            console.log("ajaxError:", exception);
+            console.error("ajaxError:", exception);
             sao.status = "failure";
             sao.error = exception;
-
           });
-
       }
     }
   },
@@ -317,4 +313,3 @@
 //   head.appendChild(style);
 
 // };
-

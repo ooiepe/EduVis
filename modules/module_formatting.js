@@ -9,7 +9,6 @@
 * A collection of reusable format functions 
 *
 * @class formats
-* @constructor
 */
 
 (function (eduVis) {
