@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>EV Framework Standalone Tool Configuration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="resources/css/EduVis.css">
+  <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" media="all" />
+  <style type="text/css">
+
+  </style>
+</head>
+<body>
+
+
+<div style="width:950px;margin:0 auto;">
+
+  <div style="background-color: #c8d5de;padding:23px;margin-bottom:20px;">
+    <div style="border: 1px solid #0195bd;background-color: #fff;padding:20px 31px;">
+
+    <!-- content -->
+
+      <!-- tabs -->
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#ev-instance-configure" data-toggle="tab">Customization</a></li>
+        <li><a href="#ev-instance-preview" data-toggle="tab">Preview</a></li>
+        <li><a href="#ev-instance-configuration" data-toggle="tab">Configuration</a></li>
+      </ul>
+
+      <!-- tab content -->
+      <div class="tab-content">
+
+        <div class="tab-pane active" id="ev-instance-configure">
+          <!-- tab controls -->
+          <p><em>Use the controls below to customize your visualization tool.</em></p>
+          <div>
+            <div id="vistool-controls" style="margin:6px;padding:6px;border:2px solid #c8d5de;"></div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="ev-instance-preview" style="padding-bottom:100px;">
+          <!-- tab preview -->
+          <p><em>Here is a preview of the custom visualization tool you have made.  This is what others will see when you share it.</em></p>
+          <div id="vistool"></div>
+        </div>
+        
+        <div class="tab-pane" id="ev-instance-configuration">
+          <!-- tab preview -->
+          <p><em>Click the Extract Button Below to View the Tool Configuration</em></p>
+          
+          <div style="margin-bottom:20px;">
+            <button class="btn" id="config-extract-update" name="config-extract-update" value="Extract Configuration">Extract Configuration</button>
+          </div>
+
+          <div>
+            <textarea style="width:600px" id="config-view" rows="15" cols="95"> </textarea>
+          </div>
+        </div>
+
+      </div>
+      <!-- end content -->
+    </div>
+  </div>
+
+</div>
+
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="EduVis.js"></script>
+<script type="text/javascript">
+
+  var __CFG_Tool_Name__ = "Single_Time_Series",
+      __CFG_Drupal_Install_Path__ = 'http://ooi.dev/epe/epedev/threedotone';
+
+  //considerations
+  var _thumbnail_id = 0;
+
+  function EduVis_extract(){
+
+    // pull the configuration from the default tool instance
+    var config = EduVis.tool.instances[__CFG_Tool_Name__]["default"].configuration;
+      
+    // update the configuration value of the textarea
+    $("#config-view").val(JSON.stringify(config));
+  
+    return true;
+  }
+  
+  (function(){
+
+    // add an event to the submit button
+    $('#config-extract-update').click(function(){
+      return EduVis_extract();
+    });
+    
+    // set the EduVis, tools, and resources paths
+    EduVis.Environment.setPaths( 
+      'sites/all/modules/custom/epe_ev', // eduvis
+      __CFG_Drupal_Install_Path__ + '/sites/default/files/evtools/', // tools
+      __CFG_Drupal_Install_Path__ + '/sites/all/modules/custom/epe_ev/resources/' // resources
+    );
+
+    EduVis.tool.load(
+      { 
+        "name" : __CFG_Tool_Name__, 
+        "tool_container_div": "vistool",
+        //"instance_config": "",
+        "isEdit" : true
+      }
+    );
+
+  }());
+  
+</script>
+</body>
+</html>
