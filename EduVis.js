@@ -8,6 +8,8 @@
 *
 */
 
+$ = $ || jQuery;
+
 var EduVis = (function () {
 
   "use strict";
