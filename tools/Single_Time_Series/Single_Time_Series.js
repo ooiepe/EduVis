@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Single Time Series (STS)
- * Revised 3/14/2014
+ * Revised 3/24/2014
  * Written by Mike Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
@@ -814,6 +814,8 @@
 
                   $("#db-dates-"+evt.target.value).show();
 
+                  tool.controls.apply_button_update("modified");
+
                 })
                 .append('<option value="realtime">Real Time</option>')
                 .append('<option value="archived">Archived</option>')
@@ -864,6 +866,8 @@
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
+                          tool.controls.apply_button_update("modified");
+
                       },
                       "defaultDate": tool.configuration.start_date
 
@@ -898,6 +902,7 @@
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
+                          tool.controls.apply_button_update("modified");
                       },
                       "defaultDate": tool.configuration.end_date
 
@@ -934,6 +939,9 @@
                 })
                 .addClass('small')
                 .val(tool.configuration.realtime_days)
+                .on("change", function(){
+                  tool.controls.apply_button_update("modified")
+                })
               )
               .append(
                 $("<div/>")
@@ -1039,13 +1047,14 @@
           })
           .append(
             $("<a/>", {
+              "id":"btn-apply",
               "type":"button",
-              "class":"btn btn-medium",
+              "class":"btn btn-medium disabled",
             })
             .css({
-              "width": "12em"
+              "width": "100px"
             })
-            .html("Apply")
+            .html('Apply <i class="icon-ok-sign"></i>') //icon-exclamation-sign
             .on("click",function(){
 
               var config = tool.configuration;
@@ -1094,8 +1103,10 @@
               tool.select_updateStations();
               tool.select_updateParameters();
 
+              tool.controls.apply_button_update("up-to-date");
+
            })
-          )
+          )          
       ),
 
       db_footer = $("<div/>", {
@@ -1704,6 +1715,8 @@
 
                 sta.fadeOut();
 
+              tool.controls.apply_button_update("modified");
+
                 // simply remove this item.. no need for full redraw
                 //tool.dataCart();
               })
@@ -1754,6 +1767,9 @@
                     $(".cart-param-tools").remove();
 
                     par.fadeOut();
+
+                    tool.controls.apply_button_update("modified");
+
                   })
                 );
               },
@@ -1877,6 +1893,31 @@
         });
       }
     };
+
+    /*
+     * Update the Apply button by enabling or disabling via class and changing icon between exlamation mark or checkmark
+     * 
+    */
+    tool.controls.apply_button_update = function(status){
+
+      // status up-to-date or modified?
+      if(status == "modified"){
+
+        $("#btn-apply")
+          .attr('class', 'btn btn-medium btn-warning')
+          .html('Apply <i class="icon-exclamation-sign"></i>')
+        
+
+      }
+      else if(status == "up-to-date"){
+
+        $("#btn-apply")
+          .attr('class', 'btn btn-medium disabled')
+          .html('Apply <i class="icon-ok-sign"></i>');
+
+      }
+
+    }
 
     // extend base object with tool..
     EduVis.tool.tools[tool.name] = tool;
