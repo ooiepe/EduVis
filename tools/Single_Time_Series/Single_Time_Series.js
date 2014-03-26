@@ -300,7 +300,12 @@
     tool.draw = function() {
       var url = tool.createUrl();
       
+      $('<img class="loading-icon"' + '" src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
+        .appendTo($("#"+tool.dom_target+"_tool-status"))
+
       d3.csv(url, function(error, data) {
+
+        $(".loading-icon").remove();
 
         if(typeof data !== "undefined"){
           tool.updategraph(data);  
@@ -330,7 +335,7 @@
         tool.configuration.station = station;
 
         // are we sure we want to updated the graph here?
-        tool.graph_update();
+        tool.draw();
     };
 
     /**
@@ -341,7 +346,7 @@
         //tool.configuration.station = "";
 
         tool.configuration.parameter = parameter;
-        tool.graph_update();
+        tool.draw();
     };
 
     /**
@@ -352,7 +357,7 @@
         var target = evt.target,
             val = target.value;
         tool.configuration.start_date = val;
-        tool.graph_update();
+        tool.draw();
     }
     /**
      * Update graph and config when end date is changed 
@@ -362,32 +367,8 @@
         var target = evt.target,
             val = target.value;
         tool.configuration.end_date = val;
-        tool.graph_update();
+        tool.draw();
     }
-
-    /**
-     * Update visualization with new settings
-     * Called by graph_update_sta and graph_update_param
-     */    
-    tool.graph_update = function() {
-      
-      var url = tool.createUrl();        
-      
-      d3.csv(url, function(error, data) {
-      
-        if(typeof data !== "undefined"){
-          tool.updategraph(data);  
-        }
-        else{
-          if(typeof error !== "undefined"){
-            $("#"+tool.dom_target+"_tool-status").html(
-              $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not currently available for this Station.</i>')
-            )
-          }
-        }
-      });
-
-    };
 
     /**
      * Create the URL to request timeseries data
@@ -561,12 +542,6 @@
                 "id" : _target + "_select-parameters"
               })
               .on("change", function(evt){
-                
-                // clear loading icon
-                $(".loading-icon").remove();
-
-                $('<img class="loading-icon loading-'+ evt.target.value + '" src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
-                  .appendTo($("#"+_target+"_tool-status"))
 
                 $(".param-icon").remove();
                 
@@ -644,9 +619,6 @@
 
         $("#"+tool.dom_target+"_select-stations")
         .val(config.network + "," + config.station);
-        // remove loading image
-        
-        //alert("loading-icon here..")
 
       }
 
@@ -1046,15 +1018,16 @@
             "id":"db-data-cart-apply",
           })
           .append(
-            $("<a/>", {
+            $("<button>", {
               "id":"btn-apply",
               "type":"button",
               "class":"btn btn-medium disabled",
             })
             .css({
-              "width": "100px"
+              "width": "100px",
+              "margin-right":"10px"
             })
-            .html('Apply <i class="icon-ok-sign"></i>') //icon-exclamation-sign
+            .html('Apply') //icon-exclamation-sign
             .on("click",function(){
 
               var config = tool.configuration;
@@ -1106,7 +1079,10 @@
               tool.controls.apply_button_update("up-to-date");
 
            })
-          )          
+          )
+          .append(
+            $('<img src="'+ EduVis.Environment.getPathResources() + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
+          )   
       ),
 
       db_footer = $("<div/>", {
@@ -1694,14 +1670,14 @@
               if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
                   
               $("<span/>")
-              .html("[X]")
+              .html("&nbsp;&nbsp;")
               .css({
                   "float":"right",
                   "margin":"2px",
-                  "border":"1px solid red",
+                  //"border":"1px solid red",
               })
               .attr("title","Remove Station " + station)
-              .addClass("cart-station-tools")
+              .addClass("cart-station-tools ui-icon ui-icon-trash")
 
               .on("click", function(evt_station_remove_click){
 
@@ -1744,14 +1720,14 @@
 
                 $( par ).append( 
                   $("<span/>")
-                  .html("[X]")
+                  .html("&nbsp;&nbsp;")
                   .css({
                     "float":"right",
                     "margin":"2px",
-                    "border":"1px solid red",
+                    //"border":"1px solid red",
                   })
                   .attr("title", "Remove " + param)
-                  .addClass("cart-param-tools")
+                  .addClass("cart-param-tools ui-icon ui-icon-trash")
 
                   .on("click", function(evt_param_remove_click){
 
@@ -1904,19 +1880,22 @@
       if(status == "modified"){
 
         $("#btn-apply")
-          .attr('class', 'btn btn-medium btn-warning')
-          .html('Apply <i class="icon-exclamation-sign"></i>')
-        
+          .attr('class', 'btn btn-medium')
+          .html('Apply');
 
+          // <i class="icon-exclamation-sign"></i>'
+        
       }
       else if(status == "up-to-date"){
 
         $("#btn-apply")
           .attr('class', 'btn btn-medium disabled')
-          .html('Apply <i class="icon-ok-sign"></i>');
+          .html('Apply');
+           //<i class="icon-ok-sign"></i>'
+
+          $("#apply-check").show().fadeOut(3000);
 
       }
-
     }
 
     // extend base object with tool..
