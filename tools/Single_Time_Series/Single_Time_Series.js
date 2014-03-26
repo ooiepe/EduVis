@@ -300,7 +300,7 @@
     tool.draw = function() {
       var url = tool.createUrl();
       
-      $('<img class="loading-icon"' + '" src="' + EduVis.Environment.getPathResources() + '/img/loading_small.gif" />')
+      $('<img class="loading-icon"' + '" src="' + EduVis.Environment.getPathResources() + 'img/loading_small.gif" />')
         .appendTo($("#"+tool.dom_target+"_tool-status"))
 
       d3.csv(url, function(error, data) {
@@ -1081,7 +1081,7 @@
            })
           )
           .append(
-            $('<img src="'+ EduVis.Environment.getPathResources() + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
+            $('<img src="'+ EduVis.Environment.getPathResources() + 'img/check_green.png"' + ' id="apply-check" style="display:none" />')
           )   
       ),
 
