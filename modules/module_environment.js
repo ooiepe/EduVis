@@ -40,8 +40,8 @@
 
         // initialize with defaults.
         _environment_path_root = (_root || "");
-        _environment_path_tools = (_tools || "");// + "tools/";
-        _environment_path_resources = (_resources || "");// + "resources/";
+        _environment_path_tools = (_tools || _root + "tools/"); // + "tools/";
+        _environment_path_resources = (_resources || _root + "resources/"); // + "resources/";
 
         /*
             console.log("....  P A T H S .....", _root);
