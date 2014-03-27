@@ -4,7 +4,7 @@
   <title>EV Framework Standalone Tool Configuration</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
-  <link type="text/css" rel="stylesheet" href="http://ooi.dev/epe/epedev/threedotone/sites/all/themes/epe_theme/css/overrides.css" media="all" />
+  <link type="text/css" rel="stylesheet" href="resources/css/overrides.css" media="all" />
 </head>
 <body>
 
@@ -64,13 +64,10 @@
 <script src="EduVis.js"></script>
 <script type="text/javascript">
 
-  // HOW TO Develop Locally
-  // 1. modify the tool you want to view
-  // 2. modify the path to the drupal install
-  // 3. modify the CSS path to the overrides file -> sites/all/themes/epe_theme/css/overrides.css
+  // Last Update: 3/27/2014
 
-  var __CFG_Tool_Name__ = "Single_Time_Series",
-      __CFG_Drupal_Install_Path__ = 'http://ooi.dev/epe/epedev/threedotone';
+  // Change the tool name below to the tool you would like to view
+  var __CFG_Tool_Name__ = "Single_Time_Series";
 
   //considerations
   var _thumbnail_id = 0;
@@ -94,11 +91,11 @@
     });
     
     // set the EduVis, tools, and resources paths
-    EduVis.Environment.setPaths( 
-      'sites/default/files/evtools/EduVis/', // eduvis
-      __CFG_Drupal_Install_Path__ + '/sites/default/files/evtools/EduVis/tools/', // tools
-      __CFG_Drupal_Install_Path__ + '/sites/default/files/evtools/EduVis/resources/' // resources
-    );
+    // EduVis.Environment.setPaths(
+    //  'http://ooi.dev/epe/epedev/threedotone/sites/default/files/evtools/EduVis/', // eduvis
+    //  'http://ooi.dev/epe/epedev/threedotone/sites/default/files/evtools/EduVis/tools/', // tools
+    //  'http://ooi.dev/epe/epedev/threedotone/sites/default/files/evtools/EduVis/resources/' // resources
+    // )
 
     EduVis.tool.load(
       { 
