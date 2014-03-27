@@ -300,7 +300,7 @@
     tool.draw = function() {
       var url = tool.createUrl();
       
-      $('<img class="loading-icon"' + '" src="' + EduVis.Environment.getPathResources() + 'img/loading_small.gif" />')
+      $('<img class="loading-icon"' + '" src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series/img/loading_small.gif" />')
         .appendTo($("#"+tool.dom_target+"_tool-status"))
 
       d3.csv(url, function(error, data) {
@@ -1081,7 +1081,7 @@
            })
           )
           .append(
-            $('<img src="'+ EduVis.Environment.getPathResources() + 'img/check_green.png"' + ' id="apply-check" style="display:none" />')
+            $('<img src="'+ EduVis.Environment.getPathTools() + 'Single_Time_Series/img/check_green.png"' + ' id="apply-check" style="display:none" />')
           )   
       ),
 
@@ -1604,7 +1604,6 @@
             el_start_time = $("#db-date-start").val(),
             el_end_time = $("#db-date-end").val();
 
-
         // some testing of dates
         //  only testing for presense of values for now
 
@@ -1677,7 +1676,7 @@
                   //"border":"1px solid red",
               })
               .attr("title","Remove Station " + station)
-              .addClass("cart-station-tools ui-icon ui-icon-trash")
+              .addClass("cart-station-tools ui-icon ui-icon-close")
 
               .on("click", function(evt_station_remove_click){
 
@@ -1720,14 +1719,17 @@
 
                 $( par ).append( 
                   $("<span/>")
-                  .html("&nbsp;&nbsp;")
+                  .html(
+                      "&nbsp;&nbsp;"
+                      
+                  )//'<img src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series/img/x_black.png" />'
                   .css({
                     "float":"right",
                     "margin":"2px",
                     //"border":"1px solid red",
                   })
                   .attr("title", "Remove " + param)
-                  .addClass("cart-param-tools ui-icon ui-icon-trash")
+                  .addClass("cart-station-tools ui-icon ui-icon-close")
 
                   .on("click", function(evt_param_remove_click){
 
