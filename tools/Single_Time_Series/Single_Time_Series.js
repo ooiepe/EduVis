@@ -1438,6 +1438,8 @@
       
       // extend the cart item into the cart.. bascially, just appending the parameter.
       $.extend(true, tool.configuration.data_cart, data_cart_item);
+
+      tool.controls.apply_button_update("modified");
     }
 
     /**
