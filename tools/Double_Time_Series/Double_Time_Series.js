@@ -7,7 +7,7 @@
     "use strict";
     var tool = {
         "name" : "Double_Time_Series",
-        "version" : "0.1",
+        "version" : "0.2",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
           {
@@ -200,7 +200,7 @@
     tool.setup = function( _target ){
       var g = this.graph;
 
-      g.margin = {top: 26, right: 60, bottom: 40, left: 60};
+      g.margin = {top: 40, right: 60, bottom: 40, left: 60};
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
       
@@ -270,19 +270,57 @@
         .x(function(d) { return g.x(d.date); })
         .y(function(d) { return g.y(d.data); });
 
-      g.title = g.svg.append("text")
+      // g.title = g.svg.append("text")
+      //   .attr("class", "gtitle")
+      //   .attr("text-anchor", "middle")
+      //   .style("font-size", "18px")
+      //   .attr("y", 0)
+      //   .attr("dy", ".75em")
+      //   .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
+      //   .text( 
+      //     this.configuration.network1 + " Station " + this.configuration.station1 + " AND "+
+      //     this.configuration.network2 + " Station " + this.configuration.station2
+      //   );
+
+      g.title1 = g.svg.append("text")
         .attr("class", "gtitle")
         .attr("text-anchor", "middle")
-        .style("font-size", "18px")
+        .style("font-size", "16px")
         .attr("y", 0)
         .attr("dy", ".75em")
-        .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
+        .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (0) + ") ")
         .text( 
-
-          this.configuration.network1 + " Station " + this.configuration.station1 + " AND "+
-          this.configuration.network2 + " Station " + this.configuration.station2
-
+          this.configuration.network1 + " - " + this.configuration.station1 + " - " + this.configuration.parameter1
         );
+
+      g.stats1 = g.svg.append("text")
+        .attr("id", _target+"_stats1")
+        .attr("class", "glabel")
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("dy", "-6px")
+        .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (34) + ") ")
+        .text( "Statistics");
+
+      g.title2 = g.svg.append("text")
+        .attr("class", "gtitle")
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .attr("y", 0)
+        .attr("dy", ".75em")
+        .attr("transform", "translate(" + (g.width/2+g.margin.left*4) + "," + (0) + ") ")
+        .text( 
+          this.configuration.network2 + " - " + this.configuration.station2 + " - " + this.configuration.parameter2
+        );
+
+      g.stats2 = g.svg.append("text")
+        .attr("id", _target+"_stats2")
+        .attr("class", "glabel")
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .attr("dy", "-6px")
+        .attr("transform", "translate(" + (g.width/2+g.margin.left*4) + "," + (34) + ") ")
+        .text( "Statistics");
       
       g.ylabel1 = g.svg.append("text")
         .attr("id", _target+"_ylabel1")
@@ -315,14 +353,14 @@
         .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
         .text( "Date Range");
 
-      g.stats = g.svg.append("text")
-        .attr("id", _target+"_stats")
-        .attr("class", "glabel")
-        .attr("text-anchor", "end")
-        .style("font-size", "11px")
-        .attr("dy", "-6px")
-        .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
-        .text( "Statistics");
+      // g.stats = g.svg.append("text")
+      //   .attr("id", _target+"_stats")
+      //   .attr("class", "glabel")
+      //   .attr("text-anchor", "end")
+      //   .style("font-size", "11px")
+      //   .attr("dy", "-6px")
+      //   .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (22) + ") ")
+      //   .text( "Statistics");
 
       
       tool.select_createDropdowns(_target);
@@ -493,13 +531,14 @@
           .ease("linear")
           .attr("d", g["line" + variable]);
           
-          g.title.text( this.configuration["network" + variable] + " Station " + this.configuration["station" + variable]);
+          g["title"+variable].text( this.configuration["network" + variable] + " Station " + this.configuration["station" + variable]);
           g["ylabel"+variable].text(cols[1].key);
           var datelimits = g.x.domain();
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
-          g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-          //console.log(stats);
+          
+          g["stats"+variable].text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
+          console.log( g["stats"+variable]);
 
           // update x and y axis 
           d3.select("#"+tool.dom_target+"_yAxis"+variable).call(g["yAxis"+variable]);
