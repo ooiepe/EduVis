@@ -77,6 +77,12 @@
 		return _environment_path_resources;
     },
 
+    _environment_get_path_tool = function(tool_name){
+
+        return _environment_path_tools + "/" + tool_name;        
+
+    },
+
     _environment_set_webservice = function( _path_webservice ) {
 
         _environment_path_webservice = _path_webservice;
@@ -112,6 +118,8 @@
         
         getPathTools : _environment_get_path_tools,
         getPathResources : _environment_get_path_resources,
+
+        getPathTool : _environment_get_path_tool,
 
         setWebservice : _environment_set_webservice,
         getWebservice : _environment_get_webservice,
