@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 4/1/2014
+ * Revised 4/2/2014
  * Written by Michael Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
@@ -135,7 +135,11 @@
                 }
               }
             }
-          }
+          },
+
+          //not updated
+          "line_color1":"#a33333",
+          "line_color2":"#6699CC"
         },
 
         "data" : {},
@@ -250,14 +254,14 @@
         .attr("class", "line1")
         .attr("d", g.line1)
         .style("fill","none")
-        .style("stroke","#a33333")
+        .style("stroke",tool.configuration.line_color1)
         .style("stroke-width","2px");
 
       g.focus.append("path")
         .attr("class", "line2")
         .attr("d", g.line2)
         .style("fill","none")
-        .style("stroke","#6699CC")
+        .style("stroke",tool.configuration.line_color2)
         .style("stroke-width","2px");
 
       g.line1 = d3.svg.line()
@@ -302,6 +306,15 @@
         .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (34) + ") ")
         .text( "Statistics");
 
+      g.legend1 = g.svg.append("path")
+        .attr({
+          "stroke": tool.configuration.line_color1,
+          "stroke-width":"3",
+          "fill":"none",
+          "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
+        })
+        .attr("transform", "translate(" + (g.margin.left) + "," + (0) + ") ")
+
       g.title2 = g.svg.append("text")
         .attr("class", "gtitle")
         .attr("text-anchor", "middle")
@@ -321,6 +334,15 @@
         .attr("dy", "-6px")
         .attr("transform", "translate(" + (g.width/2+g.margin.left*4) + "," + (34) + ") ")
         .text( "Statistics");
+
+      g.legend2 = g.svg.append("path")
+        .attr({
+          "stroke": tool.configuration.line_color2,
+          "stroke-width":"3",
+          "fill":"none",
+          "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
+        })
+        .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
       
       g.ylabel1 = g.svg.append("text")
         .attr("id", _target+"_ylabel1")
@@ -380,7 +402,7 @@
     tool.draw = function(variable) {
       var url = tool.createUrl(variable);
       
-      $('<img style="height:28px;" class="loading-icon' +variable + '"  src="' + EduVis.Environment.getPathTools() + 'Double_Time_Series/img/loading_small.gif" />')
+      $('<img style="height:28px;" class="loading-icon' +variable + '"  src="' + EduVis.Environment.getPathTool(tool.name) + '/img/loading_small.gif" />')
         .appendTo($("#"+tool.dom_target+"_tool-status"+variable))
 
       d3.csv(url, function(error, data) {
@@ -531,15 +553,15 @@
           .ease("linear")
           .attr("d", g["line" + variable]);
           
-          g["title"+variable].text( this.configuration["network" + variable] + " Station " + this.configuration["station" + variable]);
+          g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + this.configuration["parameter" + variable]);
+
           g["ylabel"+variable].text(cols[1].key);
           var datelimits = g.x.domain();
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
           
           g["stats"+variable].text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-          console.log( g["stats"+variable]);
-
+          
           // update x and y axis 
           d3.select("#"+tool.dom_target+"_yAxis"+variable).call(g["yAxis"+variable]);
 
@@ -609,7 +631,7 @@
             "id" : _target+"_select-stations-1",
           })
           .css({
-              "margin":"6px 0 6px 0"
+              "margin":"6px 10px 6px 0"
           })
           .on("change", function(evt){
 
@@ -1272,7 +1294,7 @@
            })
           )
           .append(
-            $('<img src="'+ EduVis.Environment.getPathTools() + 'Double_Time_Series/img/check_green.png"' + ' id="apply-check" style="display:none" />')
+            $('<img src="'+ EduVis.Environment.getPathTool(tool.name) + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
           )   
       ),
 
