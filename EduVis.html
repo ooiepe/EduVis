@@ -11,22 +11,12 @@
 </head>
 <body>
 <div id="vistool"></div>
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script src="EduVis.js"></script>
 <script>
 (function(){
 
-	EduVis.Environment.setPaths("", "tools/", "resources/");
-
-	// // // A sample way of loading a local resource
-	// EduVis.resource.load(
-	// 	{
-	// 		"name" : "leaflet",
-	// 		//"version" : "latest"
-	// 		"resource_path" : "resources/js/",
-	// 		"resource_file_name" : "leaflet.js",
-	// 		"global_reference" : "L"
-	// 	}
-	// );
+	//EduVis.Environment.setPaths("", "tools/", "resources/");
 
 	EduVis.tool.load({
 		"name" : "Single_Time_Series",
@@ -36,5 +26,6 @@
 }());
 	
 </script>
+
 </body>
 </html>
