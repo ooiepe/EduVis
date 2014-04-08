@@ -1055,9 +1055,13 @@
                           if(tool.controls.verify_date_range()){
 
                             tool.controls.apply_button_update("modified");
+                            $("#db-btn_search").removeClass("disabled");
 
                           }
                           else{
+
+                            $("#db-btn_search").addClass("disabled");
+
                             $("<label />")
                               .attr("id","date_range_label")
                               .html("Date range exceeds 1 year!")
@@ -1105,16 +1109,18 @@
                           if(tool.controls.verify_date_range()){
 
                             tool.controls.apply_button_update("modified");
+                            $("#db-btn_search").removeClass("disabled");
                           }
-                           else{
+                          else{
+
+                            $("#db-btn_search").addClass("disabled");
+
                             $("<label />")
                               .attr("id","date_range_label")
                               .html("Date rate exceeds 1 year!")
                               .css({"color":"red"})
                               .insertBefore('#db-selection-search')
                           }
-
-
                       },
                       "defaultDate": tool.configuration.end_date
 
@@ -1186,14 +1192,20 @@
             )
           )
           .append(
-            $("<input/>", {
-                "type":"button",
+            $("<button/>", {
                 "id":"db-btn_search",
-                "value": "search"
+            })
+            .addClass("btn")
+            .html("Search")
+            .on("click", function(){
+              $("#db-search-progress").show();
+              tool.controls.searchQueue();
             })
           )
           .append(
-            $("<div>",{"id":"db-search-progress"})      //search-progress
+            $("<div>",{"id":"db-search-progress"})
+              .hide()
+            //search-progress
           )
         )
       ),
@@ -1504,7 +1516,7 @@
       // check any parameters that currently exist in the data cart
 
       // attach search to the button for now
-      $("#db-btn_search").on("click", tool.controls.searchQueue);
+      //$("#db-btn_search").on("click", tool.controls.searchQueue);
 
       tool.controls.dataCart();
 
@@ -1603,7 +1615,8 @@
           // tun the search timer
           tool.controls.searchData();
 
-          $( "#db-search-progress" ).progressbar( "value",0);
+          $( "#db-search-progress" ).progressbar( "value",0).hide();
+
           clearInterval(tool.controls._timerSearchProgress);
 
         }, time_overall);
