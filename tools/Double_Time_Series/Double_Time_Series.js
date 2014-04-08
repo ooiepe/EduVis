@@ -1049,7 +1049,21 @@
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
-                          tool.controls.apply_button_update("modified");
+
+                          $("#date_range_label").remove();
+
+                          if(tool.controls.verify_date_range()){
+
+                            tool.controls.apply_button_update("modified");
+
+                          }
+                          else{
+                            $("<label />")
+                              .attr("id","date_range_label")
+                              .html("Date range exceeds 1 year!")
+                              .css({"color":"red"})
+                              .insertBefore('#db-selection-search')
+                          }
 
                       },
                       "defaultDate": tool.configuration.start_date
@@ -1085,7 +1099,22 @@
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
-                          tool.controls.apply_button_update("modified");
+                          
+                          $("#date_range_label").remove();
+
+                          if(tool.controls.verify_date_range()){
+
+                            tool.controls.apply_button_update("modified");
+                          }
+                           else{
+                            $("<label />")
+                              .attr("id","date_range_label")
+                              .html("Date rate exceeds 1 year!")
+                              .css({"color":"red"})
+                              .insertBefore('#db-selection-search')
+                          }
+
+
                       },
                       "defaultDate": tool.configuration.end_date
 
@@ -1285,8 +1314,9 @@
               }
   
               tool.select_updateStations("1");
-              tool.select_updateStations("2");
               tool.select_updateParameters("1");
+
+              tool.select_updateStations("2");
               tool.select_updateParameters("2");
 
               tool.controls.apply_button_update("up-to-date");
@@ -1362,6 +1392,18 @@
 
       // set resize timer for window 
       resizeTimer;
+
+      tool.controls.map.on('viewreset', function(){
+       if(tool.controls.searchActive == true){
+          tool.controls.searchData()
+        }
+      });
+      
+      tool.controls.map.on('dragend', function(){
+        if(tool.controls.searchActive == true){
+          tool.controls.searchData()
+        }
+      }); //tool.controls.searchData(), this);
 
 //
 // PARAMETERS
@@ -1466,6 +1508,49 @@
 
       tool.controls.dataCart();
 
+
+
+    };
+
+    // set default for search
+    tool.controls.searchActive = false;
+
+
+    /** 
+      verify the date range is only 1 year
+    */
+
+    tool.controls.verify_date_range = function(){
+
+      var el_date_start = $("#db-date-start"),
+          el_date_end = $("#db-date-end"),
+          
+          date_start = new Date(el_date_start.val()),
+          date_end = new Date(el_date_end.val()),
+
+          date_start_ms = date_start.getTime(),
+          date_end_ms = date_end.getTime(),
+
+          oneday_ms = 1000 * 60 * 60 * 24,
+
+          diff_ms = Math.abs(date_start_ms - date_end_ms),
+          diff_days = Math.round(diff_ms/oneday_ms);
+          
+          if(diff_days > 365){
+            // is the start date or end date a leap year?
+            if( (new Date(date_start.getFullYear(), 1, 29).getMonth() == 1) || (new Date(date_end.getFullYear(), 1, 29).getMonth() == 1) ){
+              if(diff_days > 366){
+                return false;
+              }
+              else{
+                return true;
+              }
+            }
+            return false;
+          }
+          else{
+            return true;
+          }
     };
 
     /**
@@ -1529,6 +1614,8 @@
      * Station search
      * Called by searchQueue
      */
+
+
     tool.controls.searchData = function (){
 
         if(tool.controls.map.hasLayer(tool.controls.layer_station_markers)){
@@ -1619,6 +1706,8 @@
             tool.controls.map.addLayer(tool.controls.layer_station_markers);
 
         });
+
+        tool.controls.searchActive = true;
     };
 
     /**
@@ -1765,11 +1854,10 @@
                         )
                         .append( 
 
-                            $("<a/>")
+                            $("<button />")
                                 .attr({
                                     "class":"btn btn-info btn-mini",
-                                    "id":"select-" + station_dom_id + "_" +  param,
-                                    "href" : "#a-"+ station_dom_id + "_" +  param
+                                    "id":"select-" + station_dom_id + "_" +  param
                                 })
                                 .html("Add")
                                 .on("click", function(evt){
