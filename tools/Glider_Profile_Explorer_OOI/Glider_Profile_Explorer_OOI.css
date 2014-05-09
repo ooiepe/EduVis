@@ -1,3 +1,22 @@
+svg {
+    font: 10px sans-serif;
+}
+.resize path {
+    fill: #666;
+    fill-opacity: .8;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+.brush .extent {
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+}
+
 .template{
 
 	font-size: 18px;

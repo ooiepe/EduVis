@@ -98,7 +98,12 @@
 
                 ],
 
-                "stylesheets" : []
+                "stylesheets" : [
+                  {
+                    "name" : "Glider_Profile_Explorer_OOI",
+                    "src" : "Glider_Profile_Explorer_OOI.css"
+                  },
+                ]
             },
 
             "datasets" : []
@@ -106,9 +111,11 @@
         },
 
         "configuration" : {
-        	"dataset_id" : "OOI-GP05MOAS-GL002",
-          "profile_id" : "2",
-          "parameter" : "temperature"
+        	"dataset_id" : "OOI-GP05MOAS-GL001",
+          "profile_id" : "1",
+          "parameter" : "temperature",
+          "date_start":"2013-07-17",
+          "date_end":"2014-05-03"
         },
 
         "data" : {},
@@ -280,7 +287,6 @@
             )
         )
         .append(
-
 
           $("<div />")
             .attr("id", _target + "-chart")
@@ -572,7 +578,8 @@
           "oceanBasemap_url" : 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
           "oceanBasemap_layer" : {},
           "locations_query" : function(){
-            return "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude"
+
+            return "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
           },
           "trajectory_profiles" : "http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?cdm_data_type=trajectoryprofile",
 
@@ -659,15 +666,14 @@
         mapObj.poly_line = L.polyline( [], {color: 'white'})
           .addTo(mapObj.map);
       }
-
       
       // reset the poly_line 
+        //aler
 
       $.getJSON( geojson_query, function(geodata){
         
         
         // console.log(geodata);
-
         mapObj.profile_ids = d3.map();
 
         mapObj.locationsFeatureCollection = geodata;
@@ -680,6 +686,8 @@
           onEachFeature: function (location, location_feature) {
 
             //console.log(location,location_feature,location.properties.profile_id, location.properties.time);
+
+            console.log("profile_id, time", location.properties.profile_id, location.properties.time);
 
             // add the key value pair.. profile_id, time
             mapObj.profile_ids.set(location.properties.profile_id, location.properties.time);
@@ -759,8 +767,8 @@
         // zoom to layer bounds
         map.fitBounds(mapObj.layer_locations.getBounds());
 
-        // initialize map
-        tool.init_graph(tool.configuration.profile_id);
+        // initialize map with first profile
+        tool.init_graph(mapObj.profile_ids.keys()[0]);
 
       }); // end get json
  
@@ -864,7 +872,6 @@
 
     };
 
-
     tool.update_map = function(profile_id){
 
       //console.log("profile ID", profile_id);
@@ -909,6 +916,8 @@
             // lookup up slider value in map, get associated profile id
             // ui value is current slider position            
             var profile_id = tool.sliderKeys[ui.value];
+
+            tool.configuration.profile_id = profile_id;
           
             tool.leaflet_map.layer_locations.setStyle(function(feature) {
               if (feature.properties.profile_id == profile_id) {
@@ -949,6 +958,104 @@
       );
     };
 
+    tool.config_slider = function(date_start, date_end){
+
+      $("#ui-config-dateRange-slider").remove();
+
+        var margin = {
+            top: 0,
+            right: 40,
+            bottom: 20,
+            left: 40
+        },
+            width = 500 - margin.left - margin.right,
+            height = 50 - margin.top - margin.bottom,
+            date_format = d3.time.format("%Y-%m-%d");
+
+        var iso_format = d3.time.format.iso.parse,
+            date_format = d3.time.format("%Y-%m-%d"),
+            //date_start = tool.configuration.date_start,
+            //date_end = tool.configuration.date_end,
+            start = date_format.parse(date_start),
+            end = date_format.parse(date_end);
+
+            console.log("start",start,"end", end)
+
+        var x = d3.time.scale.utc()
+            .range([0, width])
+            .domain([start, end]);
+
+        var brush = d3.svg.brush()
+            .x(x)
+            .extent([start, end])
+            .on("brushstart", brushstart)
+            .on("brush", brushmove)
+            .on("brushend", brushend);
+
+        var arc = d3.svg.arc()
+            .outerRadius(height / 2)
+            .startAngle(0)
+            .endAngle(function (d, i) {
+            return i ? -Math.PI : Math.PI;
+        });
+
+        var svg = d3.select("#ui-config-dateRange").append("svg")
+            .attr("id","ui-config-dateRange-slider")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var tick_interpolate = d3.interpolate(start, end);
+        var dd = [0, .25, .5, .75, 1].map(function (a) {
+            return iso_format(tick_interpolate(a))
+        });
+
+        console.log("start", start);
+        console.log("end", end);
+        console.log("interpolated", dd);
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(
+              d3.svg.axis().scale(x)
+                .orient("bottom")
+                .tickValues(dd)
+                .tickFormat(date_format)
+            );
+
+        var brushg = svg.append("g")
+            .attr("class", "brush")
+            .call(brush);
+
+        brushg.selectAll(".resize").append("path")
+          .attr("transform", "translate(0," + height / 2 + ")")
+          .attr("d", arc);
+
+        brushg.selectAll("rect")
+          .attr("height", height);
+
+        brushstart();
+        brushmove();
+
+        function brushstart() {
+            svg.classed("selecting", true);
+        }
+
+        function brushmove() {
+            var s = brush.extent();
+            //console.log(s);
+            $("#config-date_start-input").val(date_format(s[0]));
+            $("#config-date_end-input").val(date_format(s[1]));
+        }
+
+        function brushend() {
+            svg.classed("selecting", !d3.event.target.empty());
+        }
+
+    }
+
     tool.slider_update = function(profile_id){
 
       // get profile index from array
@@ -978,6 +1085,9 @@
       // select deployment
       // narror time scale
       //
+
+      var iso_format = d3.time.format.iso.parse,
+          date_format = d3.time.format("%Y-%m-%d");
 
       // create UI elements
       tool.controls = {};
@@ -1014,57 +1124,164 @@
               .attr("id","config-dataset_id-select")
               .append("<option>...loading...</option>")
               .on("change", function(){
-                tool.configuration.dataset_id = $(this).val();
-              })
+                var val = $(this).val();
+                
+                alert(val);
+                //tool.configuration.dataset_id = val;
+
+                $.getJSON("http://tds-dev.marine.rutgers.edu:8082/erddap/info/"+ val + "/index.json", {}, function(json){
+
+                  var array_var_index = 2,
+                      array_val_index = 4,
+                      date_start,
+                      date_end;
+
+                  $.each(json.table.rows,function(i,row){
+                    
+                    var row_var = row[array_var_index],
+                        row_val = row[array_val_index];
+
+                    if( row_var == "time_coverage_start"){
+                      date_start = iso_format(row_val);
+
+                    //  alert(date_start);
+                    }
+                    
+                    if( row_var == "time_coverage_end"){
+                      date_end = iso_format(row_val);
+                    }
+                  });
+
+                                
+                  //tool.configuration.date_start = date_format(date_start);
+                  //tool.configuration.date_end = date_format(date_end);
+
+                  $("#config-date_start-input").val(  date_format(date_start));
+                  $("#config-date_end-input").val(  date_format(date_end));
+
+                tool.config_slider(date_format(date_start), date_format(date_end));
+
+
+              });
+
+            })
+
           )
-          .append(
-            $("<div />")
-              .attr("id","ui-config-parameter")
-              .append(
-                $("<label />")
-                  .attr("for", "config-parameter-select")
-                  .html("Parameter") 
-              )
-              .append(
-                tool.controls.config_parameter  = $("<select />")
-                  .attr("id","config-parameter-select")
-                  .append("<option>...loading...</option>")
-                  .on("change", function(){
-                    tool.configuration.parameter = $(this).val();
-                  })
-              )
-          )
-          .append(
-            $("<div />")
-              .attr("id","ui-config-profile_id")
-              .append(
-                $("<label />")
-                  .attr("for", "config-profile_id-input")
-                  .html("Default Profile ID") 
-              )
-              .append(
-                // initialize the configuration paramter profile_id
-                tool.controls.config_profile_id  = $("<input />")
-                  .attr({
-                    "type":"text",
-                    "id":"config-parameter-select",
-                    "class":"input-mini",
-                    "placeholder": tool.configuration.profile_id
-                  })
-                  .on("change", function(){
-                    tool.configuration.profile_id = $(this).val();
-                  })
-                  .val(tool.configuration.profile_id)
-              )
-          )
+          // .append(
+          //   $("<div />")
+          //     .attr("id","ui-config-parameter")
+          //     .append(
+          //       $("<label />")
+          //         .attr("for", "config-parameter-select")
+          //         .html("Parameter") 
+          //     )
+          //     .append(
+          //       tool.controls.config_parameter  = $("<select />")
+          //         .attr("id","config-parameter-select")
+          //         .append("<option>...loading...</option>")
+          //         .on("change", function(){
+          //           tool.configuration.parameter = $(this).val();
+          //         })
+          //     )
+          // )
+          // .append(
+          //   $("<div />")
+          //     .attr("id","ui-config-profile_id")
+          //     .append(
+          //       $("<label />")
+          //         .attr("for", "config-profile_id-input")
+          //         .html("Default Profile ID") 
+          //     )
+          //     .append(
+          //       // initialize the configuration paramter profile_id
+          //       tool.controls.config_profile_id  = $("<input />")
+          //         .attr({
+          //           "type":"text",
+          //           "id":"config-parameter-select",
+          //           "class":"input-mini",
+          //           "placeholder": tool.configuration.profile_id
+          //         })
+          //         .on("change", function(){
+          //           tool.configuration.profile_id = $(this).val();
+          //         })
+          //         .val(tool.configuration.profile_id)
+          //     )
+          // )
           .append(
             $("<div />")
               .attr("id","ui-config-map")
           )
+          
           .append(
             $("<div />")
               .attr("id","ui-config-dateRange")
+              .append(
+                $("<div />")
+                  .attr("id","ui-config-dateRange-start")
+                  .append(
+                    $("<label />")
+                      .attr("for","config-date_start-input")
+                      .html("Start Date")
+                  )
+                  .append(
+                    
+                    // var controls.data_start-input = 
+                    $("<input />")
+                      .attr("id","config-date_start-input")
+                      .addClass('datepicker')
+                      .datepicker({
+                          "dateFormat": "yy-mm-dd",
+                          //"showOn": "button",
+                          "changeMonth": true,
+                          "changeYear": true,
+                          //"showButtonPanel": true,
+                          "onSelect" : function(d,i){
+                              //console.log("datepicker changed!",d,i);
+                              //tool.configuration.date_start = d;
+                              tool.controls.apply_button_update("modified");
+
+                          },
+                          "defaultDate": tool.configuration.date_start
+
+                      })
+                      .val(tool.configuration.date_start)
+
+                  )
+              )
+              .append(
+                $("<div />")
+                  .css("margin-bottom","10px")
+                  .attr("id","ui-config-dateRange-end")
+                  .append(
+                    $("<label />")
+                      .attr("for","config-date_end-input")
+                      .html("End Date")
+                  )
+                  .append(
+                    $("<input />")
+                      .attr("id","config-date_end-input")
+                      .addClass('datepicker')
+                      .datepicker({
+                            "dateFormat": "yy-mm-dd",
+                            //"showOn": "button",
+                            "changeMonth": true,
+                            "changeYear": true,
+                            //"showButtonPanel": true,
+                            "onSelect" : function(d,i){
+                                //console.log("datepicker changed!",d,i);
+                                //tool.configuration.date_start = d;
+                                tool.controls.apply_button_update("modified");
+
+                            },
+                            "defaultDate": tool.configuration.date_start
+
+                        })
+                        .val(tool.configuration.date_end)
+                  )
+              )
+
           )
+         
           .append(
             $("<div />")
               .attr("id","ui-config-apply")
@@ -1073,18 +1290,18 @@
                   .attr("id", "config-apply")
                   .addClass("btn btn-medium")
                   .html("Apply")
+                  .css({"margin-top":"20px"})
                   .on("click",function(){
                     // update the parameter configuration value
 
-                    // update the tool parameter dropdown value
-                    $("#"+tool.dom_target + "-control-parameter-dropdown")
-                      .val(tool.configuration.parameter)
+                    tool.configuration.date_start = $("#config-date_start-input").val();
+                    tool.configuration.date_end = $("#config-date_end-input").val();
+
+
 
                     // update map and graph
                     tool.map_update();
                     //tool.graph_update();
-
-                    
 
                   })
               )
@@ -1094,23 +1311,31 @@
         //tool.erddap_parameter_metadata.settings.parameters
 
         // add parameters to dropdowns
-        tool.controls.config_parameter.children().remove();
+        //tool.controls.config_parameter.children().remove();
 
-        $.each(erddap_ref.parameters, function (index, parameter_option) {
+        // $.each(erddap_ref.parameters, function (index, parameter_option) {
 
-         tool.controls.config_parameter
-            .append(
-              $('<option></option>')
-                .val(parameter_option)
-                .html(
-                  erddap_ref[parameter_option].title
-                )
-            )
-        });
+        //  tool.controls.config_parameter
+        //     .append(
+        //       $('<option></option>')
+        //         .val(parameter_option)
+        //         .html(
+        //           erddap_ref[parameter_option].title
+        //         )
+        //     )
+        // });
 
         // set the default selected option for the parameter dropdown
-        tool.controls.config_parameter
-          .val(tool.configuration.parameter);
+        // tool.controls.config_parameter
+        //   .val(tool.configuration.parameter);
+
+        //add date range slider
+
+        //tool.config_slider();
+
+
+        // ui-config-dateRange
+
 
         // grab datasets with OOI?
 
@@ -1158,7 +1383,10 @@
 
             //http://tds-dev.marine.rutgers.edu:8082/erddap/info/OOI-GP05MOAS-GL001/index.json
 
+
         });
+
+        
 
     };
 
