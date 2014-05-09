@@ -133,13 +133,15 @@
                 "parameters": {
                   "water_temperature":{},
                   "air_temperature":{}
-                }
+                },
+                "custom_name":"NDBC 44033"
               },
               "44025": { 
                 "parameters": {
                   "water_temperature":{},
                   "air_temperature":{}
-                }
+                },
+                "custom_name":"NDBC 44025"
               }
             }
           }
@@ -692,7 +694,7 @@
         end = config.end_date;
       }
 
-      return 'http://epedata.oceanobservatories.org/timeseries?' + 
+      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -898,7 +900,7 @@
               "value": network + "," + station
             })
             .html(
-              network + " - " + station
+              station_obj.custom_name
             );
 
           options.push(option);
@@ -961,30 +963,28 @@
       $(".param-icon").remove();
 
       $("#"+tool.dom_target+"_select-parameters")
-      .empty()
-      .append("<option>..updating..</option>");
+        .empty()
+        .append("<option>..updating..</option>");
 
-        $.each(dc[network][station],function(station, parameters){
+      // populate options array with parameters
+      $.each(dc[network][station].parameters, function(parameter){
+        // create new option and add it to the options array
+        var option = $("<option></option>")
+          .attr({
+            "value": parameter
+          })
+          .html(parameter);
 
-          $.each(parameters,function(parameter){
+        options.push(option);
 
-            // create new option and add it to the options array
-            var option = $("<option></option>")
-              .attr({
-                "value": parameter
-              })
-              .html(parameter);
-
-            options.push(option);
-
-          });
-        });
+      });
 
       // clear loading indicator and append options
       $("#"+tool.dom_target+"_select-parameters")
         .empty()
         .append(options);
 
+      // set the default selected paramter
       selected_param = $("#"+tool.dom_target+"_select-parameters option")
         .filter(function(){
           //console.log("config param", config.parameter);
@@ -1970,9 +1970,13 @@
 
         $.each(station, function( station, station_obj){
 
+          if(typeof station_obj.custom_name === "undefined"){
+            station_obj.custom_name = network + " " + station;
+          }          
+
           var cart_network_station = $("<div />")
           .addClass("cart-station")
-          .html("<h4>" + network + " " +station+"</h4>")
+          .html('<div class="station-name" >' + station_obj.custom_name +"</div>")
           .click(function(){
               tool.controls.stationWindowUpdate_fromCart(network,station);
           })
@@ -1984,38 +1988,117 @@
               // is there already a span element? if so, remove it
               if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
                   
-              $("<span/>")
-              .html("&nbsp;&nbsp;")
-              .css({
-                  "float":"right",
-                  "margin":"2px",
-                  //"border":"1px solid red",
-              })
-              .attr("title","Remove Station " + station)
-              .addClass("cart-station-tools ui-icon ui-icon-close")
+              var tmpSpan = $("<span />")
+                //.html("&nbsp;&nbsp;")
+                .css({
+                    "position":"relative",
+                    "top":"0",
+                    "float":"right",
+                    "margin":"2px"
+                    //"border":"1px solid red",
+                })
+                //.addClass("cart-station-tools")
+                .append(
+                  $("<span />")
+                    .css("float","left")
+                    .attr("title","Edit Name for " + station)
+                    .addClass("cart-station-tools ui-icon ui-icon-pencil")
 
-              .on("click", function(evt_station_remove_click){
+                    .on("click", function(evt_station_edit_name_click){
 
-                //console.log("station remove click");
+                      var station_input; 
+                      $(tmpSpan).remove();
+                      // load input box and cancel button
+                      var current_name = sta.find(".station-name").html();
 
-                evt_station_remove_click.stopImmediatePropagation();
+                      //console.log("station remove click");
+                      sta.find(".station-name")
+                        .empty()
+                        .append(
 
-                delete tool.configuration.data_cart[network][station];
+                          $("<div />")
+                            .append(
+                              station_input = $("<input />")
+                                .attr("type","text")
+                                .addClass("input input-medium")
+                                .val(station_obj.custom_name)
+                                // .on("change",function(a){
+                                //   station_obj.custom_name = a.target.value;
+                                //   sta.find(".station-name").html(station_obj.custom_name);
 
-                $(".cart-param-tools").remove();
+                                // })
+                            )
+                            .append(
+                              $("<span />")
+                              .css("float","right")
+                                .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+                                .on("click",function(evt){
+                                  sta.find(".station-name").html(station_obj.custom_name);
 
-                sta.fadeOut();
+                                })
+                            )
+                            .append(
+                              $("<span />")
+                              .css("float","right")
+                                .addClass("cart-station-tools ui-icon ui-icon-circle-check")
+                                .on("click",function(evt){
 
-              tool.controls.apply_button_update("modified");
+                                  station_obj.custom_name = station_input.val();
+                                  sta.find(".station-name").html(station_obj.custom_name);
 
-                // simply remove this item.. no need for full redraw
-                //tool.dataCart();
-              })
-              .prependTo(sta);
+                                })
+                            )
+                            .hover(function(hover_evt){
+                              hover_evt.stopImmediatePropagation();
+                            })
+
+                        )
+
+
+                      evt_station_edit_name_click.stopImmediatePropagation();
+
+                      //delete tool.configuration.data_cart[network][station];
+
+                      //$(".cart-param-tools").remove();
+
+                      //sta.fadeOut();
+
+                      tool.controls.apply_button_update("modified");
+
+                      // simply remove this item.. no need for full redraw
+                      //tool.dataCart();
+                    })
+
+                )
+                .append(
+                  $("<span />")
+                    .css("float","left")
+                    .attr("title","Remove Station " + station)
+                    .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+
+                    .on("click", function(evt_station_remove_click){
+
+                      //console.log("station remove click");
+
+                      evt_station_remove_click.stopImmediatePropagation();
+
+                      delete tool.configuration.data_cart[network][station];
+
+                      $(".cart-param-tools").remove();
+
+                      sta.fadeOut();
+
+                      tool.controls.apply_button_update("modified");
+
+                      // simply remove this item.. no need for full redraw
+                      //tool.dataCart();
+                    })
+                )
+                .prependTo(sta);
                 
             },
             function() {
-                $( this ).find( "span:last" ).remove();
+                $( this ).find( "span" ).remove();
             }
           )
             
@@ -2028,49 +2111,49 @@
                 .addClass("cart-param")
                 .html(param)
 
-            //mouseover of parameter item
-            .hover(
-              function() {
-                var par = $(this);
+                //mouseover of parameter item
+                .hover(
+                  function() {
+                    var par = $(this);
 
-                $( par ).append( 
-                  $("<span/>")
-                  .html(
-                      "&nbsp;&nbsp;"
-                      
-                  )//'<img src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series/img/x_black.png" />'
-                  .css({
-                    "float":"right",
-                    "margin":"2px",
-                    //"border":"1px solid red",
-                  })
-                  .attr("title", "Remove " + param)
-                  .addClass("cart-station-tools ui-icon ui-icon-close")
+                    $( par ).append( 
+                      $("<span/>")
+                      .html(
+                          "&nbsp;&nbsp;"
+                          
+                      )//'<img src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series/img/x_black.png" />'
+                      .css({
+                        "float":"right",
+                        "margin":"2px",
+                        //"border":"1px solid red",
+                      })
+                      .attr("title", "Remove " + param)
+                      .addClass("cart-station-tools ui-icon ui-icon-circle-close")
 
-                  .on("click", function(evt_param_remove_click){
+                      .on("click", function(evt_param_remove_click){
 
-                    //console.log("param remove click");
-                    
-                    // click of remove button will delete the item from the cart
-                    // do we want an ok prompt?
+                        //console.log("param remove click");
+                        
+                        // click of remove button will delete the item from the cart
+                        // do we want an ok prompt?
 
-                    evt_param_remove_click.stopImmediatePropagation();
+                        evt_param_remove_click.stopImmediatePropagation();
 
-                    delete tool.configuration.data_cart[network][station]["parameters"][param];
+                        delete tool.configuration.data_cart[network][station]["parameters"][param];
 
-                    $(".cart-param-tools").remove();
+                        $(".cart-param-tools").remove();
 
-                    par.fadeOut();
+                        par.fadeOut();
 
-                    tool.controls.apply_button_update("modified");
+                        tool.controls.apply_button_update("modified");
 
-                  })
+                      })
+                    );
+                  },
+                  function() {
+                    $( this ).find( "span" ).remove();
+                  }
                 );
-              },
-              function() {
-                $( this ).find( "span:last" ).remove();
-              }
-            );
 
             station_params.append(station_param);                   
 
