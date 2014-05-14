@@ -2,6 +2,10 @@
   font-weight: bold;
 }
 
+.cart-params{
+  clear:right;
+}
+
 /*
 svg {
   font: 11px 'Helvetica Neue', Helvetica, Arial, sans-serif;

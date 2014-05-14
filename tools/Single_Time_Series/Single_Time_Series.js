@@ -124,14 +124,14 @@
                   "water_temperature":{},
                   "air_temperature":{}
                 },
-                "custom_name":"fourfourothreethree"
+                "custom_name":"NDBC 44033"
               },
               "44025": { 
                 "parameters": {
                   "water_temperature":{},
                   "air_temperature":{},
                 },
-                "custom_name":"fourfourotwofive"
+                "custom_name":"NDBC 44025"
               }
             }
           }
