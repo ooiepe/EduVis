@@ -21,3 +21,7 @@ svg {
 
 	font-size: 18px;
 }
+
+#vistool-controls label{
+    font-weight:bold;
+}

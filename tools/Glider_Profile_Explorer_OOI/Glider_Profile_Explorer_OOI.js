@@ -1,6 +1,8 @@
 /*  *  *  *  *  *  *  *
 *
-* Glider Profile Explorer
+* Glider Profile Explorer OOI (GPE OOI)
+* Revised 5/15/2014
+* Written by Mike Mills
 *
 */
 
@@ -111,11 +113,11 @@
         },
 
         "configuration" : {
-        	"dataset_id" : "OOI-GP05MOAS-GL001",
+          "dataset_id" : "OOI-GP05MOAS-GL001",
           "profile_id" : "1",
           "parameter" : "temperature",
-          "date_start":"2013-09-17",
-          "date_end":"2014-03-03"
+          "date_start": "2013-09-17",
+          "date_end": "2014-03-03"
         },
 
         "data" : {},
@@ -190,7 +192,7 @@
 
 
       // setup UI
-    	$("<div />")
+      $("<div />")
         .css({
           "width":"840px",
           "margin":"0",
@@ -318,7 +320,7 @@
       // initialize the map
       tool.map_setup();
 
-      console.log("tool loaded");
+      //console.log("tool loaded");
 
       // hack to invalidate the map bounds.
       $('.nav-tabs a[href="#ev-instance-preview"]').click(function (e) {
@@ -369,10 +371,10 @@
           .attr("width", g.width)
           .attr("height", g.height);
       
-      g.focus = g.svg.append("g")
+      g.chart = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
-      g.focus.append("g")
+      g.chart.append("g")
         .attr("id", _target+"_xAxis")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
@@ -383,7 +385,7 @@
         })
         .call(g.xAxis);
         
-      g.focus.append("g")
+      g.chart.append("g")
         .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
         .style({
@@ -393,12 +395,33 @@
         })
         .call(g.yAxis);
       
-      g.focus.append("path")
+      g.chart.append("path")
         .attr("class", "line")
         .attr("d", g.line)
         .style("fill","none")
         .style("stroke","#999999")
         .style("stroke-width","2px");
+
+      g.mouse_focus = g.chart.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+      g.mouse_focus.append("circle")
+          .attr("r", 4.5);
+
+      g.mouse_focus.append("text")
+          .attr("x", 9)
+          .attr("dy", ".35em");
+
+      g.mousemover = g.chart.append("rect")
+        .attr("class", "overlay")
+        .attr("width", g.width)
+        .attr("height", g.height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function() { g.mouse_focus.style("display", null); })
+        .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
+        //.on("mousemove", mousemove);
 
       g.line = d3.svg.line()
         .interpolate("monotone")
@@ -464,7 +487,7 @@
         .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
         .text( column_selected);
 
-      // initialize visualization controls
+     // initialize visualization controls
 
       // create reference to dropdown
       var parameter_dropdown = $("#"+ _target + "-control-parameter-dropdown");
@@ -654,7 +677,7 @@
           map = mapObj.map,
           geojson_query = mapObj.locations_query();
 
-          console.log("Querying Spatial Dataset:", geojson_query);
+          //console.log("Querying Spatial Dataset:", geojson_query);
 
       if(typeof mapObj.poly_line === "undefined"){
         mapObj.poly_line = L.polyline( [], {color: 'white'})
@@ -685,9 +708,7 @@
         mapObj.layer_locations = new L.geoJson(mapObj.locationsFeatureCollection,{
           onEachFeature: function (location, location_feature) {
 
-            //console.log(location,location_feature,location.properties.profile_id, location.properties.time);
-
-            console.log("profile_id, time", location.properties.profile_id, location.properties.time);
+            //console.log("profile_id, time", location.properties.profile_id, location.properties.time);
 
             // add the key value pair.. profile_id, time
             mapObj.profile_ids.set(location.properties.profile_id, location.properties.time);
@@ -765,7 +786,8 @@
         map.addLayer(mapObj.layer_locations);
 
         // zoom to layer bounds
-        map.fitBounds(mapObj.layer_locations.getBounds());
+        //map.fitBounds(mapObj.layer_locations.getBounds());
+        //console.log("DEBUG.... fit to bounds removed.. ")
 
         // initialize map with first profile
         tool.init_graph(mapObj.profile_ids.keys()[0]);
@@ -819,8 +841,8 @@
             column = erddap_ref[config.parameter],
             column_selected = column.column,
             column_selected_title = column.title,
-            column_time = erddap_ref.time.column;
-
+            column_time = erddap_ref.time.column,
+            bisectData = d3.bisector(function(d) { return d[column_depth]; }).left;
 
         // clean depth and selected column values
         data.forEach(function(d) {
@@ -864,9 +886,22 @@
         d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
         d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
 
-        //$("#" + tool.dom_target + "-control-parameter-dropdown").val(column_selected)
+        //mouse move
+        g.mousemover.on("mousemove", function(){
 
-        console.log("GRAPH UPDATE");
+          var y0 = g.y.invert(d3.mouse(this)[1]),
+              i = bisectData(data, y0, 1),
+              d0 = data[i - 1],
+              d1 = data[i],
+              d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0;
+          
+          g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
+
+          g.mouse_focus.select("text").text(d3.round(d[column_depth],1) + " m - "  + d3.round(d[column_selected],2));
+
+        })
+
+        //console.log("GRAPH UPDATE");
 
       });
 
@@ -981,9 +1016,7 @@
             start = date_format.parse(date_start),
             end = date_format.parse(date_end);
 
-            //console.log("start",start,"end", end);
-
-       var range_date_start = range_start || date_start,
+        var range_date_start = range_start || date_start,
            range_date_end = range_end || date_end;
 
         var x = d3.time.scale.utc()
@@ -1047,7 +1080,7 @@
 
         function brushmove() {
             var s = brush.extent();
-            //console.log(s);
+            
             $("#config-date_start-input").val(date_format(s[0]));
             $("#config-date_end-input").val(date_format(s[1]));
         }
@@ -1075,31 +1108,17 @@
 
     tool.init_tool = function() {
 
-        // todo: include instance in call
-        //console.log(" ... template init..... ", this)
-        this.Glider_Profile_Explorer_OOI(this.dom_target);
+      this.Glider_Profile_Explorer_OOI(this.dom_target);
 
     };
 
     tool.init_controls = function(target_div){
-
-      // explore deployments
-      // select deployment
-      // narror time scale
-      //
 
       var iso_format = d3.time.format.iso.parse,
           date_format = d3.time.format("%Y-%m-%d");
 
       // create UI elements
       tool.controls = {};
-
-      //define all controls
-
-      // dataset_id
-      // parameter
-      // date_start
-      // date_end
 
       var erddap_ref = tool.settings.erddap_parameter_metadata,
         
@@ -1109,16 +1128,19 @@
               .html("Glider Dataset Explorer")
           )
           .append(
-            $("<ol />")
-              .append("<li>Locate a Dataset by Date Range, Geographical Bounds, or Parameter</li>")
-              .append("<li>Narrow time range (optional)</li>")
-              .append("<li>Select default profile and parameter</li>")
+            $("<div />")
+              .html("Customize your glider profile explorer default view.")
+              .append(
+                $("<ol />")
+                  .append("<li>Choose a Deployment Dataset</li>")
+                  .append("<li>Refine the Date Range (optional)</li>")
+                  .append("<li>Apply the Configuration</li>")
+              )
           )
-
           .append(
             $("<label />")
               .attr("for", "config-dataset_id-select")
-              .html("Deployment")
+              .html("Deployment Dataset")
           )
           .append(
             tool.controls.config_dataset_id = $("<select />")
@@ -1142,8 +1164,6 @@
 
                     if( row_var == "time_coverage_start"){
                       date_start = iso_format(row_val);
-
-                    //  alert(date_start);
                     }
                     
                     if( row_var == "time_coverage_end"){
@@ -1159,6 +1179,17 @@
                   else{
                     tool.config_dateRange_slider(date_format(date_start), date_format(date_end));
                   }
+
+                  // set the date picker start and end range restrictions
+                  $("#config-date_start-input").datepicker("option", {
+                    "minDate":date_format(date_start),
+                    "maxDate":date_format(date_end)
+                  });
+
+                  $("#config-date_end-input").datepicker("option", {
+                    "minDate":date_format(date_start),
+                    "maxDate":date_format(date_end)
+                  });
 
                 });
 
@@ -1188,21 +1219,18 @@
                       .addClass('datepicker')
                       .datepicker({
                           "dateFormat": "yy-mm-dd",
+                          //"minDate": tool.configuration.date_start,
+                          //"maxDate": tool.configuration.date_end,
                           //"showOn": "button",
                           "changeMonth": true,
                           "changeYear": true,
                           //"showButtonPanel": true,
                           "onSelect" : function(d,i){
-                              //console.log("datepicker changed!",d,i);
-                              //tool.configuration.date_start = d;
-                              tool.controls.apply_button_update("modified");
-
+                            tool.config_dateRange_slider(d,$("#config-date_end-input").val());
                           },
                           "defaultDate": tool.configuration.date_start
-
                       })
                       .val(tool.configuration.date_start)
-
                   )
               )
               .append(
@@ -1220,15 +1248,14 @@
                       .addClass('datepicker')
                       .datepicker({
                             "dateFormat": "yy-mm-dd",
+                            //"minDate": tool.configuration.date_start,
+                            //"maxDate": tool.configuration.date_end,
                             //"showOn": "button",
                             "changeMonth": true,
                             "changeYear": true,
                             //"showButtonPanel": true,
                             "onSelect" : function(d,i){
-                                //console.log("datepicker changed!",d,i);
-                                //tool.configuration.date_start = d;
-                                tool.controls.apply_button_update("modified");
-
+                                tool.config_dateRange_slider($("#config-date_start-input").val(),d);
                             },
                             "defaultDate": tool.configuration.date_start
 
@@ -1254,8 +1281,6 @@
                     tool.configuration.date_start = $("#config-date_start-input").val();
                     tool.configuration.date_end = $("#config-date_end-input").val();
 
-
-
                     // update map and graph
                     tool.map_update();
                     //tool.graph_update();
@@ -1264,37 +1289,6 @@
               )
           )
           .appendTo("#vistool-controls");
-
-        //tool.erddap_parameter_metadata.settings.parameters
-
-        // add parameters to dropdowns
-        //tool.controls.config_parameter.children().remove();
-
-        // $.each(erddap_ref.parameters, function (index, parameter_option) {
-
-        //  tool.controls.config_parameter
-        //     .append(
-        //       $('<option></option>')
-        //         .val(parameter_option)
-        //         .html(
-        //           erddap_ref[parameter_option].title
-        //         )
-        //     )
-        // });
-
-        // set the default selected option for the parameter dropdown
-        // tool.controls.config_parameter
-        //   .val(tool.configuration.parameter);
-
-        //add date range slider
-
-        //tool.config_dateRange_slider();
-
-
-        // ui-config-dateRange
-
-
-        // grab datasets with OOI?
 
         $.getJSON('http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.json?searchFor=&cdm_data_type=trajectoryprofile&protocol=tabledap&institution=ooi', {}, function(json, textStatus) {
               
@@ -1340,11 +1334,7 @@
 
             tool.controls.config_dataset_id.trigger("change");
 
-            //http://tds-dev.marine.rutgers.edu:8082/erddap/info/OOI-GP05MOAS-GL001/index.json
-
         });
-
-        
 
     };
 
@@ -1352,81 +1342,3 @@
     EduVis.tool.tools[tool.name] = tool;
 
 }(EduVis));
-
-
-
-// tool.request_data_parsed_UNUSED = function(){
-
-//       var g = tool.graph;
-
-//       d3.text("http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/GP05MOASGlider001Data.csv?profile_id,time,latitude,longitude,depth,salinity,temperature,conductivity,density&profile_number=1&salinity!=NaN&temperature!=NaN&conductivity!=NaN&density!=NaN", "text/csv", function(error, data){
-// //http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/GP05MOASGlider001Data.csv?profile_number,time,latitude,longitude,depth,salinity,temperature,conductivity,density&profile_number=1&salinity!=NaN&temperature!=NaN&conductivity!=NaN&density!=NaN
-    
-//       console.log("text file", data);
-
-//           var rows = d3.csv.parseRows(data),
-//               cols = d3.values(rows[0]),
-//               units = d3.values(rows[1]),
-//               rowTotal = rows.length,
-//               rowCount = 2,
-//               valTotal = cols.length,
-//               rowData = [];
-
-//           for(;rowCount<rowTotal;rowCount++){
-
-//             var tmpRow = {},
-//                 tmpVals = [],
-//                 valCount = 0;
-            
-//             // for(;valCount<valTotal;valCount++){
-//             //   tmpVals.push({
-//             //     "key":cols[valCount],
-//             //     "value":rows[rowCount][valCount]
-//             //   });
-//             // }
-
-//             for(;valCount<valTotal;valCount++){
-//               var tmpObj = {};
-//               tmpObj[cols[valCount]] = rows[rowCount][valCount];
-//               tmpVals.push(tmpObj);
-//             }
-//             rowData.push(tmpVals);
-
-//           }
-
-//           console.log("new data", rowData, "count", rowData.length);
-      
-//           rowData.forEach(function(d) {
-//            console.log("d",d.depth);
-//             d.depth = +d["depth"];
-//             d.data = +d[cols[5]];
-//           }); 
-
-//           g.x.domain(d3.extent(data, (function(d) { return d.depth; })));
-//           // Updte the Y domain to use the range of the returned data.
-//           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
-          
-//           g.svg.selectAll("path.line")
-//           .data([rowData])
-//           .transition()
-//           .duration(1000)
-//           .ease("linear")
-//           .attr("d", g.line);
-          
-//           // // g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + this.configuration["parameter" + variable]);
-
-//           // // g["ylabel"+variable].text(cols[1].key);
-//           // // var datelimits = g.x.domain();
-//           // // g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
-//           // // var stats = tool.average(data);
-          
-//           // // g["stats"+variable].text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-          
-//           // // update x and y axis 
-//           // //d3.select("#"+tool.dom_target+"_yAxis").call(g["yAxis"]);
-
-//           // update correct axis
-//           d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
-          
-//       });
-//     };
