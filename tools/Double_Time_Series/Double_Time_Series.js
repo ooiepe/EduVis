@@ -1,13 +1,13 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 4/2/2014
+ * Revised 5/20/2014
  * Written by Michael Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
     "use strict";
     var tool = {
         "name" : "Double_Time_Series",
-        "version" : "0.2",
+        "version" : "0.3.2",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
           {
@@ -126,13 +126,15 @@
                 "parameters": {
                   "water_temperature":{},
                   "air_temperature":{}
-                }
+                },
+                "custom_name":"NDBC 44033"
               },
               "44025": { 
                 "parameters": {
                   "water_temperature":{},
                   "air_temperature":{}
-                }
+                },
+                "custom_name":"NDBC 44025"
               }
             }
           },
@@ -342,7 +344,7 @@
           "fill":"none",
           "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
         })
-        .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
+        .attr("transform", "translate(" + (g.width + g.margin.right/3) + "," + (0) + ") ")
       
       g.ylabel1 = g.svg.append("text")
         .attr("id", _target+"_ylabel1")
@@ -504,7 +506,9 @@
      * Update visualization with new data
      * Called by draw and graph_update
      */    
-    tool.updategraph = function(data,variable) {
+    tool.updategraph = function(data, variable) {
+
+      console.log("variable: ", variable);
 
       if(typeof data === "undefined"){
 
@@ -546,12 +550,13 @@
           // Updte the Y domain to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
           
+          console.log("path", "path.line"+variable)
           g.svg.selectAll("path.line"+variable)
-          .data([data])
-          .transition()
-          .duration(1000)
-          .ease("linear")
-          .attr("d", g["line" + variable]);
+            .data([data])
+            .transition()
+            .duration(1000)
+            .ease("linear")
+            .attr("d", g["line" + variable]);
           
           g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + this.configuration["parameter" + variable]);
 
@@ -609,141 +614,150 @@
       tool.controls.dropdown1 = {};
       tool.controls.dropdown2 = {};
 
-
       var tc = tool.controls, 
           dd1 = tc.dropdown1,
-          dd2 = tc.dropdown2;
+          dd2 = tc.dropdown2,
+          dd_width = (tool.graph.width/2);// - tool.graph.margin.left - tool.graph.margin.right
 
       dd1 = $("<div/>", {
           "id": _target+"_tool-dropdown-1"
         })
+        .css({
+          "width" : dd_width +"px",
+          "float" : "left",
+          "padding-left" : tool.graph.margin.left + "px",
+          "text-align":"center"
+          
+        })
         .append(
-          $("<label/>")
-            .html("Station 1:&nbsp;")
-            .css({
-              "display":"inline",
-              //"font-weight":"bold"
+          $("<div />")
+          .append(
+            $("<span/>")
+              .html("Station 1:&nbsp;")
+          )
+          .append(
+            $("<select></select>")
+            .attr({
+              "id" : _target+"_select-stations-1",
             })
-        )
-        .append(
-          $("<select></select>")
-          .attr({
-            "id" : _target+"_select-stations-1",
-          })
-          .css({
-              "margin":"6px 10px 6px 0"
-          })
-          .on("change", function(evt){
-
-            // update network and station in config
-            if(tool.select_updateParameters("1")){
-              tool.graph_update_sta(evt.target.value,"1");
-            }
-            else{
-              // set option shere
-
-              $("#"+_target+"_tool-status1")
-                .html(
-                  $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
-                )
-            }
-          })
-        )
-        .append(
-          $("<label/>")
-            .html("&nbsp;&nbsp;&nbsp;Parameter 1:&nbsp;")
             .css({
-              "display":"inline",
-              //"font-weight":"bold"
+                "margin":"6px 10px 6px 0"
             })
+            .on("change", function(evt){
+
+              // update network and station in config
+              if(tool.select_updateParameters("1")){
+                tool.graph_update_sta(evt.target.value,"1");
+              }
+              else{
+                // set option shere
+
+                $("#"+_target+"_tool-status1")
+                  .html(
+                    $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
+                  )
+              }
+            })
+          )
         )
         .append(
-          $("<select></select>")
-          .attr({
-            "id" : _target + "_select-parameters-1"
-          })
-          .css({
-              "margin":"6px 10px 6px 0"
-          })
-          .on("change", function(evt){
+          $("<div/>")
+            .append(
+              $("<span/>")
+                .html("Parameter 1:&nbsp;")
+            )
+            .append(
+              $("<select></select>")
+              .attr({
+                "id" : _target + "_select-parameters-1"
+              })
+              .css({
+                  "margin":"6px 10px 6px 0"
+              })
+              .on("change", function(evt){
 
-            $(".param-icon").remove();
-            
-            tool.graph_update_param(evt.target.value,"1")
+                $(".param-icon").remove();
+                
+                tool.graph_update_param(evt.target.value,"1")
 
-          })
-        )
-        .append(
-          $("<span/>",{
-              "id" : _target+"_tool-status1"
-          })
-        );
+              })
+            )
+            .append(
+              $("<span/>",{
+                  "id" : _target+"_tool-status1"
+              })
+            )
+          );
       
 
       dd2 = $("<div/>",{
           "id": _target+"_tool-dropdown-2"
         })
-
+        .css({
+          "width" : dd_width +"px",
+          "float" : "right",
+          "padding-right" : tool.graph.margin.right + "px",
+          "text-align":"center"
+        })
         .append(
-          $("<label/>")
-            .html("Station 2:&nbsp;")
-            .css({
-              "display":"inline",
-              //"font-weight":"bold"
+          $("<div />")
+          
+          .append(
+            $("<span/>")
+              .html("Station 2:&nbsp;")
+          )
+          .append(
+            $("<select></select>")
+            .attr({
+              "id" : _target+"_select-stations-2"
             })
-        )
-        .append(
-          $("<select></select>")
-          .attr({
-            "id" : _target+"_select-stations-2"
-          })
-          .css({
-              "margin":"6px 10px 6px 0"
-          })
-          .on("change", function(evt){
-
-            // update network and station in config
-            if(tool.select_updateParameters("2")){
-              tool.graph_update_sta(evt.target.value,"2");
-            }
-            else{
-              // set option shere
-
-              $("#"+_target+"_tool-status2")
-                .html(
-                  $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
-                )
-            }
-          })
-        )
-        .append(
-          $("<label/>")
-            .html("&nbsp;&nbsp;&nbsp;Parameter 2:&nbsp;")
             .css({
-              "display":"inline",
-              //"font-weight":"bold"
+                "margin":"6px 10px 6px 0"
             })
+            .on("change", function(evt){
+
+              // update network and station in config
+              if(tool.select_updateParameters("2")){
+                tool.graph_update_sta(evt.target.value,"2");
+              }
+              else{
+                // set option shere
+
+                $("#"+_target+"_tool-status2")
+                  .html(
+                    $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
+                  )
+              }
+            })
+          )
         )
         .append(
-          $("<select></select>")
-          .attr({
-            "id" : _target + "_select-parameters-2"
-          })
-          .css({
-              "margin":"6px 0 6px 0"
-          })
-          .on("change", function(evt){
+          $("<div/>")
+            .append(
+              $("<span/>")
+                .html("Parameter 2:&nbsp;")
+            )
+            .append(
+              $("<select></select>")
+              .attr({
+                "id" : _target + "_select-parameters-2"
+              })
+              .css({
+                  "margin":"6px 0 6px 0"
+              })
+              .on("change", function(evt){
 
-            $(".param-icon").remove();
-            
-            tool.graph_update_param(evt.target.value,"2")
+                $(".param-icon").remove();
+                
+                tool.graph_update_param(evt.target.value,"2")
 
-          })
-        )
-        .append(
-          $("<span/>",{
-              "id" : _target+"_tool-status2"
-          })
+              })
+            )
+            .append(
+              $("<span/>",{
+                  "id" : _target+"_tool-status2"
+              })
+            )
         );
 
       var tool_controls = $("<div/>")
@@ -794,7 +808,7 @@
               "value": network + "," + station
             })
             .html(
-              network + " - " + station
+               station_obj.custom_name
             );
 
           options.push(option);
@@ -826,12 +840,9 @@
       else{
 
         $("#"+tool.dom_target+"_select-stations-" + variable)
-        .val(config["network" + variable] + "," + config["station" + variable]);
+          .val(config["network" + variable] + "," + config["station" + variable]);
 
       }
-
-      //console.log("*****" + config.network + "," + config.station);
-
     };
 
     /**
@@ -860,21 +871,18 @@
       .empty()
       .append("<option>..updating..</option>");
 
-        $.each(dc[network][station],function(station, parameters){
+      $.each(dc[network][station].parameters,function(parameter){
 
-          $.each(parameters,function(parameter){
+          // create new option and add it to the options array
+          var option = $("<option></option>")
+            .attr({
+              "value": parameter
+            })
+            .html(parameter);
 
-            // create new option and add it to the options array
-            var option = $("<option></option>")
-              .attr({
-                "value": parameter
-              })
-              .html(parameter);
+          options.push(option);
 
-            options.push(option);
-
-          });
-        });
+      });
 
       // clear loading indicator and append options
       $("#"+tool.dom_target+"_select-parameters-" + variable)
@@ -1004,18 +1012,6 @@
                 .append('<option value="archived">Archived</option>')
               )
             )
-            //tabs
-            // .append(
-            //   $("<div/>", {
-            //     "id":"db-dates-tabs"
-            //   })
-            //   .append(
-            //     $("div").html("tab1")
-            //   )
-            //   .append(
-            //     $("div").html("tab2")
-            //   )
-            // )
             .append(
               $("<div/>", {
                 "id":"db-dates-archived"
@@ -1064,7 +1060,7 @@
 
                             $("<label />")
                               .attr("id","date_range_label")
-                              .html("Date range exceeds 1 year!")
+                              .html("Please select a date range that is one year or less.")
                               .css({"color":"red"})
                               .insertBefore('#db-selection-search')
                           }
@@ -1117,7 +1113,7 @@
 
                             $("<label />")
                               .attr("id","date_range_label")
-                              .html("Date rate exceeds 1 year!")
+                              .html("Please select a date range that is one year or less.")
                               .css({"color":"red"})
                               .insertBefore('#db-selection-search')
                           }
@@ -1176,7 +1172,6 @@
                 )
               )
             )
-
           )
           .append(
           $("<div/>", {
@@ -1263,6 +1258,7 @@
           $("<div/>", {
             "id":"db-data-cart"
           })
+          //.sortable()
         )
       )
        .append(
@@ -1422,7 +1418,8 @@
 //
 
     // get the parameters from the json file.
-     $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
+     //$.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
+      $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
         
         //var parameters = this.db_data.parameters,
         var parameters = data.parameters,
@@ -1469,7 +1466,8 @@
 // // networks
 // //
 
-      $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
+      //$.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
+        $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
 
         //{ "networks": [ { "id": "ndbc", "name": "NDBC", "description": "National Data Buoy Center", "url": "http://sdf.ndbc.noaa.gov/" }, { "id": "co-ops", "name": "CO-OPS", "description": "Center for Operational Oceanographic Products and Services", "url": "http://opendap.co-ops.nos.noaa.gov/" } ] }
         
@@ -1546,23 +1544,28 @@
           oneday_ms = 1000 * 60 * 60 * 24,
 
           diff_ms = Math.abs(date_start_ms - date_end_ms),
-          diff_days = Math.round(diff_ms/oneday_ms);
-          
-          if(diff_days > 365){
-            // is the start date or end date a leap year?
-            if( (new Date(date_start.getFullYear(), 1, 29).getMonth() == 1) || (new Date(date_end.getFullYear(), 1, 29).getMonth() == 1) ){
-              if(diff_days > 366){
-                return false;
-              }
-              else{
-                return true;
-              }
-            }
+          diff_days = Math.floor(diff_ms/oneday_ms);
+        
+          if(diff_days > 366){  
             return false;
-          }
-          else{
+          }else{
             return true;
           }
+          // if(diff_days > 365){
+          //   // is the start date or end date a leap year?
+          //   if( (new Date(date_start.getFullYear(), 1, 29).getMonth() == 1) || (new Date(date_end.getFullYear(), 1, 29).getMonth() == 1) ){
+          //     if(diff_days > 366){
+          //       return false;
+          //     }
+          //     else{
+          //       return true;
+          //     }
+          //   }
+          //   return false;
+          // }
+          // else{
+          //   return true;
+          // }
     };
 
     /**
@@ -1635,7 +1638,10 @@
             tool.controls.map.removeLayer(tool.controls.layer_station_markers);
         }
 
-        var search_stations_query = "http://epedata.oceanobservatories.org" + tool.controls.stationSearch();
+        //var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + tool.controls.stationSearch();
+
+        var search_stations_query = "http://epedata.oceanobservatories.org/timeseries/" + tool.controls.stationSearch();
+
 
         $.getJSON( search_stations_query, function(geodata){
 
@@ -1668,7 +1674,7 @@
 
                             setTimeout(function(){layer.setStyle(tool.styleStationReset);},2000);
 
-                            tool.controls.stationWindowUpdate(station);
+                            tool.controls.stationWindowUpdate(station_feature);
 
                         },
 
@@ -1729,13 +1735,21 @@
      * @param station station object from geojson, includes geometry
      * @param param parameter
      */
-    tool.controls.data_cart_add_param = function(station, param){
+    tool.controls.data_cart_add_param = function(station_obj, param){
 
-        var sp = station.properties,
-            network = sp.network,
-            station = sp.name;
+      var network, station;
 
-        tool.controls.dataCartAddParam(network,station,param);
+      if(typeof(station_obj.properties)=="object"){
+        network = station_obj.properties.network;
+        station = station_obj.properties.name;
+      }
+      else{
+        network = station_obj.network;
+        station = station_obj.name;
+      }
+
+      tool.controls.dataCartAddParam(network,station,param);
+
     };
     
     /**
@@ -1748,6 +1762,8 @@
          
       data_cart_item[network] = {};
       data_cart_item[network][station] = {};
+      data_cart_item[network][station]["name"] = station;
+      data_cart_item[network][station]["network"] = network;
       data_cart_item[network][station]["parameters"] = {};
       data_cart_item[network][station]["parameters"][param]={};
       
@@ -1817,11 +1833,24 @@
      * Attached to map dots in searchData
      *   @param station station object
      */
-    tool.controls.stationWindowUpdate = function(station){
+    tool.controls.stationWindowUpdate = function(station_obj){
+
+      var network, station;
+
+      console.log("Station Object", station_obj);
+
+      if(typeof(station_obj.properties)=="object"){
+        network = station_obj.properties.network;
+        station = station_obj.properties.name;
+      }
+      else{
+        network = station_obj.network;
+        station = station_obj.name;
+      }
 
         //console.log("station", station);
 
-        var station_dom_id = "station-" + station.properties.network + "-"+station.properties.name;
+        var station_dom_id = "station-" + network + "-"+station;
 
         if( $("#" + station_dom_id).length > 0){
 
@@ -1842,10 +1871,35 @@
         
             // request station from data-services
 
-            $.getJSON( "http://epedata.oceanobservatories.org/stations/" + station.properties.network + "/" + station.properties.name, function( data ) {
+           // $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
 
+            $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
                 // get reference to drop down
                 // if exists, check for presence of current network/station
+
+                /*
+                  // Example Station Response
+                  {
+                    "id": "259",
+                    "network": "NDBC",
+                    "name": "44056",
+                    "description": "NDBC Station 44056 - Duck FRF, NC",
+                    "longitude": "-75.714",
+                    "latitude": "36.2",
+                    "start_time": "2009-05-14 15:45:00",
+                    "end_time": "9999-01-01 00:00:00",
+                    "parameters": [
+                      "mean_wave_period",
+                      "peak_wave_period",
+                      "significant_wave_height",
+                      "water_temperature",
+                      "wave_to_direction"
+                    ]
+                  }
+
+
+                */
+
 
                 // move to function to add to station dropdown.. also add to object to track additions / subtractions
                 var dom_station_window = $("<div></div>")
@@ -1878,7 +1932,7 @@
                                     //evt.stopPropagation();
                                     evt.stopImmediatePropagation();
 
-                                    tool.controls.data_cart_add_param(station, param);
+                                    tool.controls.data_cart_add_param(station_obj, param);
                                     tool.controls.dataCart();
                                 })
                         )
@@ -1892,12 +1946,77 @@
 
                 });
 
+// "id": "259",
+// "network": "ND
+// "name": "44056
+// "description":
+// "longitude": "
+// "latitude": "3
+// "start_time": 
+// "end_time": "9
+// "parameters": 
+
+                // format the station window details
                 $("#db-station-details")
                 .empty()
                 .append(
-                    $("<h4/>")
+                  
+                  $("<div/>")
+                    .append(
+                      $("<div/>")
                         .addClass("title")
-                        .html("Network: (" + station.properties.network + ") " + station.properties.name)
+                        .append(
+                          $("<b/>").html("" + network + " " + station)
+                        )
+                        .append(
+                          $("<span/>")
+                            .html("&nbsp;&nbsp;")
+                            .css({
+                                "float":"right",
+                                "margin":"2px",
+                                //"border":"1px solid red",
+                            })
+                            .attr("title","Remove Station " + station)
+                            .addClass("cart-station-tools ui-icon ui-icon-info")
+
+                            .on("click", function(){
+                              $("#db-station-meta-data").toggle();
+                            })
+                        )
+                    )
+                    .append(
+                      $("<div/>")
+                      .attr({"id":"db-station-meta-data"})
+                      .append(
+
+                        (function(data){
+
+                          // create attribute table for the station
+                          var attrs = ["id","network","name","description","longitude", "start_time","end_time"],
+                            table = $("<table class='table'></table>");
+
+                          $.each( attrs , function( a, attr_val ){
+
+                            var dataAttr = data[attr_val],
+                              row = $("<tr></tr>")
+                                .append($("<th></th>")
+                                  .html(attr_val))
+                                .append($("<td></td>")
+                                  .html(dataAttr));
+                                
+                            console.log("attr", a, attr_val, dataAttr);
+
+                            table.append(row);
+
+                          });
+
+                          return table;
+
+                        })(data)
+
+                      )
+                      .hide()
+                    )
                 )
                 .append(dom_station_window)
                 .scrollTop(0);
@@ -1954,25 +2073,186 @@
      * Update the Data Cart div
      * Called by init_controls, stationWindowUpdate and stationWindowUpdate_fromCart
      */
-    tool.controls.dataCart = function(){
+    // tool.controls.dataCart = function(){
+
+    //   var dc = $("#data-cart"),
+    //       cart_networks = $("<div />");
+
+    //   $.each( tool.configuration.data_cart , function( network, station){
+            
+    //     var  network_station_count,
+
+    //     cart_network = $("<div />")
+    //         .addClass("cart-network"),
+    //         //.html("<h4>"+network+"</h4>");
+
+    //     cart_network_stations = $("<div></div>")
+    //         .addClass("cart-stations cart-stations-sort");
+
+    //     $.each(station, function( station, station_obj){
+
+    //       console.log("station object", station_obj);
+
+    //       var cart_network_station = $("<div></div>")
+    //       .addClass("cart-station")
+    //       .html("<div>--=" + network + " " +station+"</div>")
+    //       .click(function(){
+    //           //console.log("this new station ", station, station_obj);
+    //           tool.controls.stationWindowUpdate(station);
+    //       })
+    //       .hover(
+    //         function() {
+    //           var sta = $(this);
+    //           //console.log("sta****", sta);
+
+    //           // is there already a span element? if so, remove it
+    //           if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
+                  
+    //           $("<span/>")
+    //           .html("&nbsp;&nbsp;")
+    //           .css({
+    //               "float":"right",
+    //               "margin":"2px",
+    //               //"border":"1px solid red",
+    //           })
+    //           .attr("title","Remove Station " + station)
+    //           .addClass("cart-station-tools ui-icon ui-icon-close")
+
+    //           .on("click", function(evt_station_remove_click){
+
+    //             //console.log("station remove click");
+
+    //             evt_station_remove_click.stopImmediatePropagation();
+
+    //             delete tool.configuration.data_cart[network][station];
+
+    //             $(".cart-param-tools").remove();
+
+    //             sta.fadeOut();
+
+    //             tool.controls.apply_button_update("modified");
+
+    //             // simply remove this item.. no need for full redraw
+    //             //tool.dataCart();
+    //           })
+    //           .prependTo(sta);
+                
+    //         },
+    //         function() {
+    //             $( this ).find( "span:last" ).remove();
+    //         }
+    //       )
+            
+    //       var station_params = $("<div></div>")
+    //           .addClass("cart-params");
+
+    //       $.each(station_obj.parameters, function(param){
+                
+    //         var station_param = $("<div></div>")
+                
+    //             .addClass("cart-param")
+    //             .html(param)
+
+    //         //mouseover of parameter item
+    //         .hover(
+    //           function() {
+    //             var par = $(this);
+
+    //             $( par ).append( 
+    //               $("<span/>")
+    //               .html(
+    //                   "&nbsp;&nbsp;"
+                      
+    //               )//'<img src="' + EduVis.Environment.getPathTools() + 'Double_Time_Series/img/x_black.png" />'
+    //               .css({
+    //                 "float":"right",
+    //                 "margin":"2px",
+    //                 //"border":"1px solid red",
+    //               })
+    //               .attr("title", "Remove " + param)
+    //               .addClass("cart-station-tools ui-icon ui-icon-close")
+
+    //               .on("click", function(evt_param_remove_click){
+
+    //                 //console.log("param remove click");
+                    
+    //                 // click of remove button will delete the item from the cart
+    //                 // do we want an ok prompt?
+
+    //                 evt_param_remove_click.stopImmediatePropagation();
+
+    //                 delete tool.configuration.data_cart[network][station]["parameters"][param];
+
+    //                 $(".cart-param-tools").remove();
+
+    //                 par.fadeOut();
+
+    //                 tool.controls.apply_button_update("modified");
+
+    //               })
+    //             );
+    //           },
+    //           function() {
+    //             $( this ).find( "span:last" ).remove();
+    //           }
+    //         );
+
+    //         station_params.append(station_param);                   
+
+    //       });
+
+    //       cart_network_station
+    //       .append(station_params);
+
+    //       cart_network_stations
+    //       .append(cart_network_station);
+
+    //     });
+        
+    //     // apply sorting
+    //     //cart_network.sortable();
+    //     //cart_network_stations.sortable();
+    //     //cart_networks.sortable();
+
+    //     cart_network.append(cart_network_stations);
+
+    //     cart_networks.append(cart_network);
+        
+
+    //   });
+
+    //   // clear and update data cart
+    //   $("#db-data-cart")
+    //   .empty()
+    //   .append(cart_networks);
+
+
+
+    // };
+
+tool.controls.dataCart = function(){
 
       var dc = $("#data-cart"),
-          cart_networks = $("<div></div>");
+          cart_networks = $("<div />");
 
       $.each( tool.configuration.data_cart , function( network, station){
             
-        var cart_network = $("<div></div>")
+        var cart_network = $("<div />")
             .addClass("cart-network")
             //.html("<h4>"+network+"</h4>");
 
-        var cart_network_stations = $("<div></div>")
+        var cart_network_stations = $("<div />")
             .addClass("cart-stations");
 
         $.each(station, function( station, station_obj){
 
-          var cart_network_station = $("<div></div>")
+          if(typeof station_obj.custom_name === "undefined"){
+            station_obj.custom_name = network + " " + station;
+          }          
+
+          var cart_network_station = $("<div />")
           .addClass("cart-station")
-          .html("<h4>" + network + " " +station+"</h4>")
+          .html('<div class="station-name" >' + station_obj.custom_name +"</div>")
           .click(function(){
               tool.controls.stationWindowUpdate_fromCart(network,station);
           })
@@ -1984,38 +2264,117 @@
               // is there already a span element? if so, remove it
               if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
                   
-              $("<span/>")
-              .html("&nbsp;&nbsp;")
-              .css({
-                  "float":"right",
-                  "margin":"2px",
-                  //"border":"1px solid red",
-              })
-              .attr("title","Remove Station " + station)
-              .addClass("cart-station-tools ui-icon ui-icon-close")
+              var tmpSpan = $("<span />")
+                //.html("&nbsp;&nbsp;")
+                .css({
+                    "position":"relative",
+                    "top":"0",
+                    "float":"right",
+                    "margin":"2px"
+                    //"border":"1px solid red",
+                })
+                //.addClass("cart-station-tools")
+                .append(
+                  $("<span />")
+                    .css("float","left")
+                    .attr("title","Edit Name for " + station)
+                    .addClass("cart-station-tools ui-icon ui-icon-pencil")
 
-              .on("click", function(evt_station_remove_click){
+                    .on("click", function(evt_station_edit_name_click){
 
-                //console.log("station remove click");
+                      var station_input; 
+                      $(tmpSpan).remove();
+                      // load input box and cancel button
+                      var current_name = sta.find(".station-name").html();
 
-                evt_station_remove_click.stopImmediatePropagation();
+                      //console.log("station remove click");
+                      sta.find(".station-name")
+                        .empty()
+                        .append(
 
-                delete tool.configuration.data_cart[network][station];
+                          $("<div />")
+                            .append(
+                              station_input = $("<input />")
+                                .attr("type","text")
+                                .addClass("input input-medium")
+                                .val(station_obj.custom_name)
+                                // .on("change",function(a){
+                                //   station_obj.custom_name = a.target.value;
+                                //   sta.find(".station-name").html(station_obj.custom_name);
 
-                $(".cart-param-tools").remove();
+                                // })
+                            )
+                            .append(
+                              $("<span />")
+                              .css("float","right")
+                                .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+                                .on("click",function(evt){
+                                  sta.find(".station-name").html(station_obj.custom_name);
 
-                sta.fadeOut();
+                                })
+                            )
+                            .append(
+                              $("<span />")
+                              .css("float","right")
+                                .addClass("cart-station-tools ui-icon ui-icon-circle-check")
+                                .on("click",function(evt){
 
-              tool.controls.apply_button_update("modified");
+                                  station_obj.custom_name = station_input.val();
+                                  sta.find(".station-name").html(station_obj.custom_name);
 
-                // simply remove this item.. no need for full redraw
-                //tool.dataCart();
-              })
-              .prependTo(sta);
+                                })
+                            )
+                            .hover(function(hover_evt){
+                              hover_evt.stopImmediatePropagation();
+                            })
+
+                        )
+
+
+                      evt_station_edit_name_click.stopImmediatePropagation();
+
+                      //delete tool.configuration.data_cart[network][station];
+
+                      //$(".cart-param-tools").remove();
+
+                      //sta.fadeOut();
+
+                      tool.controls.apply_button_update("modified");
+
+                      // simply remove this item.. no need for full redraw
+                      //tool.dataCart();
+                    })
+
+                )
+                .append(
+                  $("<span />")
+                    .css("float","left")
+                    .attr("title","Remove Station " + station)
+                    .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+
+                    .on("click", function(evt_station_remove_click){
+
+                      //console.log("station remove click");
+
+                      evt_station_remove_click.stopImmediatePropagation();
+
+                      delete tool.configuration.data_cart[network][station];
+
+                      $(".cart-param-tools").remove();
+
+                      sta.fadeOut();
+
+                      tool.controls.apply_button_update("modified");
+
+                      // simply remove this item.. no need for full redraw
+                      //tool.dataCart();
+                    })
+                )
+                .prependTo(sta);
                 
             },
             function() {
-                $( this ).find( "span:last" ).remove();
+                $( this ).find( "span" ).remove();
             }
           )
             
@@ -2028,65 +2387,67 @@
                 .addClass("cart-param")
                 .html(param)
 
-            //mouseover of parameter item
-            .hover(
-              function() {
-                var par = $(this);
+                //mouseover of parameter item
+                .hover(
+                  function() {
+                    var par = $(this);
 
-                $( par ).append( 
-                  $("<span/>")
-                  .html(
-                      "&nbsp;&nbsp;"
-                      
-                  )//'<img src="' + EduVis.Environment.getPathTools() + 'Double_Time_Series/img/x_black.png" />'
-                  .css({
-                    "float":"right",
-                    "margin":"2px",
-                    //"border":"1px solid red",
-                  })
-                  .attr("title", "Remove " + param)
-                  .addClass("cart-station-tools ui-icon ui-icon-close")
+                    $( par ).append( 
+                      $("<span/>")
+                      .html(
+                          "&nbsp;&nbsp;"
+                          
+                      )//'<img src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series/img/x_black.png" />'
+                      .css({
+                        "float":"right",
+                        "margin":"2px",
+                        //"border":"1px solid red",
+                      })
+                      .attr("title", "Remove " + param)
+                      .addClass("cart-station-tools ui-icon ui-icon-circle-close")
 
-                  .on("click", function(evt_param_remove_click){
+                      .on("click", function(evt_param_remove_click){
 
-                    //console.log("param remove click");
-                    
-                    // click of remove button will delete the item from the cart
-                    // do we want an ok prompt?
+                        //console.log("param remove click");
+                        
+                        // click of remove button will delete the item from the cart
+                        // do we want an ok prompt?
 
-                    evt_param_remove_click.stopImmediatePropagation();
+                        evt_param_remove_click.stopImmediatePropagation();
 
-                    delete tool.configuration.data_cart[network][station]["parameters"][param];
+                        delete tool.configuration.data_cart[network][station]["parameters"][param];
 
-                    $(".cart-param-tools").remove();
+                        $(".cart-param-tools").remove();
 
-                    par.fadeOut();
+                        par.fadeOut();
 
-                    tool.controls.apply_button_update("modified");
+                        tool.controls.apply_button_update("modified");
 
-                  })
+                      })
+                    );
+                  },
+                  function() {
+                    $( this ).find( "span" ).remove();
+                  }
                 );
-              },
-              function() {
-                $( this ).find( "span:last" ).remove();
-              }
-            );
 
             station_params.append(station_param);                   
 
           });
 
           cart_network_station
-          .append(station_params);
+            .append(station_params);
 
           cart_network_stations
-          .append(cart_network_station);
+            .append(cart_network_station);
 
         });
 
-        cart_network.append(cart_network_stations);
+        cart_network
+          .append(cart_network_stations);
 
-        cart_networks.append(cart_network);
+        cart_networks
+          .append(cart_network);
 
       });
 
@@ -2095,12 +2456,19 @@
       .empty()
       .append(cart_networks);
 
+      //$(".db-data-cart").draggable("option", "handle", "h4");
+
     };
 
     /**
      * Update the station window div with details when a parameter is clicked in the cart
      * Called by dataCart
      */
+    // tool.controls.stationWindowUpdate_fromCart = function(network,station){
+
+    //   tool.controls.stationWindowUpdate(station);
+    // };
+
     tool.controls.stationWindowUpdate_fromCart = function(network,station){
 
       var station_dom_id = "station-" + network + "-"+station;
