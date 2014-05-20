@@ -281,6 +281,7 @@
       g.height = height_chart_container - g.margin.top - g.margin.bottom;
       
       g.parseDate = d3.time.format.iso.parse;
+      g.formatDate = d3.time.format("%Y-%m-%d");
       
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
@@ -301,23 +302,23 @@
           .attr("width", g.width)
           .attr("height", g.height);
       
-      g.focus = g.svg.append("g")
+      g.chart = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
-      g.focus.append("g")
+      g.chart.append("g")
         .attr("id", _target+"_xAxis")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
         .call(g.xAxis);
         
-      g.focus.append("g")
+      g.chart.append("g")
         .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
         .call(g.yAxis);
 
       // add overlay here.. with mousemove event for X axis valuation
 
-      g.mouse_focus = g.focus.append("g")
+      g.mouse_focus = g.chart.append("g")
         .attr("class", "focus")
         .style("display", "none");
 
@@ -328,7 +329,7 @@
           .attr("x", 9)
           .attr("dy", ".35em");
 
-      g.mousemover = g.focus.append("rect")
+      g.mousemover = g.chart.append("rect")
         .attr("class", "overlay")
         .attr("width", g.width)
         .attr("height", g.height)
@@ -338,7 +339,7 @@
         .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
         //.on("mousemove", mousemove);
       
-      g.focus.append("path")
+      g.chart.append("path")
         //.datum(data)
         .attr("class", "line")
         .attr("d", g.line1)
@@ -694,7 +695,7 @@
         end = config.end_date;
       }
 
-      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
+      return 'http://epedata.oceanobservatories.org/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -784,7 +785,7 @@
                 d1 = data[i],
                 d = x0 - d0.date > d1.date - x0 ? d1 : d0;
             g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
-            g.mouse_focus.select("text").text(d.data);
+            g.mouse_focus.select("text").text(g.formatDate(d.date) + " - " + d3.round(d.data,4));
           })
 
         }
