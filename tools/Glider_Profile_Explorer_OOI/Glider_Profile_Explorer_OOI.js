@@ -1,7 +1,7 @@
 /*  *  *  *  *  *  *  *
 *
 * Glider Profile Explorer OOI (GPE OOI)
-* Revised 5/15/2014
+* Revised 5/20/2014
 * Written by Mike Mills
 *
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Explorer",
         "url" : "",
 
-        "version" : "0.0.1",
+        "version" : "0.3.2",
         "authors" : [
             {
                 "name" : "Michael Mills",
