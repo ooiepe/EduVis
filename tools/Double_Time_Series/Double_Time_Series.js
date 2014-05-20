@@ -2298,11 +2298,7 @@ tool.controls.dataCart = function(){
                                 .attr("type","text")
                                 .addClass("input input-medium")
                                 .val(station_obj.custom_name)
-                                // .on("change",function(a){
-                                //   station_obj.custom_name = a.target.value;
-                                //   sta.find(".station-name").html(station_obj.custom_name);
-
-                                // })
+                                .on("click", function(e){e.stopImmediatePropagation();})
                             )
                             .append(
                               $("<span />")
