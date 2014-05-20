@@ -1,5 +1,10 @@
 .station-name{
   font-weight: bold;
+  height:20px;
+}
+
+.cart-params{
+  clear:right;
 }
 
 /*
