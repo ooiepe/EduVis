@@ -1,13 +1,13 @@
 /**
  * OOI EPE - Single Time Series (STS)
- * Revised 3/24/2014
+ * Revised 5/20/2014
  * Written by Mike Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
     "use strict";
     var tool = {
         "name" : "Single_Time_Series",
-        "version" : "0.3",
+        "version" : "0.3.2",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -418,7 +418,7 @@
         end = config.end_date;
       }
 
-      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
+      return 'http://epedata.oceanobservatories.org/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -487,7 +487,6 @@
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
           g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-          //console.log(stats);
 
           // update x and y axis 
           d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
@@ -694,18 +693,18 @@
       .empty()
       .append("<option>..updating..</option>");
 
-        $.each(dc[network][station].parameters,function(parameter){
+      $.each(dc[network][station].parameters,function(parameter){
 
-            // create new option and add it to the options array
-            var option = $("<option></option>")
-              .attr({
-                "value": parameter
-              })
-              .html(parameter);
+          // create new option and add it to the options array
+          var option = $("<option></option>")
+            .attr({
+              "value": parameter
+            })
+            .html(parameter);
 
-            options.push(option);
+          options.push(option);
 
-        });
+      });
 
       // clear loading indicator and append options
       $("#"+tool.dom_target+"_select-parameters")
@@ -874,10 +873,34 @@
                       "changeMonth": true,
                       "changeYear": true,
                       //"showButtonPanel": true,
-                      "onSelect" : function(d,i){
+                      // "onSelect" : function(d,i){
+                      //     //console.log("datepicker changed!",d,i);
+                      //     //tool.configuration.date_start = d;
+                      //     tool.controls.apply_button_update("modified");
+
+                      // },
+                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
-                          tool.controls.apply_button_update("modified");
+
+                          $("#date_range_label").remove();
+
+                          if(tool.controls.verify_date_range()){
+
+                            tool.controls.apply_button_update("modified");
+                            $("#db-btn_search").removeClass("disabled");
+
+                          }
+                          else{
+
+                            $("#db-btn_search").addClass("disabled");
+
+                            $("<label />")
+                              .attr("id","date_range_label")
+                              .html("Please select a date range that is one year or less.")
+                              .css({"color":"red"})
+                              .insertBefore('#db-selection-search')
+                          }
 
                       },
                       "defaultDate": tool.configuration.start_date
@@ -910,10 +933,34 @@
                       "changeMonth": true,
                       "changeYear": true,
                       //"showButtonPanel": true,
+                      // "onSelect" : function(d,i){
+                      //     //console.log("datepicker changed!",d,i);
+                      //     //tool.configuration.date_start = d;
+                      //     tool.controls.apply_button_update("modified");
+                      // },
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
-                          tool.controls.apply_button_update("modified");
+
+                          $("#date_range_label").remove();
+
+                          if(tool.controls.verify_date_range()){
+
+                            tool.controls.apply_button_update("modified");
+                            $("#db-btn_search").removeClass("disabled");
+
+                          }
+                          else{
+
+                            $("#db-btn_search").addClass("disabled");
+
+                            $("<label />")
+                              .attr("id","date_range_label")
+                              .html("Please select a date range that is one year or less.")
+                              .css({"color":"red"})
+                              .insertBefore('#db-selection-search')
+                          }
+
                       },
                       "defaultDate": tool.configuration.end_date
 
@@ -1320,6 +1367,33 @@
 
       //console.log("el_date_start: " +el_date_start.val());
       //console.log("el_date_end: " +el_date_end.val());
+    };
+
+     /** 
+      verify the date range is only 1 year
+    */
+
+    tool.controls.verify_date_range = function(){
+
+      var el_date_start = $("#db-date-start"),
+          el_date_end = $("#db-date-end"),
+          
+          date_start = new Date(el_date_start.val()),
+          date_end = new Date(el_date_end.val()),
+
+          date_start_ms = date_start.getTime(),
+          date_end_ms = date_end.getTime(),
+
+          oneday_ms = 1000 * 60 * 60 * 24,
+
+          diff_ms = Math.abs(date_start_ms - date_end_ms),
+          diff_days = Math.floor(diff_ms/oneday_ms);
+        
+          if(diff_days > 366){  
+            return false;
+          }else{
+            return true;
+          }
     };
 
     /**
