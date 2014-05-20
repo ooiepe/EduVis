@@ -1,13 +1,15 @@
 /**
  * OOI EPE - Single Time Series (STS)
- * Revised 4/30/2014
+ * Revised 5/20/2014
  * Written by Mike Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
+    
     "use strict";
+
     var tool = {
         "name" : "Single_Time_Series_Map",
-        "version" : "0.1",
+        "version" : "0.3.2",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -1148,10 +1150,34 @@
                       "changeMonth": true,
                       "changeYear": true,
                       //"showButtonPanel": true,
+                      // "onSelect" : function(d,i){
+                      //     //console.log("datepicker changed!",d,i);
+                      //     //tool.configuration.date_start = d;
+                      //     tool.controls.apply_button_update("modified");
+
+                      // },
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
-                          tool.controls.apply_button_update("modified");
+
+                          $("#date_range_label").remove();
+
+                          if(tool.controls.verify_date_range()){
+
+                            tool.controls.apply_button_update("modified");
+                            $("#db-btn_search").removeClass("disabled");
+
+                          }
+                          else{
+
+                            $("#db-btn_search").addClass("disabled");
+
+                            $("<label />")
+                              .attr("id","date_range_label")
+                              .html("Please select a date range that is one year or less.")
+                              .css({"color":"red"})
+                              .insertBefore('#db-selection-search')
+                          }
 
                       },
                       "defaultDate": tool.configuration.start_date
@@ -1184,10 +1210,34 @@
                       "changeMonth": true,
                       "changeYear": true,
                       //"showButtonPanel": true,
+                      // "onSelect" : function(d,i){
+                      //     //console.log("datepicker changed!",d,i);
+                      //     //tool.configuration.date_start = d;
+                      //     tool.controls.apply_button_update("modified");
+                      // },
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
-                          tool.controls.apply_button_update("modified");
+
+                          $("#date_range_label").remove();
+
+                          if(tool.controls.verify_date_range()){
+
+                            tool.controls.apply_button_update("modified");
+                            $("#db-btn_search").removeClass("disabled");
+
+                          }
+                          else{
+
+                            $("#db-btn_search").addClass("disabled");
+
+                            $("<label />")
+                              .attr("id","date_range_label")
+                              .html("Please select a date range that is one year or less.")
+                              .css({"color":"red"})
+                              .insertBefore('#db-selection-search')
+                          }
+
                       },
                       "defaultDate": tool.configuration.end_date
 
@@ -1583,6 +1633,49 @@
 
       //console.log("el_date_start: " +el_date_start.val());
       //console.log("el_date_end: " +el_date_end.val());
+    };
+
+
+    /** 
+      verify the date range is maximum 1 year
+    */
+
+    tool.controls.verify_date_range = function(){
+
+      var el_date_start = $("#db-date-start"),
+          el_date_end = $("#db-date-end"),
+          
+          date_start = new Date(el_date_start.val()),
+          date_end = new Date(el_date_end.val()),
+
+          date_start_ms = date_start.getTime(),
+          date_end_ms = date_end.getTime(),
+
+          oneday_ms = 1000 * 60 * 60 * 24,
+
+          diff_ms = Math.abs(date_start_ms - date_end_ms),
+          diff_days = Math.floor(diff_ms/oneday_ms);
+        
+          if(diff_days > 366){  
+            return false;
+          }else{
+            return true;
+          }
+          // if(diff_days > 365){
+          //   // is the start date or end date a leap year?
+          //   if( (new Date(date_start.getFullYear(), 1, 29).getMonth() == 1) || (new Date(date_end.getFullYear(), 1, 29).getMonth() == 1) ){
+          //     if(diff_days > 366){
+          //       return false;
+          //     }
+          //     else{
+          //       return true;
+          //     }
+          //   }
+          //   return false;
+          // }
+          // else{
+          //   return true;
+          // }
     };
 
     /**
