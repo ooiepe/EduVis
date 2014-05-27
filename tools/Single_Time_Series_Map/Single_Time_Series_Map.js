@@ -1,8 +1,11 @@
-/**
- * OOI EPE - Single Time Series (STS)
- * Revised 5/20/2014
+/*
+
+ * OOI EPE - Single Time Series with Map (STSM)
+ * Revised 5/27/2014
  * Written by Mike Mills and Sage Lichtenwalner
- */
+
+*/
+
 (function (eduVis) {
     
     "use strict";
@@ -320,6 +323,19 @@
 
       // add overlay here.. with mousemove event for X axis valuation
 
+      g.chart.append("path")
+        //.datum(data)
+        .attr("class", "line")
+        .attr("d", g.line1)
+        .style("fill","none")
+        .style("stroke","#a33333")
+        .style("stroke-width","2px");
+
+      g.line1 = d3.svg.line()
+        .interpolate("monotone")
+        .x(function(d) { return g.x(d.date); })
+        .y(function(d) { return g.y(d.data); });
+
       g.mouse_focus = g.chart.append("g")
         .attr("class", "focus")
         .style("display", "none");
@@ -340,19 +356,6 @@
         .on("mouseover", function() { g.mouse_focus.style("display", null); })
         .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
         //.on("mousemove", mousemove);
-      
-      g.chart.append("path")
-        //.datum(data)
-        .attr("class", "line")
-        .attr("d", g.line1)
-        .style("fill","none")
-        .style("stroke","#a33333")
-        .style("stroke-width","2px");
-
-      g.line1 = d3.svg.line()
-        .interpolate("monotone")
-        .x(function(d) { return g.x(d.date); })
-        .y(function(d) { return g.y(d.data); });
       
       g.title = g.svg.append("text")
         .attr("class", "gtitle")
@@ -781,15 +784,17 @@
 
           //mouse move
           g.mousemover.on("mousemove", function(){
-            var x0 = g.x.invert(d3.mouse(this)[0]),
+            var chartMiddle = g.width / 2,
+                mouseX = d3.mouse(this)[0],
+                x0 = g.x.invert(mouseX),
                 i = bisectDate(data, x0, 1),
                 d0 = data[i - 1],
                 d1 = data[i],
                 d = x0 - d0.date > d1.date - x0 ? d1 : d0;
             g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
-            g.mouse_focus.select("text").text(g.formatDate(d.date) + " - " + d3.round(d.data,4));
+            g.mouse_focus.select("text").text(g.formatDate(d.date) + " - " + d3.round(d.data,4))
+              .attr("transform", "translate(" + (mouseX > chartMiddle ? -110 : 0) + "," + 0 + ")");
           })
-
         }
       }
       

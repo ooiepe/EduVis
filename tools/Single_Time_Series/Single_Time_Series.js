@@ -1,8 +1,11 @@
-/**
+/*
+
  * OOI EPE - Single Time Series (STS)
- * Revised 5/20/2014
+ * Revised 5/27/2014
  * Written by Mike Mills and Sage Lichtenwalner
- */
+ 
+*/
+
 (function (eduVis) {
     "use strict";
     var tool = {
@@ -502,18 +505,18 @@
 
           //mouse move
           g.mousemover.on("mousemove", function(){
-            var x0 = g.x.invert(d3.mouse(this)[0]),
+            var chartMiddle = g.width / 2,
+                mouseX = d3.mouse(this)[0],
+                x0 = g.x.invert(mouseX),
                 i = bisectDate(data, x0, 1),
                 d0 = data[i - 1],
                 d1 = data[i],
                 d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-                
             g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
-            //g.mouse_focus.select("text").text(d.data + "(" + "getUNITS!"" + ") - " + d.date);
-            g.mouse_focus.select("text").text(d.data + " - " + date_format(g.parseDate(d.date)));
+            g.mouse_focus.select("text").text(d.data + " - " + date_format(g.parseDate(d.date)))
+              .attr("transform", "translate(" + (mouseX > chartMiddle ? -110 : 0) + "," + 0 + ")");
 
           })
-
         }
       }
       

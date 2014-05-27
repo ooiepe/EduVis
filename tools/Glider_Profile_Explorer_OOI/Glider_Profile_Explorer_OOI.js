@@ -1,9 +1,9 @@
-/*  *  *  *  *  *  *  *
-*
-* Glider Profile Explorer OOI (GPE OOI)
-* Revised 5/20/2014
-* Written by Mike Mills
-*
+/*
+
+ * Glider Profile Explorer OOI (GPE OOI)
+ * Revised 5/27/2014
+ * Written by Mike Mills
+
 */
 
 (function (eduVis) {
@@ -355,7 +355,7 @@
       g.x = d3.scale.linear().range([0, g.width]);
       g.y = d3.scale.linear().range([0, g.height]);
       
-      g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10).tickSize(5,0,0);
+      g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10);//.tickSize(5,0,0);
       g.yAxis = d3.svg.axis().scale(g.y).orient("left");//.tickSize(0,0,0);
       
       g.svg = d3.select("#"+_target + "-viz-container").append("svg")
@@ -380,8 +380,8 @@
         .attr("transform", "translate(0," + g.height + ")")
         .style({
           "fill" : "none",
-          "stroke" :"#666666",
-          "stroke-width":"1px"
+          "stroke" :"#666666"
+          //,"stroke-width":"1px"
         })
         .call(g.xAxis);
         
@@ -487,7 +487,7 @@
         .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
         .text( column_selected);
 
-     // initialize visualization controls
+      // initialize visualization controls
 
       // create reference to dropdown
       var parameter_dropdown = $("#"+ _target + "-control-parameter-dropdown");
@@ -827,7 +827,9 @@
 
       d3.csv( tool.erddap_request_profile(dataset_id, profile_id), function(error,data){
 
-        //console.log("error", error, data);
+        console.log("error", error, data);
+
+        console.log(JSON.stringify(data));
 
         // var erddap_meta = tool.settings.erddap_parameter_metadata,
         //     //column_date = erddap_meta.time.column,
@@ -889,15 +891,19 @@
         //mouse move
         g.mousemover.on("mousemove", function(){
 
-          var y0 = g.y.invert(d3.mouse(this)[1]),
-              i = bisectData(data, y0, 1),
-              d0 = data[i - 1],
-              d1 = data[i],
-              d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0;
+        var chartMiddle = g.width / 2,
+            mouseY = d3.mouse(this)[1],
+            mouseX = d3.mouse(this)[0],
+            y0 = g.y.invert(mouseY),
+            i = bisectData(data, y0, 1),
+            d0 = data[i - 1],
+            d1 = data[i],
+            d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0;
           
-          g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
+        g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
 
-          g.mouse_focus.select("text").text(d3.round(d[column_depth],1) + " m - "  + d3.round(d[column_selected],2));
+        g.mouse_focus.select("text").text(d3.round(d[column_depth], 1) + " m - " + d3.round(d[column_selected], 2))
+          .attr("transform", "translate(" + (mouseX > chartMiddle ? -90 : 0) + "," + 0 + ")");
 
         })
 
@@ -1335,7 +1341,6 @@
             tool.controls.config_dataset_id.trigger("change");
 
         });
-
     };
 
     // extend base object with tool..
