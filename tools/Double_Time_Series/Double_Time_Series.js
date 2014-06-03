@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 5/20/2014
+ * Revised 6/3/2014
  * Written by Michael Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
@@ -315,7 +315,7 @@
           "fill":"none",
           "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
         })
-        .attr("transform", "translate(" + (g.margin.left) + "," + (0) + ") ")
+        .attr("transform", "translate(" + (g.margin.left) + "," + (0) + ") ");
 
       g.title2 = g.svg.append("text")
         .attr("class", "gtitle")
@@ -344,7 +344,7 @@
           "fill":"none",
           "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
         })
-        .attr("transform", "translate(" + (g.width + g.margin.right/3) + "," + (0) + ") ")
+        .attr("transform", "translate(" + (g.width + g.margin.right/3) + "," + (0) + ") ");
       
       g.ylabel1 = g.svg.append("text")
         .attr("id", _target+"_ylabel1")
@@ -405,7 +405,7 @@
       var url = tool.createUrl(variable);
       
       $('<img style="height:28px;" class="loading-icon' +variable + '"  src="' + EduVis.Environment.getPathTool(tool.name) + '/img/loading_small.gif" />')
-        .appendTo($("#"+tool.dom_target+"_tool-status"+variable))
+        .appendTo($("#"+tool.dom_target+"_tool-status"+variable));
 
       d3.csv(url, function(error, data) {
 
@@ -419,7 +419,7 @@
 
             $("#"+tool.dom_target+"_tool-status"+variable).html(
               $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not currently available for this Station.</i>')
-            )
+            );
           }
         }
       });
@@ -486,11 +486,11 @@
           end;
 
       if(config.date_type == "realtime"){
-        start = config.realtime_days,
+        start = config.realtime_days;
         end = "now";  
       }
       else{
-        start = config.start_date,
+        start = config.start_date;
         end = config.end_date;
       }
 
@@ -500,7 +500,7 @@
         '&parameter=' + parameter + 
         '&start_time=' + start +
         '&end_time=' + end;
-    }
+    };
     
     /**
      * Update visualization with new data
@@ -516,12 +516,12 @@
 
         $("#"+tool.dom_target+"_tool-status"+variable).html(
           $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
-        )
+        );
 
       }
       else{
 
-        if(data.length == 0){
+        if(data.length === 0){
 
             // insert an icon to let user know to select param
           $("#"+tool.dom_target+"_tool-status"+variable).html(
@@ -550,7 +550,8 @@
           // Updte the Y domain to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
           
-          console.log("path", "path.line"+variable)
+          //console.log("path", "path.line"+variable);
+
           g.svg.selectAll("path.line"+variable)
             .data([data])
             .transition()
@@ -576,10 +577,11 @@
           d3.selectAll('.axis line, .axis path')
             .style("fill","none")
             .style("stroke","#999")
-            .style("stroke-width","1px")
+            .style("stroke-width","1px");
+
             //.style("shape-rendering","crispEdges")
           d3.selectAll('.y.axis line var'+variable)
-            .style("stroke-opacity",".4")
+            .style("stroke-opacity",".4");
 
         }
       }
@@ -595,7 +597,7 @@
      * This should be replaced by d3.deviation and other related functions when (if?) implemented.
      */
     tool.average = function(data) {
-      var a=Array();
+      var a = [];
       data.forEach(function(d) {
         a.push(d.data);
       });
@@ -603,7 +605,7 @@
       for(var m, s = 0, l = t; l--; s += a[l]);
       for(m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
       return r.deviation = Math.sqrt(r.variance = s / t), r;
-    }
+    };
 
     /**
      * Generate station and parameter pulldowns
@@ -655,7 +657,7 @@
                 $("#"+_target+"_tool-status1")
                   .html(
                     $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
-                  )
+                  );
               }
             })
           )
@@ -678,7 +680,7 @@
 
                 $(".param-icon").remove();
                 
-                tool.graph_update_param(evt.target.value,"1")
+                tool.graph_update_param(evt.target.value,"1");
 
               })
             )
@@ -726,7 +728,7 @@
                 $("#"+_target+"_tool-status2")
                   .html(
                     $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
-                  )
+                  );
               }
             })
           )
@@ -749,7 +751,7 @@
 
                 $(".param-icon").remove();
                 
-                tool.graph_update_param(evt.target.value,"2")
+                tool.graph_update_param(evt.target.value,"2");
 
               })
             )
@@ -782,7 +784,7 @@
         )
         .appendTo(
           $("#"+_target)
-        )
+        );
     };
 
     /**
@@ -831,7 +833,7 @@
         $("#"+tool.dom_target+"_select-stations-"+ variable + " option:first")
         .prop("selected", "selected");
           
-        var net_sta = $("#"+tool.dom_target+"_select-stations-" + varialbe).val().split(",");
+        var net_sta = $("#"+tool.dom_target+"_select-stations-" + variable).val().split(",");
             
         config.network1 = net_sta[0];
         config.station1 = net_sta[1];
@@ -897,22 +899,19 @@
         })
         .prop('selected', true);
 
-      if(selected_param.length == 0){
+      if(selected_param.length === 0){
 
-        // update the configuration network and station 
-        var net_sta = $("#"+tool.dom_target+"_select-stations-"+variable).val().split(",");
-        
         config.network1 = net_sta[0];
         config.station1 = net_sta[1];
 
         $("#"+tool.dom_target+"_tool-status"+variable)
           .html(
             $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Please choose a new parameter.</i>')
-          )
+          );
 
         $("<option>(choose one)</option>")
           .prop("selected", true)
-          .insertBefore($("#"+tool.dom_target+"_select-parameters-"+variable+" option:first"))
+          .insertBefore($("#"+tool.dom_target+"_select-parameters-"+variable+" option:first"));
 
         return false;
       }
@@ -1038,10 +1037,8 @@
                   .addClass('datepicker')
                   .datepicker({
                       "dateFormat": "yy-mm-dd",
-                      //"showOn": "button",
                       "changeMonth": true,
                       "changeYear": true,
-                      //"showButtonPanel": true,
                       "onSelect" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
@@ -1062,7 +1059,7 @@
                               .attr("id","date_range_label")
                               .html("Please select a date range that is one year or less.")
                               .css({"color":"red"})
-                              .insertBefore('#db-selection-search')
+                              .insertBefore('#db-selection-search');
                           }
 
                       },
@@ -1115,7 +1112,7 @@
                               .attr("id","date_range_label")
                               .html("Please select a date range that is one year or less.")
                               .css({"color":"red"})
-                              .insertBefore('#db-selection-search')
+                              .insertBefore('#db-selection-search');
                           }
                       },
                       "defaultDate": tool.configuration.end_date
@@ -1154,7 +1151,7 @@
                 .addClass('small')
                 .val(tool.configuration.realtime_days)
                 .on("change", function(){
-                  tool.controls.apply_button_update("modified")
+                  tool.controls.apply_button_update("modified");
                 })
               )
               .append(
@@ -1266,7 +1263,7 @@
             "id":"db-data-cart-apply",
           })
           .append(
-            $("<button>", {
+            $("<div/>", {
               "id":"btn-apply",
               "type":"button",
               "class":"btn btn-medium disabled",
@@ -1348,7 +1345,7 @@
           .append(db_main_content)
           .append(db_sidebar_right)
           .append(db_footer)
-        )
+        );
 
       dataBrowserDom
         .append(dataBrowser_html)
@@ -1402,16 +1399,16 @@
       resizeTimer;
 
       tool.controls.map.on('viewreset', function(){
-       if(tool.controls.searchActive == true){
-          tool.controls.searchData()
+       if(tool.controls.searchActive === true){
+          tool.controls.searchData();
         }
       });
       
       tool.controls.map.on('dragend', function(){
-        if(tool.controls.searchActive == true){
-          tool.controls.searchData()
+        if(tool.controls.searchActive === true){
+          tool.controls.searchData();
         }
-      }); //tool.controls.searchData(), this);
+      });
 
 //
 // PARAMETERS
@@ -1771,7 +1768,7 @@
       $.extend(true, tool.configuration.data_cart, data_cart_item);
 
       tool.controls.apply_button_update("modified");
-    }
+    };
 
     /**
      * Extracts the bounds of the current map view 
@@ -1921,7 +1918,7 @@
                         )
                         .append( 
 
-                            $("<button />")
+                            $("<div />")
                                 .attr({
                                     "class":"btn btn-info btn-mini",
                                     "id":"select-" + station_dom_id + "_" +  param
@@ -1942,7 +1939,7 @@
                                 .attr("title", param.description)
                                 .attr("href", "#"+param)
                         )
-                    )
+                    );
 
                 });
 
@@ -2042,18 +2039,18 @@
         // some testing of dates
         //  only testing for presense of values for now
 
-        if(el_start_time != ""){
+        if(el_start_time !== ""){
             start_time = el_start_time;
             
-            if(el_end_time == ""){
+            if(el_end_time === ""){
                 end_time = start_time;
             }
         }
 
-        if(el_end_time != ""){
+        if(el_end_time !== ""){
           end_time = el_end_time;
 
-          if(el_start_time == ""){
+          if(el_start_time === ""){
             start_time = end_time;
           }
         }
@@ -2069,168 +2066,7 @@
         return service_url;
     };
 
-    /**
-     * Update the Data Cart div
-     * Called by init_controls, stationWindowUpdate and stationWindowUpdate_fromCart
-     */
-    // tool.controls.dataCart = function(){
-
-    //   var dc = $("#data-cart"),
-    //       cart_networks = $("<div />");
-
-    //   $.each( tool.configuration.data_cart , function( network, station){
-            
-    //     var  network_station_count,
-
-    //     cart_network = $("<div />")
-    //         .addClass("cart-network"),
-    //         //.html("<h4>"+network+"</h4>");
-
-    //     cart_network_stations = $("<div></div>")
-    //         .addClass("cart-stations cart-stations-sort");
-
-    //     $.each(station, function( station, station_obj){
-
-    //       console.log("station object", station_obj);
-
-    //       var cart_network_station = $("<div></div>")
-    //       .addClass("cart-station")
-    //       .html("<div>--=" + network + " " +station+"</div>")
-    //       .click(function(){
-    //           //console.log("this new station ", station, station_obj);
-    //           tool.controls.stationWindowUpdate(station);
-    //       })
-    //       .hover(
-    //         function() {
-    //           var sta = $(this);
-    //           //console.log("sta****", sta);
-
-    //           // is there already a span element? if so, remove it
-    //           if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
-                  
-    //           $("<span/>")
-    //           .html("&nbsp;&nbsp;")
-    //           .css({
-    //               "float":"right",
-    //               "margin":"2px",
-    //               //"border":"1px solid red",
-    //           })
-    //           .attr("title","Remove Station " + station)
-    //           .addClass("cart-station-tools ui-icon ui-icon-close")
-
-    //           .on("click", function(evt_station_remove_click){
-
-    //             //console.log("station remove click");
-
-    //             evt_station_remove_click.stopImmediatePropagation();
-
-    //             delete tool.configuration.data_cart[network][station];
-
-    //             $(".cart-param-tools").remove();
-
-    //             sta.fadeOut();
-
-    //             tool.controls.apply_button_update("modified");
-
-    //             // simply remove this item.. no need for full redraw
-    //             //tool.dataCart();
-    //           })
-    //           .prependTo(sta);
-                
-    //         },
-    //         function() {
-    //             $( this ).find( "span:last" ).remove();
-    //         }
-    //       )
-            
-    //       var station_params = $("<div></div>")
-    //           .addClass("cart-params");
-
-    //       $.each(station_obj.parameters, function(param){
-                
-    //         var station_param = $("<div></div>")
-                
-    //             .addClass("cart-param")
-    //             .html(param)
-
-    //         //mouseover of parameter item
-    //         .hover(
-    //           function() {
-    //             var par = $(this);
-
-    //             $( par ).append( 
-    //               $("<span/>")
-    //               .html(
-    //                   "&nbsp;&nbsp;"
-                      
-    //               )//'<img src="' + EduVis.Environment.getPathTools() + 'Double_Time_Series/img/x_black.png" />'
-    //               .css({
-    //                 "float":"right",
-    //                 "margin":"2px",
-    //                 //"border":"1px solid red",
-    //               })
-    //               .attr("title", "Remove " + param)
-    //               .addClass("cart-station-tools ui-icon ui-icon-close")
-
-    //               .on("click", function(evt_param_remove_click){
-
-    //                 //console.log("param remove click");
-                    
-    //                 // click of remove button will delete the item from the cart
-    //                 // do we want an ok prompt?
-
-    //                 evt_param_remove_click.stopImmediatePropagation();
-
-    //                 delete tool.configuration.data_cart[network][station]["parameters"][param];
-
-    //                 $(".cart-param-tools").remove();
-
-    //                 par.fadeOut();
-
-    //                 tool.controls.apply_button_update("modified");
-
-    //               })
-    //             );
-    //           },
-    //           function() {
-    //             $( this ).find( "span:last" ).remove();
-    //           }
-    //         );
-
-    //         station_params.append(station_param);                   
-
-    //       });
-
-    //       cart_network_station
-    //       .append(station_params);
-
-    //       cart_network_stations
-    //       .append(cart_network_station);
-
-    //     });
-        
-    //     // apply sorting
-    //     //cart_network.sortable();
-    //     //cart_network_stations.sortable();
-    //     //cart_networks.sortable();
-
-    //     cart_network.append(cart_network_stations);
-
-    //     cart_networks.append(cart_network);
-        
-
-    //   });
-
-    //   // clear and update data cart
-    //   $("#db-data-cart")
-    //   .empty()
-    //   .append(cart_networks);
-
-
-
-    // };
-
-tool.controls.dataCart = function(){
+    tool.controls.dataCart = function(){
 
       var dc = $("#data-cart"),
           cart_networks = $("<div />");
@@ -2238,7 +2074,7 @@ tool.controls.dataCart = function(){
       $.each( tool.configuration.data_cart , function( network, station){
             
         var cart_network = $("<div />")
-            .addClass("cart-network")
+            .addClass("cart-network");
             //.html("<h4>"+network+"</h4>");
 
         var cart_network_stations = $("<div />")
@@ -2324,7 +2160,7 @@ tool.controls.dataCart = function(){
                               hover_evt.stopImmediatePropagation();
                             })
 
-                        )
+                        );
 
 
                       evt_station_edit_name_click.stopImmediatePropagation();
@@ -2372,7 +2208,7 @@ tool.controls.dataCart = function(){
             function() {
                 $( this ).find( "span" ).remove();
             }
-          )
+          );
             
           var station_params = $("<div></div>")
               .addClass("cart-params");
@@ -2507,12 +2343,10 @@ tool.controls.dataCart = function(){
               )
               .append( 
 
-                // <button class="btn btn-mini" type="button">Mini button</button>
                 $("<a/>")
                 .attr({
                   "class":"btn btn-mini station-window-add",
-                  "id":"select-" + station_dom_id + "_" +  param,
-                  "type" : "button"
+                  "id":"select-" + station_dom_id + "_" +  param
                 })
                 .html("Add")
                 .on("click", function(evt){
@@ -2524,7 +2358,7 @@ tool.controls.dataCart = function(){
                   tool.controls.dataCart();
                 })
               )
-            )
+            );
           });
 
           $("#db-station-details")
@@ -2533,8 +2367,8 @@ tool.controls.dataCart = function(){
             $("<div>")
             .append(
               $("<h4/>")
-              .addClass("title")
-              .html("Network: (" + network + ") " + station)
+                .addClass("title")
+                .html("Network: (" + network + ") " + station)
             )
             .hover(
               function() {
@@ -2578,7 +2412,7 @@ tool.controls.dataCart = function(){
           $("#apply-check").show().fadeOut(3000);
 
       }
-    }
+    };
 
     // extend base object with tool..
     EduVis.tool.tools[tool.name] = tool;
