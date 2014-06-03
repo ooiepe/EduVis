@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 5/27/2014
+ * Revised 6/02/2014
  * Written by Mike Mills
 
 */
@@ -123,7 +123,60 @@
         "data" : {},
         "target_div" : "",
         "tools" : {},
-        "settings" : {}
+        "settings" : {},
+        "mapping": {
+          "oceanBasemap_url" : 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
+          "styles" : {
+
+            "profile" : {
+              radius: 3,
+              fillColor: "#ff0000",
+              color: "#000",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+            },
+
+            "profile_selected" : {
+              radius: 7,
+              fillColor: "#ff7800",
+              color: "#000",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+            },
+            "profile_click" : {
+              radius: 8,
+              fillColor: "#00aaee",
+              color: "#000",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+            },
+            "profile_hover" : {
+              radius: 7,
+              fillColor: "#ff7800",
+              color: "#000",
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.8
+            }
+          },
+        
+        "trajectory_profiles" : "http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?cdm_data_type=trajectoryprofile",
+        "locations_query" : function(){
+
+            return "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
+         }
+       },
+      "controls" : {
+        "slider" : {
+          "date_start" : null,
+          "date_end" : null,
+          "date_range_start" : null,
+          "date_range_end" : null
+        }
+      }
 
     };
 
@@ -241,7 +294,7 @@
                             val = slider.slider("option","value");
 
                           if ( val != slider.slider("option","min")){
-                              slider.slider("value", +val - 1 )
+                              slider.slider("value", +val - 1 );
                           }
                         })
                         .append(
@@ -276,7 +329,7 @@
                             val = slider.slider("option","value");
 
                           if ( val != slider.slider("option","max")){
-                              slider.slider("value", +val + 1 )
+                              slider.slider("value", +val + 1 );
                           }
                         })
                         .append(
@@ -328,7 +381,7 @@
         $(this).tab('show');
         tool.leaflet_map.map.invalidateSize();
         tool.leaflet_map.map.fitBounds(tool.leaflet_map.layer_locations.getBounds());
-      })
+      });
 
       EduVis.tool.load_complete(this);
 
@@ -346,7 +399,7 @@
           column_selected = column.column,
           column_selected_title = column.title;
 
-      g.margin = {top: 40, right: 10, bottom: 40, left: 45};
+      g.margin = {top: 40, right: 10, bottom: 40, left: 46};
       g.width = 400 - g.margin.left - g.margin.right;
       g.height = 450 - g.margin.top - g.margin.bottom;
       
@@ -420,7 +473,7 @@
         .style("fill", "none")
         .style("pointer-events", "all")
         .on("mouseover", function() { g.mouse_focus.style("display", null); })
-        .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
+        .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
         //.on("mousemove", mousemove);
 
       g.line = d3.svg.line()
@@ -502,7 +555,7 @@
               .html(
                 erddap_ref[parameter_option].title
               )
-          )
+          );
       });
 
       // set initial value of dropdown and set change event to update chart
@@ -512,7 +565,7 @@
           
           tool.configuration.parameter = $(this).val();
           tool.graph_update(tool.configuration.profile_id);
-        })
+        });
 
     };
 
@@ -529,8 +582,6 @@
       query = "&profile_id=" + profile_id + "&" + columns.join("!=NaN&") + "!=NaN&orderBy(%22depth%22)";
 
       return tabledap_url + dataset_url + "profile_id," +columns.join(",") + query;
-
-
     };
 
     tool.erddap_dataset_query = function(params_obj){
@@ -585,7 +636,7 @@
       
       return dataset_url;
 
-    }
+    };
 
     tool.map_setup = function(){
 
@@ -593,57 +644,14 @@
           Leaflet Map
         */
 
-        // create object to hold leaflet map, styles, and references
-
+        // create object to hold leaflet map, layer references, and profile ids
         tool.leaflet_map = {
 
           "map" : {},
-          "oceanBasemap_url" : 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
           "oceanBasemap_layer" : {},
-          "locations_query" : function(){
-
-            return "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
-          },
-          "trajectory_profiles" : "http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?cdm_data_type=trajectoryprofile",
-
           "layer_collection":[],
           "profile_ids" : {},
-          "styles" : {
-
-            "profile" : {
-              radius: 3,
-              fillColor: "#ff0000",
-              color: "#000",
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            },
-
-            "profile_selected" : {
-              radius: 7,
-              fillColor: "#ff7800",
-              color: "#000",
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            },
-            "profile_click" : {
-              radius: 8,
-              fillColor: "#00aaee",
-              color: "#000",
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            },
-            "profile_hover" : {
-              radius: 7,
-              fillColor: "#ff7800",
-              color: "#000",
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            }
-          }
+          
         };
 
         // initialize map
@@ -655,7 +663,7 @@
 
         // set esri tile service url for ocean basemap
         // set leaflet layer of esri ocean basmap
-        tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.leaflet_map.oceanBasemap_url,{ 
+        tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.mapping.oceanBasemap_url,{ 
           maxZoom: 19, 
           attribution: 'Tile Layer: &copy; Esri' 
         }).addTo(tool.leaflet_map.map);
@@ -674,10 +682,7 @@
 
        // create shortcuts for map references
       var mapObj = tool.leaflet_map,
-          map = mapObj.map,
-          geojson_query = mapObj.locations_query();
-
-          //console.log("Querying Spatial Dataset:", geojson_query);
+          map = mapObj.map;
 
       if(typeof mapObj.poly_line === "undefined"){
         mapObj.poly_line = L.polyline( [], {color: 'white'})
@@ -690,11 +695,7 @@
           .addTo(mapObj.map);
       }
       
-      // reset the poly_line 
-        //aler
-
-      $.getJSON( geojson_query, function(geodata){
-        
+      $.getJSON( tool.mapping.locations_query() , function(geodata){
         
         // console.log(geodata);
         mapObj.profile_ids = d3.map();
@@ -723,16 +724,16 @@
               "click": function(e){
                 
                 // update the profile style on click
-                //profile.setStyle(tool.leaflet_map.styles.profile_click);
+                //profile.setStyle(tool.mapping.styles.profile_click);
 
                 var profile_id = e.target.feature.properties.profile_id;
 
                 // only update the style for the selected profile
                 tool.leaflet_map.layer_locations.setStyle(function(feature) {
                   if (feature.properties.profile_id == profile_id) {
-                    return tool.leaflet_map.styles.profile_click;
+                    return tool.mapping.styles.profile_click;
                   }
-                  return tool.leaflet_map.styles.profile;
+                  return tool.mapping.styles.profile;
                 });
 
                 // update the graph and slider
@@ -770,7 +771,7 @@
             });
           },
           pointToLayer: function (location, latlng) {
-            return L.circleMarker(latlng, tool.leaflet_map.styles.profile);
+            return L.circleMarker(latlng, tool.mapping.styles.profile);
           }
         });
 
@@ -794,11 +795,11 @@
 
       }); // end get json
  
-    }
+    };
 
     tool.init_graph = function(pid){
 
-       //profile.setStyle(tool.leaflet_map.styles.profile_click);
+       //profile.setStyle(tool.mapping.styles.profile_click);
       var profile_id = pid,
           lat, lng;
 
@@ -808,16 +809,16 @@
           lng = d3.round(feature.geometry.coordinates[0],4);
           lat = d3.round(feature.geometry.coordinates[1],4);
           
-          return tool.leaflet_map.styles.profile_click;
+          return tool.mapping.styles.profile_click;
         }
-        return tool.leaflet_map.styles.profile;
+        return tool.mapping.styles.profile;
       });
 
       tool.graph_update(profile_id, lat, lng);
 
       tool.slider_update(profile_id);
 
-    }
+    };
 
     tool.graph_update = function(pid, lat, lng){
 
@@ -829,7 +830,7 @@
 
         console.log("error", error, data);
 
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify(data));
 
         // var erddap_meta = tool.settings.erddap_parameter_metadata,
         //     //column_date = erddap_meta.time.column,
@@ -876,13 +877,13 @@
 
         g.subtitle.text(
           " Profile: "+ pid 
-        )
+        );
         //+ " Lat: " + lat + " Long:" + lng
 
         g.xlabel.text(
           column_selected_title + 
           (erddap_ref[config.parameter].units !== "" ? " (" + erddap_ref[config.parameter].units + ")" : "")
-        )
+        );
 
         // // update x and y axis 
         d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
@@ -905,7 +906,7 @@
         g.mouse_focus.select("text").text(d3.round(d[column_depth], 1) + " m - " + d3.round(d[column_selected], 2))
           .attr("transform", "translate(" + (mouseX > chartMiddle ? -90 : 0) + "," + 0 + ")");
 
-        })
+        });
 
         //console.log("GRAPH UPDATE");
 
@@ -949,9 +950,9 @@
             //   if (feature.properties.profile_id == profile_id) {
             //   //  lng = d3.round(feature.geometry.coordinates[0],4);
             //   //   lat = d3.round(feature.geometry.coordinates[1],4);           
-            //     return tool.leaflet_map.styles.profile_click;
+            //     return tool.mapping.styles.profile_click;
             //   }
-            //   return tool.leaflet_map.styles.profile_selected;
+            //   return tool.mapping.styles.profile_selected;
             // });
             
             // lookup up slider value in map, get associated profile id
@@ -962,9 +963,9 @@
           
             tool.leaflet_map.layer_locations.setStyle(function(feature) {
               if (feature.properties.profile_id == profile_id) {
-                return tool.leaflet_map.styles.profile_selected;
+                return tool.mapping.styles.profile_selected;
               }
-              return tool.leaflet_map.styles.profile;       
+              return tool.mapping.styles.profile;       
             });
 
           },
@@ -975,7 +976,7 @@
             // lng = d3.round(profile.feature.geometry.coordinates[0],4),
             // lat = d3.round(profile.feature.geometry.coordinates[1],4);
             
-            //profile.setStyle(tool.leaflet_map.styles.profile_click);
+            //profile.setStyle(tool.mapping.styles.profile_click);
             var profile_id = tool.sliderKeys[ui.value],
                 lat, lng;
 
@@ -989,9 +990,9 @@
 
                 tool.leaflet_map.map.panTo([lat,lng]);
                 
-                return tool.leaflet_map.styles.profile_click;
+                return tool.mapping.styles.profile_click;
               }
-              return tool.leaflet_map.styles.profile;
+              return tool.mapping.styles.profile;
             });
 
             tool.graph_update(profile_id, lat, lng);
@@ -1002,8 +1003,6 @@
     };
 
     tool.config_dateRange_slider = function(date_start, date_end, range_start, range_end){
-
-     
         
       $("#ui-config-dateRange-slider").remove();
 
@@ -1018,12 +1017,12 @@
             date_format = d3.time.format("%Y-%m-%d");
 
         var iso_format = d3.time.format.iso.parse,
-            date_format = d3.time.format("%Y-%m-%d"),
+            
             start = date_format.parse(date_start),
             end = date_format.parse(date_end);
 
         var range_date_start = range_start || date_start,
-           range_date_end = range_end || date_end;
+            range_date_end = range_end || date_end;
 
         var x = d3.time.scale.utc()
             .range([0, width])
@@ -1052,8 +1051,8 @@
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         var tick_interpolate = d3.interpolate(start, end);
-        var dd = [0, .25, .5, .75, 1].map(function (a) {
-            return iso_format(tick_interpolate(a))
+        var dd = [0, 0.25, 0.5, 0.75, 1].map(function (a) {
+            return iso_format(tick_interpolate(a));
         });
 
         svg.append("g")
@@ -1095,7 +1094,7 @@
             svg.classed("selecting", !d3.event.target.empty());
         }
 
-    }
+    };
 
     tool.slider_update = function(profile_id){
 
@@ -1121,13 +1120,17 @@
     tool.init_controls = function(target_div){
 
       var iso_format = d3.time.format.iso.parse,
-          date_format = d3.time.format("%Y-%m-%d");
-
-      // create UI elements
-      tool.controls = {};
-
-      var erddap_ref = tool.settings.erddap_parameter_metadata,
+        date_format = d3.time.format("%Y-%m-%d"),
+        slider = tool.controls.slider;
         
+        slider.date_start = tool.configuration.date_start;
+        slider.date_end = tool.configuration.date_end;
+
+        slider.date_range_start = tool.configuration.date_start;
+        slider.date_range_end = tool.configuration.date_end;
+
+        var erddap_ref = tool.settings.erddap_parameter_metadata,
+      
         dropdown_deployment = $("<div />")
           .append(
             $("<h2 />")
@@ -1149,6 +1152,7 @@
               .html("Deployment Dataset")
           )
           .append(
+
             tool.controls.config_dataset_id = $("<select />")
               .attr("id","config-dataset_id-select")
               .append("<option>...loading...</option>")
@@ -1177,13 +1181,25 @@
                     }
                   });
 
+                  slider.date_start = date_format(date_start);
+                  slider.date_end = date_format(date_end);
+                  slider.date_range_start = date_format(date_start);
+                  slider.date_range_end = date_format(date_end);
+
                   // now set the slider to the full range of the requested dataset
                   // if its the config dataset load the specific start and end dates
                   if(tool.configuration.dataset_id == val){
-                    tool.config_dateRange_slider(date_format(date_start), date_format(date_end), tool.configuration.date_start, tool.configuration.date_end);  
+
+                    slider.date_range_start = tool.configuration.date_start;
+                    slider.date_range_end = tool.configuration.date_end;
+                    
+                    tool.config_dateRange_slider( slider.date_start, slider.date_end, slider.date_range_start, slider.date_range_end);
+
                   }
                   else{
-                    tool.config_dateRange_slider(date_format(date_start), date_format(date_end));
+
+                    tool.config_dateRange_slider( slider.date_start, slider.date_end, slider.date_range_start, slider.date_range_end );
+
                   }
 
                   // set the date picker start and end range restrictions
@@ -1204,7 +1220,21 @@
           )
           .append(
             $("<div />")
-              .attr("id","ui-config-map")
+              .attr("id","ui-config-map-container")
+              .css({
+                "width":"400px",
+                "height":"400px",
+                "background-color":"red"
+
+              })
+              .append(
+                  $("<div />")
+                  .attr("id","ui-config-map")
+                  .css({
+                    "width":"400px",
+                    "height":"400px"
+                  })
+              )
           )
           .append(
             $("<div />")
@@ -1232,7 +1262,7 @@
                           "changeYear": true,
                           //"showButtonPanel": true,
                           "onSelect" : function(d,i){
-                            tool.config_dateRange_slider(d,$("#config-date_end-input").val());
+                            tool.config_dateRange_slider(slider.date_start, slider.date_end, d, $("#config-date_end-input").val());
                           },
                           "defaultDate": tool.configuration.date_start
                       })
@@ -1261,7 +1291,8 @@
                             "changeYear": true,
                             //"showButtonPanel": true,
                             "onSelect" : function(d,i){
-                                tool.config_dateRange_slider($("#config-date_start-input").val(),d);
+
+                                tool.config_dateRange_slider(slider.date_start, slider.date_end, $("#config-date_start-input").val(), d);
                             },
                             "defaultDate": tool.configuration.date_start
 
@@ -1296,6 +1327,7 @@
           )
           .appendTo("#vistool-controls");
 
+        // only request datasets with institution of OOI
         $.getJSON('http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.json?searchFor=&cdm_data_type=trajectoryprofile&protocol=tabledap&institution=ooi', {}, function(json, textStatus) {
               
             var ds = json, datasets = [],
@@ -1339,6 +1371,24 @@
               .val(tool.configuration.dataset_id);
 
             tool.controls.config_dataset_id.trigger("change");
+
+            
+            // add the leaflet map tool control
+            tool.controls.leaflet_map = {
+              "map" : L.map('ui-config-map', {
+                "center": [38.5,-78.2],
+                "zoom": 3
+                // ,noWrap : true
+              })
+            };
+
+            // add the ocean basemap to the map tool control
+            tool.controls.leaflet_map.oceanBasemap_layer = new L.TileLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",{ 
+              maxZoom: 19, 
+              attribution: 'Tile Layer: &copy; Esri' 
+            }).addTo(tool.controls.leaflet_map.map);
+
+            //tool.map_update();
 
         });
     };
