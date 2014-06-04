@@ -1834,11 +1834,12 @@
 
       var network, station;
 
-      console.log("Station Object", station_obj);
+      console.log("Station Object", "type: " + typeof(station_obj.properties), station_obj);
 
-      if(typeof(station_obj.properties)=="object"){
-        network = station_obj.properties.network;
-        station = station_obj.properties.name;
+
+      if(typeof(station_obj.feature.properties)==="object"){
+        network = station_obj.feature.properties.network;
+        station = station_obj.feature.properties.name;
       }
       else{
         network = station_obj.network;
