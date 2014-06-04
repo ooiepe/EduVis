@@ -1,13 +1,13 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 6/3/2014
+ * Revised 6/4/2014
  * Written by Michael Mills and Sage Lichtenwalner
  */
 (function (eduVis) {
     "use strict";
     var tool = {
         "name" : "Double_Time_Series",
-        "version" : "0.3.2",
+        "version" : "0.3.3",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
           {
@@ -1637,7 +1637,7 @@
 
         //var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + tool.controls.stationSearch();
 
-        var search_stations_query = "http://epedata.oceanobservatories.org/timeseries/" + tool.controls.stationSearch();
+        var search_stations_query = "http://epedata.oceanobservatories.org/" + tool.controls.stationSearch();
 
 
         $.getJSON( search_stations_query, function(geodata){
@@ -2398,7 +2398,6 @@
         $("#btn-apply")
           .attr('class', 'btn btn-medium')
           .html('Apply');
-
           // <i class="icon-exclamation-sign"></i>'
         
       }
@@ -2409,7 +2408,7 @@
           .html('Apply');
            //<i class="icon-ok-sign"></i>'
 
-          $("#apply-check").show().fadeOut(3000);
+        $("#apply-check").show().fadeOut(3000);
 
       }
     };
