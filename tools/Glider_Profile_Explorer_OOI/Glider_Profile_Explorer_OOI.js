@@ -1248,23 +1248,21 @@
                       .html("Start Date")
                   )
                   .append(
-                    
-                    // var controls.data_start-input = 
+
                     $("<input />")
                       .attr("id","config-date_start-input")
                       .addClass('datepicker')
                       .datepicker({
-                          "dateFormat": "yy-mm-dd",
-                          //"minDate": tool.configuration.date_start,
-                          //"maxDate": tool.configuration.date_end,
-                          //"showOn": "button",
-                          "changeMonth": true,
-                          "changeYear": true,
-                          //"showButtonPanel": true,
-                          "onSelect" : function(d,i){
-                            tool.config_dateRange_slider(slider.date_start, slider.date_end, d, $("#config-date_end-input").val());
-                          },
-                          "defaultDate": tool.configuration.date_start
+                        "dateFormat": "yy-mm-dd",
+                        "changeMonth": true,
+                        "changeYear": true,
+                        "onClose" : function(d,i){
+                          var el_end_date = $("#config-date_end-input");
+                          el_end_date.datepicker("option","minDate", d);
+
+                          tool.config_dateRange_slider(slider.date_start, slider.date_end, d, el_end_date.val());
+                        },
+                        "defaultDate": tool.configuration.date_start
                       })
                       .val(tool.configuration.date_start)
                   )
@@ -1279,30 +1277,25 @@
                       .html("End Date")
                   )
                   .append(
+
                     $("<input />")
                       .attr("id","config-date_end-input")
                       .addClass('datepicker')
                       .datepicker({
-                            "dateFormat": "yy-mm-dd",
-                            //"minDate": tool.configuration.date_start,
-                            //"maxDate": tool.configuration.date_end,
-                            //"showOn": "button",
-                            "changeMonth": true,
-                            "changeYear": true,
-                            //"showButtonPanel": true,
-                            "onSelect" : function(d,i){
-
-                                tool.config_dateRange_slider(slider.date_start, slider.date_end, $("#config-date_start-input").val(), d);
-                            },
-                            "defaultDate": tool.configuration.date_start
-
-                        })
-                        .val(tool.configuration.date_end)
+                        "dateFormat": "yy-mm-dd",
+                        "changeMonth": true,
+                        "changeYear": true,
+                        "onClose" : function(d,i){
+                          var el_start_date = $("#config-date_start-input");
+                          el_start_date.datepicker("option", "maxDate", d);
+                          tool.config_dateRange_slider(slider.date_start, slider.date_end, el_start_date.val(), d);
+                        },
+                        "defaultDate": tool.configuration.date_start
+                      })
+                      .val(tool.configuration.date_end)
                   )
               )
-
-          )
-         
+          )        
           .append(
             $("<div />")
               .attr("id","ui-config-apply")
@@ -1371,7 +1364,6 @@
               .val(tool.configuration.dataset_id);
 
             tool.controls.config_dataset_id.trigger("change");
-
             
             // add the leaflet map tool control
             tool.controls.leaflet_map = {

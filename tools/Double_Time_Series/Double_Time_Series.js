@@ -1039,28 +1039,25 @@
                       "dateFormat": "yy-mm-dd",
                       "changeMonth": true,
                       "changeYear": true,
-                      "onSelect" : function(d,i){
-                          //console.log("datepicker changed!",d,i);
-                          //tool.configuration.date_start = d;
+                      "onClose" : function(d,i){
+                        $("#date_range_label").remove();
 
-                          $("#date_range_label").remove();
+                        if(tool.controls.verify_date_range()){
 
-                          if(tool.controls.verify_date_range()){
+                          tool.controls.apply_button_update("modified");
+                          $("#db-btn_search").removeClass("disabled");
 
-                            tool.controls.apply_button_update("modified");
-                            $("#db-btn_search").removeClass("disabled");
+                        }
+                        else{
 
-                          }
-                          else{
+                          $("#db-btn_search").addClass("disabled");
 
-                            $("#db-btn_search").addClass("disabled");
-
-                            $("<label />")
-                              .attr("id","date_range_label")
-                              .html("Please select a date range that is one year or less.")
-                              .css({"color":"red"})
-                              .insertBefore('#db-selection-search');
-                          }
+                          $("<label />")
+                            .attr("id","date_range_label")
+                            .html("Please select a date range that is one year or less.")
+                            .css({"color":"red"})
+                            .insertBefore('#db-selection-search');
+                        }
 
                       },
                       "defaultDate": tool.configuration.start_date
@@ -1089,14 +1086,9 @@
                   .addClass('datepicker')
                   .datepicker({
                       "dateFormat": "yy-mm-dd",
-                      //"showOn": "button",
                       "changeMonth": true,
                       "changeYear": true,
-                      //"showButtonPanel": true,
-                      "onSelect" : function(d,i){
-                          //console.log("datepicker changed!",d,i);
-                          //tool.configuration.date_start = d;
-                          
+                      "onClose" : function(d,i){
                           $("#date_range_label").remove();
 
                           if(tool.controls.verify_date_range()){
@@ -1116,7 +1108,6 @@
                           }
                       },
                       "defaultDate": tool.configuration.end_date
-
                   })
                   .val(tool.configuration.end_date)
                 )
