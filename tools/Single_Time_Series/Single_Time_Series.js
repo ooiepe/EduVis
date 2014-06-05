@@ -875,35 +875,25 @@
                       //"showOn": "button",
                       "changeMonth": true,
                       "changeYear": true,
-                      //"showButtonPanel": true,
-                      // "onSelect" : function(d,i){
-                      //     //console.log("datepicker changed!",d,i);
-                      //     //tool.configuration.date_start = d;
-                      //     tool.controls.apply_button_update("modified");
+                      "onClose" : function(d,i){
+                        $("#date_range_label").remove();
 
-                      // },
-                       "onSelect" : function(d,i){
-                          //console.log("datepicker changed!",d,i);
-                          //tool.configuration.date_start = d;
+                        if(tool.controls.verify_date_range()){
 
-                          $("#date_range_label").remove();
+                          tool.controls.apply_button_update("modified");
+                          $("#db-btn_search").removeClass("disabled");
 
-                          if(tool.controls.verify_date_range()){
+                        }
+                        else{
 
-                            tool.controls.apply_button_update("modified");
-                            $("#db-btn_search").removeClass("disabled");
+                          $("#db-btn_search").addClass("disabled");
 
-                          }
-                          else{
-
-                            $("#db-btn_search").addClass("disabled");
-
-                            $("<label />")
-                              .attr("id","date_range_label")
-                              .html("Please select a date range that is one year or less.")
-                              .css({"color":"red"})
-                              .insertBefore('#db-selection-search')
-                          }
+                          $("<label />")
+                            .attr("id","date_range_label")
+                            .html("Please select a date range that is one year or less.")
+                            .css({"color":"red"})
+                            .insertBefore('#db-selection-search')
+                        }
 
                       },
                       "defaultDate": tool.configuration.start_date
@@ -932,16 +922,9 @@
                   .addClass('datepicker')
                   .datepicker({
                       "dateFormat": "yy-mm-dd",
-                      //"showOn": "button",
                       "changeMonth": true,
                       "changeYear": true,
-                      //"showButtonPanel": true,
-                      // "onSelect" : function(d,i){
-                      //     //console.log("datepicker changed!",d,i);
-                      //     //tool.configuration.date_start = d;
-                      //     tool.controls.apply_button_update("modified");
-                      // },
-                      "onSelect" : function(d,i){
+                      "onClose" : function(d,i){
                           //console.log("datepicker changed!",d,i);
                           //tool.configuration.date_start = d;
 
