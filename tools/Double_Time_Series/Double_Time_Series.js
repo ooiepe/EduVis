@@ -1184,7 +1184,7 @@
             )
           )
           .append(
-            $("<button/>", {
+            $("<div/>", {
                 "id":"db-btn_search",
             })
             .addClass("btn")
