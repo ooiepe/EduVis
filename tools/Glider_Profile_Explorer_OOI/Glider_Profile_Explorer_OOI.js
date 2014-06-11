@@ -162,8 +162,6 @@
               fillOpacity: 0.8
             }
           },
-        
-        "trajectory_profiles" : "http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?cdm_data_type=trajectoryprofile",
         "locations_query" : function(){
 
             return "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
@@ -571,8 +569,6 @@
 
     tool.erddap_request_profile = function(dataset_id, profile_id, columns_selected){
     
-      // need to implement start and end date constraints
-
       // profile_id,time,depth,salinity,temperature,conductivity,density
 
       var tabledap_url = "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/",
@@ -586,34 +582,6 @@
 
     tool.erddap_dataset_query = function(params_obj){
 
-      /* example object
-            var params_obj = {
-              "minLon":"20",
-              "maxLon":"30",
-              "minLat":"40",
-              "minTime":"50"
-            };
-      */
-
-      // http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?page=1&itemsPerPage=1000&searchFor=&protocol=%28ANY%29&cdm_data_type=trajectoryprofile&institution=%28ANY%29&ioos_category=%28ANY%29&keywords=%28ANY%29&long_name=%28ANY%29&standard_name=%28ANY%29&variableName=%28ANY%29&maxLat=&minLon=&maxLon=&minLat=&minTime=&maxTime=
-
-      // http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?
-      // page=1
-      // itemsPerPage=1000
-      // searchFor=
-      // cdm_data_type=trajectoryprofile
-      // institution=%28ANY%29
-      // keywords=%28ANY%29&
-      // long_name=%28ANY%29&
-      // standard_name=%28ANY%29&
-      // variableName=%28ANY%29&
-      // maxLat
-      // minLon
-      // maxLon
-      // minLat
-      // minTime
-      // maxTime
-  
       var dataset_url = "http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.html?",
         query_params = {
           "cdm_data_type" : "trajectoryprofile",
@@ -894,21 +862,20 @@
 
         var chartMiddle = g.width / 2,
             mouseY = d3.mouse(this)[1],
-            mouseX = d3.mouse(this)[0],
             y0 = g.y.invert(mouseY),
             i = bisectData(data, y0, 1),
             d0 = data[i - 1],
             d1 = data[i],
-            d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0;
+            d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0,
+            chartMidPoint = (g.x.domain()[1] + g.x.domain()[0])/2,
+            xPosition = d[column_selected] > chartMidPoint ? -90 : 0;
           
         g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
 
         g.mouse_focus.select("text").text(d3.round(d[column_depth], 1) + " m - " + d3.round(d[column_selected], 2))
-          .attr("transform", "translate(" + (mouseX > chartMiddle ? -90 : 0) + "," + 0 + ")");
+          .attr("transform", "translate(" + xPosition + "," + 0 + ")");
 
         });
-
-        //console.log("GRAPH UPDATE");
 
       });
 
@@ -1156,9 +1123,11 @@
             tool.controls.config_dataset_id = $("<select />")
               .attr("id","config-dataset_id-select")
               .append("<option>...loading...</option>")
-              .on("change", function(){
+              .on("change", function(evt){
 
-                var val = $(this).val();
+                  console.log("this config_dataset_id change event", this);
+
+                  var val = evt.target.value;
                 
                 $.getJSON("http://tds-dev.marine.rutgers.edu:8082/erddap/info/"+ val + "/index.json", {}, function(json){
 
@@ -1213,7 +1182,16 @@
                     "maxDate":date_format(date_end)
                   });
 
-                });
+
+                })
+                .done(function (resp) {
+                  console.log("done", resp);
+                    
+                })
+                .fail(function (resp) {
+                
+                  console.log("fail", resp);
+                })
 
             })
 
@@ -1320,17 +1298,29 @@
           )
           .appendTo("#vistool-controls");
 
+
+        //console.log("request advanced search for cdm data", this);  
+
         // only request datasets with institution of OOI
-        $.getJSON('http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.json?searchFor=&cdm_data_type=trajectoryprofile&protocol=tabledap&institution=ooi', {}, function(json, textStatus) {
-              
+        $.getJSON('http://tds-dev.marine.rutgers.edu:8082/erddap/search/advanced.json', 
+          {
+            "page":"1",
+            "itemsPerPage":"1000",
+            "searchFor":"",
+            "cdm_data_type":"trajectoryprofile",
+            "protocol":"tabledap",
+            "institution": "ooi",
+
+          }, function(json) {
+            
             var ds = json, datasets = [],
-            vals_we_want = ["Dataset ID", "Title"],
-            ci = 0,
-            clen = ds.table.columnNames.length;
+              vals_we_want = ["Dataset ID", "Title"],
+              ci = 0,
+              clen = ds.table.columnNames.length;
 
             function getColumnKey(columnValue) {
               for (ci = 0; ci < clen; ci++) {
-                  if (ds.table.columnNames[ci] == columnValue) return ci;
+                if (ds.table.columnNames[ci] == columnValue) return ci;
               }
               return -1;
             }
@@ -1382,7 +1372,14 @@
 
             //tool.map_update();
 
+        })
+        .done(function (resp) {
+          console.log("done", resp);
+        })
+        .fail(function (resp) {
+          console.log("request failed", resp);
         });
+    
     };
 
     // extend base object with tool..
