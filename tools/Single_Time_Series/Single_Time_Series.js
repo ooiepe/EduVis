@@ -208,6 +208,7 @@
       g.height = 400 - g.margin.top - g.margin.bottom;
       
       g.parseDate = d3.time.format.iso.parse;
+      g.formatDate = d3.time.format("%Y-%m-%d");
       
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
@@ -505,21 +506,25 @@
 
           //mouse move
           g.mousemover.on("mousemove", function(){
-            var chartMiddle = g.width / 2,
-                mouseX = d3.mouse(this)[0],
+
+            var mouseX = d3.mouse(this)[0],
                 x0 = g.x.invert(mouseX),
                 i = bisectDate(data, x0, 1),
                 d0 = data[i - 1],
                 d1 = data[i],
-                d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-            g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
-            g.mouse_focus.select("text").text(d.data + " - " + date_format(g.parseDate(d.date)))
-              .attr("transform", "translate(" + (mouseX > chartMiddle ? -110 : 0) + "," + 0 + ")");
+                d = x0 - d0.date > d1.date - x0 ? d1 : d0,
+                xMax = g.x(g.x.domain()[1]),
+                xPosition = g.x(x0)>(xMax/2) ? -110:0;
 
-          })
+            g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
+            g.mouse_focus.select("text").text(g.formatDate(d.date) + " - " + d3.round(d.data,4))
+              .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+
+          });
+
         }
-      }
-      
+      };
+
       // remove loading image
       $(".loading-icon").remove();
 
