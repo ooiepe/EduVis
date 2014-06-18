@@ -204,20 +204,28 @@
      * Called by init_tool
      */
     tool.setup = function( _target ){
-      var g = this.graph;
+      var g = this.graph,
+      bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
       g.margin = {top: 40, right: 60, bottom: 40, left: 60};
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
       
       g.parseDate = d3.time.format.iso.parse;
+      g.formatDate = d3.time.format("%Y-%m-%d");
       
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
+
+      g.x1 = d3.time.scale.utc().range([0, g.width]);
+      g.x2 = d3.time.scale.utc().range([0, g.width]);
+
+      g.y1 = d3.scale.linear().range([g.height, 0]);
+      g.y2 = d3.scale.linear().range([g.height, 0]);
       
       g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(12).tickSize(5,0,0);
-      g.yAxis1 = d3.svg.axis().scale(g.y).orient("left");//.tickSize(0,0,0);
-      g.yAxis2 = d3.svg.axis().scale(g.y).orient("right");//.tickSize(0,0,0);
+      g.yAxis1 = d3.svg.axis().scale(g.y1).orient("left");//.tickSize(0,0,0);
+      g.yAxis2 = d3.svg.axis().scale(g.y2).orient("right");//.tickSize(0,0,0);
       
       g.svg = d3.select("#"+_target).append("svg")
         .attr("id",_target+"_svggraph")
@@ -252,14 +260,14 @@
         .attr("transform","translate(" +g.width +",0)")
         .call(g.yAxis2);
 
-      g.focus.append("path")
+      g.linePath1 = g.focus.append("path")
         .attr("class", "line1")
         .attr("d", g.line1)
         .style("fill","none")
         .style("stroke",tool.configuration.line_color1)
         .style("stroke-width","2px");
 
-      g.focus.append("path")
+      g.linePath2 = g.focus.append("path")
         .attr("class", "line2")
         .attr("d", g.line2)
         .style("fill","none")
@@ -268,13 +276,51 @@
 
       g.line1 = d3.svg.line()
         .interpolate("monotone")
-        .x(function(d) { return g.x(d.date); })
-        .y(function(d) { return g.y(d.data); });
+        .x(function(d) { return g.x1(d.date); })
+        .y(function(d) { return g.y1(d.data); });
 
       g.line2 = d3.svg.line()
         .interpolate("monotone")
-        .x(function(d) { return g.x(d.date); })
-        .y(function(d) { return g.y(d.data); });
+        .x(function(d) { return g.x2(d.date); })
+        .y(function(d) { return g.y2(d.data); });
+
+      g.mouse_focus1 = g.focus.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+      g.mouse_focus1.append("circle")
+        .attr("r", 4.5);
+
+      g.mouse_focus1.append("text")
+        .attr("x", 9)
+        .attr("dy", ".35em");
+
+      g.mouse_focus2 = g.focus.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+      g.mouse_focus2.append("circle")
+        .attr("r", 4.5);
+
+      g.mouse_focus2.append("text")
+        .attr("x", 9)
+        .attr("dy", ".35em");
+
+      g.mousemover = g.focus.append("rect")
+        .attr("class", "overlay")
+        .attr("width", g.width)
+        .attr("height", g.height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function() { 
+          g.mouse_focus1.style("display", null);
+          g.mouse_focus2.style("display", null);
+        })
+        .on("mouseout", function() { 
+          g.mouse_focus1.style("display", "none");
+          g.mouse_focus2.style("display", "none");
+        });
+      
 
       // g.title = g.svg.append("text")
       //   .attr("class", "gtitle")
@@ -534,30 +580,38 @@
           // todo: parse out date for chart domain..
 
           var g = this.graph,
-              cols = d3.entries(data[0]);
+              cols = d3.entries(data[0]),
+              bisectDate = d3.bisector(function(d) { return d.date; }).left,
+              line = g["line" + variable],
+              linePath = g["linePath" + variable],
+              x = g["x" + variable],
+              y = g["y" + variable];
 
           data.forEach(function(d) {
             d.date = g.parseDate(d[cols[0].key]);
             d.data = +d[cols[1].key];
           }); 
 
-          // Update X domain to use date range from the tool when in archive mode, otherwise use the range of the returned data.
+          g["ts_data" + variable] = data;
+
+          // Update X domains to use date range from the tool when in archive mode, otherwise use the range of the returned data.
           if(this.configuration.date_type == "realtime"){
             g.x.domain(d3.extent(data, (function(d) { return d.date; })));
+            x.domain(d3.extent(data, (function(d) { return d.date; })));
           } else {
             g.x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
+            x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
           }
-          // Updte the Y domain to use the range of the returned data.
+          // Update the Y domains to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
-          
-          //console.log("path", "path.line"+variable);
+          y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
 
-          g.svg.selectAll("path.line"+variable)
+          linePath
             .data([data])
             .transition()
             .duration(1000)
             .ease("linear")
-            .attr("d", g["line" + variable]);
+            .attr("d", line);
           
           g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + this.configuration["parameter" + variable]);
 
@@ -582,6 +636,39 @@
             //.style("shape-rendering","crispEdges")
           d3.selectAll('.y.axis line var'+variable)
             .style("stroke-opacity",".4");
+
+          //update the mouseover values
+          g.mousemover.on("mousemove", function(){
+
+            var mouseX = d3.mouse(this)[0],
+                data1 = tool.graph["ts_data1"],
+                data2 = tool.graph["ts_data2"],
+                x1 = g.x1.invert(mouseX),
+                x2 = g.x2.invert(mouseX),
+
+                i1 = bisectDate(data1, x1,1),
+                i2 = bisectDate(data2, x2,1),
+
+                d10 = data1[i1 - 1],
+                d11 = data1[i1],
+                d1 = x1 - d10.date > d11.date - x1 ? d11 : d10,
+
+                d20 = data2[i2 - 1],
+                d21 = data2[i2],
+                d2 = x2 - d20.date > d21.date - x2 ? d21 : d20,
+
+                xMax = g.x(g.x.domain()[1]),
+                xPosition = g.x(x1)>(xMax/2) ? -110:0;
+
+             g.mouse_focus1.attr("transform", "translate(" + g.x1(d1.date) + "," + g.y1(d1.data) + ")");
+             g.mouse_focus1.select("text").text(g.formatDate(d1.date) + " - " + d3.round(d1.data,4))
+               .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+
+             g.mouse_focus2.attr("transform", "translate(" + g.x2(d2.date) + "," + g.y2(d2.data) + ")");
+             g.mouse_focus2.select("text").text(g.formatDate(d2.date) + " - " + d3.round(d2.data,4))
+               .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+
+          });
 
         }
       }
