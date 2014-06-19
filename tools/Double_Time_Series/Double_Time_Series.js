@@ -649,24 +649,32 @@
                 i1 = bisectDate(data1, x1,1),
                 i2 = bisectDate(data2, x2,1),
 
-                d10 = data1[i1 - 1],
-                d11 = data1[i1],
+                d10 = data1[i1 - 1] || 0,
+                d11 = data1[i1] || 0,
                 d1 = x1 - d10.date > d11.date - x1 ? d11 : d10,
 
-                d20 = data2[i2 - 1],
-                d21 = data2[i2],
+                d20 = data2[i2 - 1] || 0,
+                d21 = data2[i2] || 0,
                 d2 = x2 - d20.date > d21.date - x2 ? d21 : d20,
 
                 xMax = g.x(g.x.domain()[1]),
                 xPosition = g.x(x1)>(xMax/2) ? -110:0;
 
-             g.mouse_focus1.attr("transform", "translate(" + g.x1(d1.date) + "," + g.y1(d1.data) + ")");
-             g.mouse_focus1.select("text").text(g.formatDate(d1.date) + " - " + d3.round(d1.data,4))
-               .attr("transform", "translate(" + xPosition + "," + 0 + ")");
-
-             g.mouse_focus2.attr("transform", "translate(" + g.x2(d2.date) + "," + g.y2(d2.data) + ")");
-             g.mouse_focus2.select("text").text(g.formatDate(d2.date) + " - " + d3.round(d2.data,4))
-               .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+            if(typeof d1 !== undefined){
+              g.mouse_focus1
+                .attr("transform", "translate(" + g.x1(d1.date) + "," + g.y1(d1.data) + ")");
+              g.mouse_focus1.select("text")
+                .text(g.formatDate(d1.date) + " - " + d3.round(d1.data,4))
+                .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+            }
+            
+            if(typeof d2 !== undefined){
+              g.mouse_focus2
+                .attr("transform", "translate(" + g.x2(d2.date) + "," + g.y2(d2.data) + ")");
+              g.mouse_focus2.select("text")
+                .text(g.formatDate(d2.date) + " - " + d3.round(d2.data,4))
+                .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+            }
 
           });
 
