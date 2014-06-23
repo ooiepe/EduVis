@@ -7,6 +7,15 @@
   <link type="text/css" rel="stylesheet" href="resources/css/overrides.css" media="all" />
 </head>
 <body>
+<div>
+  <select id="tool_name">
+    <option value="Single_Time_Series">Single_Time_Series</option>
+    <option value="Single_Time_Series_Map">Single_Time_Series_Map</option>
+    <option value="Double_Time_Series">Double_Time_Series</option>
+    <option value="Glider_Profile_Explorer_OOI">Glider_Profile_Explorer_OOI</option>
+  </select>
+  <div id="tool_load" class="btn">load tool</div>
+</div>
 
 <div style="width:950px;margin:0 auto;">
 
@@ -16,8 +25,8 @@
     <!-- content -->
 
       <!-- tabs -->
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#ev-instance-configure" data-toggle="tab">Customization</a></li>
+      <ul class="nav nav-tabs" id="config-tabs">
+        <li><a class="active" href="#ev-instance-configure" data-toggle="tab">Customization</a></li>
         <li><a href="#ev-instance-preview" data-toggle="tab">Preview</a></li>
         <li><a href="#ev-instance-configuration" data-toggle="tab">Configuration</a></li>
       </ul>
@@ -64,10 +73,12 @@
 <script src="EduVis.js"></script>
 <script type="text/javascript">
 
-  // Last Update: 3/27/2014
+  // Last Update: 5/12/2014
 
   // Change the tool name below to the tool you would like to view
-  var __CFG_Tool_Name__ = "Single_Time_Series";
+  //var __CFG_Tool_Name__ = "Single_Time_Series_Map"; 
+
+  var __CFG_Tool_Name__ = "Single_Time_Series";////Glider_Profile_Explorer_OOI
 
   //considerations
   var _thumbnail_id = 0;
@@ -75,10 +86,11 @@
   function EduVis_extract(){
 
     // pull the configuration from the default tool instance
-    var config = EduVis.tool.instances[__CFG_Tool_Name__]["default"].configuration;
+    var config = EduVis.tool.instances[$("#tool_name").val()]["default"].configuration;
       
     // update the configuration value of the textarea
-    $("#config-view").val(JSON.stringify(config));
+    // use undefined, 2 (indentation level) for pretty print
+    $("#config-view").val(JSON.stringify(config, null, 2));
   
     return true;
   }
@@ -97,14 +109,19 @@
     //  'http://ooi.dev/epe/epedev/threedotone/sites/default/files/evtools/EduVis/resources/' // resources
     // )
 
-    EduVis.tool.load(
-      { 
-        "name" : __CFG_Tool_Name__, 
-        "tool_container_div": "vistool",
-        //"instance_config": "",
-        "isEdit" : true
-      }
-    );
+    $("#tool_load")
+      .on("click", function(){
+
+        EduVis.tool.load(
+          { 
+            "name" : $("#tool_name").val(), 
+            "tool_container_div": "vistool",
+            //"instance_config": "",
+            "isEdit" : true
+          }
+        );
+
+      })
 
   }());
   
