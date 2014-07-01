@@ -963,18 +963,18 @@
 
       console.log("Station Object", "type: " + typeof(station_obj.properties), station_obj);
 
+      if(typeof(station_obj.feature)==="object"){
 
-      if(typeof(station_obj.feature.properties)==="object"){
-        network = station_obj.feature.properties.network;
-        station = station_obj.feature.properties.name;
+        if(typeof(station_obj.feature.properties)==="object"){
+          network = station_obj.feature.properties.network;
+          station = station_obj.feature.properties.name;
+        }
       }
       else{
         network = station_obj.network;
-        station = station_obj.name;
+        station = station_obj.station;
       }
-
-        //console.log("station", station);
-
+      
         var station_dom_id = "station-" + network + "-"+station;
 
         if( $("#" + station_dom_id).length > 0){
@@ -993,10 +993,7 @@
             // )
 
             // coordinates -- + "(" + station.geometry.coordinates[0] + ", " + station.geometry.coordinates[1] + ")"
-        
             // request station from data-services
-
-           // $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
 
             $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
                 // get reference to drop down
@@ -1022,17 +1019,15 @@
                     ]
                   }
 
-
                 */
-
 
                 // move to function to add to station dropdown.. also add to object to track additions / subtractions
                 var dom_station_window = $("<div></div>")
-                    .attr({
-                        "id" : station_dom_id
-                    });
+                  .attr({
+                      "id" : station_dom_id
+                  });
 
-                $.each(data.parameters, function(parameters, param){
+                  $.each(data.parameters, function(parameters, param){
                     
                     //console.log("param",param);
 
@@ -1210,133 +1205,168 @@
 
         $.each(station, function( station, station_obj){
 
+          console.log(station, station_obj, network);
+
           if(typeof station_obj.custom_name === "undefined"){
             station_obj.custom_name = network + " " + station;
-          }          
+            
+          } 
+          station_obj.network = network;
+          station_obj.station = station;         
 
           var cart_network_station = $("<div />")
-          .addClass("cart-station")
-          .html('<div class="station-name" >' + station_obj.custom_name +"</div>")
-          .click(function(){
-              control.stationWindowUpdate_fromCart(network,station);
-          })
-          .hover(
-            function() {
-              var sta = $(this);
-              //console.log("sta****", sta);
-
-              // is there already a span element? if so, remove it
-              if(sta.parent().has( "span" ).length > 0) $(".cart-station-tools").remove();
-                  
-              var tmpSpan = $("<span />")
-                //.html("&nbsp;&nbsp;")
-                .css({
-                    "position":"relative",
-                    "top":"0",
-                    "float":"right",
-                    "margin":"2px"
-                    //"border":"1px solid red",
+            .addClass("cart-station")
+            .append(
+              $("<div />")
+                .addClass("station-name-edit")
+                .css("display","none")
+            )
+            .append(
+              $("<div />")
+                .addClass("station-name")
+                .html(station_obj.custom_name)
+                .click(function(){
+                    control.stationWindowUpdate(station_obj);
                 })
-                //.addClass("cart-station-tools")
-                .append(
-                  $("<span />")
-                    .css("float","left")
-                    .attr("title","Edit Name for " + station)
-                    .addClass("cart-station-tools ui-icon ui-icon-pencil")
+                .hover(
+                  // this hover element is the edit and remove button
+                  function() {
+                    var sta = $(this);
+                    sta.css("text-decoration","underline");
 
-                    .on("click", function(evt_station_edit_name_click){
+                    // is there already a span element? if so, remove it
+                    if(sta.parent().has( "span" ).length > 0){
+                      $(".cart-station-tools").remove();
+                      console.log("removed!")
+                    }
+                        
+                    var tmpSpan = $("<span />")
+                      //.html("&nbsp;&nbsp;")
+                      .css({
+                          "position":"relative",
+                          "top":"0",
+                          "float":"right",
+                          "margin":"2px"
+                          //"border":"1px solid red",
+                      })
+                      //.addClass("cart-station-tools")
+                      .append(
+                        $("<span />")
+                          .css("float","left")
+                          .attr("title","Edit Name for " + station)
+                          .addClass("cart-station-tools ui-icon ui-icon-pencil")
 
-                      var station_input; 
-                      $(tmpSpan).remove();
-                      // load input box and cancel button
-                      var current_name = sta.find(".station-name").html();
+                          .on("click", function(evt_station_edit_name_click){
 
-                      //console.log("station remove click");
-                      sta.find(".station-name")
-                        .empty()
-                        .append(
+                            var station_input; 
+                            $(tmpSpan).remove();
 
-                          $("<div />")
-                            .append(
-                              station_input = $("<input />")
-                                .attr("type","text")
-                                .addClass("input input-medium")
-                                .val(station_obj.custom_name)
-                                .on("click", function(e){e.stopImmediatePropagation();})
-                            )
-                            .append(
-                              $("<span />")
-                              .css("float","right")
-                                .addClass("cart-station-tools ui-icon ui-icon-circle-close")
-                                .on("click",function(evt){
-                                  sta.find(".station-name").html(station_obj.custom_name);
+                             // load input box and cancel button
+                            var current_name = sta.find(".station-name").html();
 
-                                })
-                            )
-                            .append(
-                              $("<span />")
-                              .css("float","right")
-                                .addClass("cart-station-tools ui-icon ui-icon-circle-check")
-                                .on("click",function(evt){
+                            //console.log("station remove click");
+                            sta.parent().find(".station-name")
+                              .css("display","none");
 
-                                  station_obj.custom_name = station_input.val();
-                                  sta.find(".station-name").html(station_obj.custom_name);
+                            sta.parent().find(".station-name-edit")
+                              .css("display","block")
+                              .empty()
+                              .append(
 
-                                })
-                            )
-                            .hover(function(hover_evt){
-                              hover_evt.stopImmediatePropagation();
-                            })
+                                $("<div />")
+                                  .append(
+                                    station_input = $("<input />")
+                                      .attr("type","text")
+                                      .addClass("input input-medium")
+                                      .val(station_obj.custom_name)
+                                      .keypress(function(e){
+                                        if(e.which == 13) {
 
-                        );
+                                          station_obj.custom_name = $(this).val();
 
+                                          console.log("Station Obj.custom name", station_obj.custom_name);
 
-                      evt_station_edit_name_click.stopImmediatePropagation();
+                                          sta.parent().find(".station-name")
+                                            .html(station_obj.custom_name)
+                                            .css("display","block");
+                                          
+                                          sta.parent().find(".station-name-edit")
+                                            .css("display","none")
+                                        }
+                                      })
+                                      //.on("click", function(e){e.stopImmediatePropagation();})
+                                  )
+                                  .append(
+                                    $("<span />")
+                                    .css("float","right")
+                                      .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+                                      .on("click",function(evt){
+                                        
+                                        sta.parent().find(".station-name")
+                                          .html(station_obj.custom_name);
 
-                      //delete tool.configuration.data_cart[network][station];
+                                      })
+                                  )
+                                  .append(
+                                    $("<span />")
+                                    .css("float","right")
+                                      .addClass("cart-station-tools ui-icon ui-icon-circle-check")
+                                      .on("click",function(evt){
 
-                      //$(".cart-param-tools").remove();
+                                        station_obj.custom_name = station_input.val();
+                                        
+                                        sta.parent().find(".station-name")
+                                          .html(station_obj.custom_name)
+                                          .css("display","block");
+                                        
+                                        sta.parent().find(".station-name-edit")
+                                          .css("display","none")
 
-                      //sta.fadeOut();
+                                      })
+                                  )
+                                  .hover(function(hover_evt){
+                                    hover_evt.stopImmediatePropagation();
+                                  })
 
-                      control.apply_button_update("modified");
+                              );
 
-                      // simply remove this item.. no need for full redraw
-                      //tool.dataCart();
-                    })
+                            evt_station_edit_name_click.stopImmediatePropagation();
 
+                            control.apply_button_update("modified");
+
+                          })
+
+                      )
+                      .append(
+                        $("<span />")
+                          .css("float","left")
+                          .attr("title","Remove Station " + station)
+                          .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+
+                          .on("click", function(evt_station_remove_click){
+
+                            evt_station_remove_click.stopImmediatePropagation();
+
+                            delete tool.configuration.data_cart[network][station];
+
+                            $(".cart-param-tools").remove();
+
+                            sta.parent().fadeOut();
+
+                            control.apply_button_update("modified");
+
+                          })
+                      )
+                      .prependTo(sta);
+                      
+                  },
+                  function() {
+                    $( this )
+                      .css("text-decoration","none")
+                      .find( "span" ).remove();
+                  }
                 )
-                .append(
-                  $("<span />")
-                    .css("float","left")
-                    .attr("title","Remove Station " + station)
-                    .addClass("cart-station-tools ui-icon ui-icon-circle-close")
-
-                    .on("click", function(evt_station_remove_click){
-
-                      //console.log("station remove click");
-
-                      evt_station_remove_click.stopImmediatePropagation();
-
-                      delete tool.configuration.data_cart[network][station];
-
-                      $(".cart-param-tools").remove();
-
-                      sta.fadeOut();
-
-                      control.apply_button_update("modified");
-
-                      // simply remove this item.. no need for full redraw
-                      //tool.dataCart();
-                    })
-                )
-                .prependTo(sta);
-                
-            },
-            function() {
-                $( this ).find( "span" ).remove();
-            }
-          );
+            );
             
           var station_params = $("<div></div>")
               .addClass("cart-params");
@@ -1424,10 +1454,6 @@
      * Update the station window div with details when a parameter is clicked in the cart
      * Called by dataCart
      */
-    // control.stationWindowUpdate_fromCart = function(network,station){
-
-    //   control.stationWindowUpdate(station);
-    // };
 
     control.stationWindowUpdate_fromCart = function(network,station){
 
@@ -1501,7 +1527,7 @@
             .hover(
               function() {
                 $(this).parent().prepend(
-                  $('<span class="station-detail-hover" style="float:right">[this]</span>')
+                  //$('<span class="station-detail-hover" style="float:right">[this]</span>')
                 )
               },
               function() {
