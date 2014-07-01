@@ -3,7 +3,7 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 6/24/2014
+ * Revised 7/1/2014
  * Written by Michael Mills
  
 */
@@ -1570,12 +1570,10 @@
   // set default for search
   control.searchActive = false;
 
-
   if ( 'object' !== typeof EduVis.controls ) {
     EduVis.controls = {};
   }
 
   EduVis.controls[control.name] = control;
-
 
 }(EduVis));

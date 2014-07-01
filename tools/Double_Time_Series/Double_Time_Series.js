@@ -1,8 +1,9 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 6/4/2014
+ * Revised 7/1/2014
  * Written by Michael Mills and Sage Lichtenwalner
- */
+*/
+
 (function (eduVis) {
     "use strict";
     var tool = {
