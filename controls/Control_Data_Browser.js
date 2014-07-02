@@ -1236,8 +1236,7 @@
 
                     // is there already a span element? if so, remove it
                     if(sta.parent().has( "span" ).length > 0){
-                      $(".cart-station-tools").remove();
-                      console.log("removed!")
+                      sta.find(".cart-station-tools").remove();
                     }
                         
                     var tmpSpan = $("<span />")
@@ -1249,7 +1248,6 @@
                           "margin":"2px"
                           //"border":"1px solid red",
                       })
-                      //.addClass("cart-station-tools")
                       .append(
                         $("<span />")
                           .css("float","left")
