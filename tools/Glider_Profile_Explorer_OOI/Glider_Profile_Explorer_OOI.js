@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 6/02/2014
+ * Revised 7/6/2014
  * Written by Mike Mills
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Explorer",
         "url" : "",
 
-        "version" : "0.3.2",
+        "version" : "0.3.3",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -114,6 +114,7 @@
 
         "configuration" : {
           "dataset_id" : "OOI-GP05MOAS-GL001",
+          "dataset_name" : "GP05MOAS", 
           "profile_id" : "1",
           "parameter" : "temperature",
           "date_start": "2013-09-17",
@@ -261,8 +262,7 @@
               
               $("<div />")
                 .attr("id", "gpe-map-title")
-                .html("GP05MOAS Profile Locations")
-
+                .html(tool.configuration.dataset_name + " Profile Locations")
             )
             .append(
 
@@ -486,7 +486,7 @@
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (0) + ") ")
-        .text("GP05MOAS");
+        .text(tool.configuration.dataset_name);
         //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
 
       g.subtitle = g.svg.append("text")
@@ -497,7 +497,7 @@
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (18) + ") ")
         .text(
-         column_selected_title + " Profile: "+ config.profile_id 
+          column_selected_title + " Profile: "+ config.profile_id 
         );
 
       // g.stats = g.svg.append("text")
@@ -755,8 +755,7 @@
         map.addLayer(mapObj.layer_locations);
 
         // zoom to layer bounds
-        //map.fitBounds(mapObj.layer_locations.getBounds());
-        //console.log("DEBUG.... fit to bounds removed.. ")
+        map.fitBounds(mapObj.layer_locations.getBounds());
 
         // initialize map with first profile
         tool.init_graph(mapObj.profile_ids.keys()[0]);
@@ -813,14 +812,15 @@
             column_selected = column.column,
             column_selected_title = column.title,
             column_time = erddap_ref.time.column,
-            bisectData = d3.bisector(function(d) { return d[column_depth]; }).left;
+            bisectData = d3.bisector(function(d) { return d[column_depth]; }).left,
+            profile_date;
 
         // clean depth and selected column values
         data.forEach(function(d) {
           //d[column_date] = g.parseDate(d[column_date]);
           d[column_depth] = +d[column_depth];
           d[column_selected] = +d[column_selected];
-        }); 
+        });
 
         // update x and y domains depth and the selected
         g.x.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
@@ -836,12 +836,12 @@
           .ease("linear")
           .attr("d", g.line);
         
-        // update chart title with 
+        // update chart title with profile id and date
+        profile_date = data[0]["time (UTC)"].slice(0,10);
         
         g.title.text(
-          "GP05MOAS"
+          tool.configuration.dataset_name + " - " + profile_date
         );
-        //column_selected_title
 
         g.subtitle.text(
           " Profile: "+ pid 
@@ -1289,9 +1289,8 @@
                     tool.configuration.date_start = $("#config-date_start-input").val();
                     tool.configuration.date_end = $("#config-date_end-input").val();
 
-                    // update map and graph
+                    // update map
                     tool.map_update();
-                    //tool.graph_update();
 
                   })
               )
