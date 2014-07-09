@@ -239,7 +239,29 @@
           "units" : "kg m-3",
           "title" : "Density"
         },
-        "parameters" : ["temperature", "salinity", "conductivity"]
+        "chlorophyll_a" : {
+          "column" : "chlorophyll_a (ug L-1)",
+          "units" : "",
+          "title" : "Chlorophyll A"
+        },
+        "oxygen_concentration" : {
+          "column" : "oxygen_concentration (uMol L-1)",
+          "units" : "uMol L-1",
+          "title" : "Oxygen Concentration"
+        },
+        
+        "oxygen_saturation" : {
+          "column" : "oxygen_saturation (%)",
+          "units" : "%",
+          "title" : "Oxygen Saturation"
+        },
+        "volumetric_backscatter" : {
+          "column" : "volumetric_backscatter_650nm (m-1 sr-1)",
+          "units" : "m-1 sr-1",
+          "title" : "Volumetric Backscatter 650nm"
+        },
+
+        "parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
       };
 
 
@@ -568,12 +590,9 @@
     };
 
     tool.erddap_request_profile = function(dataset_id, profile_id, columns_selected){
-    
-      // profile_id,time,depth,salinity,temperature,conductivity,density
-
       var tabledap_url = "http://tds-dev.marine.rutgers.edu:8082/erddap/tabledap/",
       dataset_url = dataset_id + ".csvp?",
-      columns_default = ["time","depth", "salinity", "temperature", "conductivity"], // density
+      columns_default = ["time","depth", "salinity", "temperature", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter_650nm"],
       columns = typeof columns_selected === "object" ? columns_selected : columns_default,
       query = "&profile_id=" + profile_id + "&" + columns.join("!=NaN&") + "!=NaN&orderBy(%22depth%22)";
 
