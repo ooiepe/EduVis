@@ -1,7 +1,7 @@
 /**
  * OOI EPE - Custom Time Series (CTS)
- * Revised 3/20/2014
- * Written by Sage Lichtenwalner
+ * Revised 7/9/2014
+ * Written by Sage Lichtenwalner and Mike Mills
  */
 // CSV to JSON Converters
 // http://jsfiddle.net/sturtevant/AZFvQ/
@@ -100,6 +100,7 @@
       g.height = 400 - g.margin.top - g.margin.bottom;
       
       g.parseDate = d3.time.format.iso.parse;
+      g.date_format = d3.time.format("%Y-%m-%d");
       
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
@@ -141,6 +142,27 @@
         .style("fill","none")
         .style("stroke",tool.configuration.color)
         .style("stroke-width","2px");
+
+      //mouse move
+      g.mouse_focus = g.focus.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+      g.mouse_focus.append("circle")
+        .attr("r", 4.5);
+
+      g.mouse_focus.append("text")
+        .attr("x", 9)
+        .attr("dy", ".35em");
+
+      g.mousemover = g.focus.append("rect")
+        .attr("class", "overlay")
+        .attr("width", g.width)
+        .attr("height", g.height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function() { g.mouse_focus.style("display", null); })
+        .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
 
       g.line1 = d3.svg.line()
         .interpolate("monotone")
@@ -214,6 +236,7 @@
       var g = this.graph;  
       var dataset = tool.configuration.dataset;
       var data = [];
+      var bisectDate = d3.bisector(function(d) { return d.date; }).left;
       
       if(dataset.length === 0){
         alert('Bad data! (updategraph)');
@@ -256,10 +279,25 @@
           .style("stroke-width","1px");
         d3.selectAll('.y.axis line')
           .style("stroke-opacity",".4");
-        
+
+        g.mousemover.on("mousemove", function(){
+
+          var mouseX = d3.mouse(this)[0],
+              x0 = g.x.invert(mouseX),
+              i = bisectDate(data, x0, 1),
+              d0 = data[i - 1],
+              d1 = data[i],
+              d = x0 - d0.date > d1.date - x0 ? d1 : d0,
+              xMax = g.x(g.x.domain()[1]),
+              xPosition = g.x(x0)>(xMax/2) ? -110:0;
+
+          g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
+          g.mouse_focus.select("text").text(g.date_format(d.date) + " - " + d3.round(d.data,4))
+            .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+
+        });
       }
     };
-    
 
     /**
      * Generate parameter pulldown
@@ -361,7 +399,6 @@
       for(m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
       return r.deviation = Math.sqrt(r.variance = s / t), r;
     };
-
 
     /**
      * Initial setup of tool configuration panel
