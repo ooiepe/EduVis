@@ -108,8 +108,6 @@
                     "src": "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css"
                 }
             ],
-
-
           },
           "datasets" : []            
         },
@@ -641,7 +639,14 @@
               "value": network + "," + station
             })
             .html(
-              station_obj.custom_name
+              function(){
+                if(typeof station_obj.custom_name === "undefined"){
+                  return network + " - " + station;
+                }
+                else{
+                  return station_obj.custom_name;
+                }
+              }
             );
 
           options.push(option);
