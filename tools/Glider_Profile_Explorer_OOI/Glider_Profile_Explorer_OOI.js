@@ -222,12 +222,12 @@
         "salinity" : {
           "column" : "salinity (1)",
           "units" : "",
-          "title" : "Salinity"
+          "title" : "Salinity" // Sea Water Practical Salinity
         },
         "temperature" : {
           "column" : "temperature (Celsius)",
-          "units" : "degrees celsius",
-          "title" : "Temperature"
+          "units" : "Degrees celsius",
+          "title" : "Sea Water Temperature"
         },
         "conductivity" : {
           "column" : "conductivity (S m-1)",
@@ -242,7 +242,7 @@
         "chlorophyll_a" : {
           "column" : "chlorophyll_a (ug L-1)",
           "units" : "",
-          "title" : "Chlorophyll A"
+          "title" : "Chlorophyll A" // Chlorophyll a Concentration
         },
         "oxygen_concentration" : {
           "column" : "oxygen_concentration (uMol L-1)",
@@ -253,7 +253,7 @@
         "oxygen_saturation" : {
           "column" : "oxygen_saturation (%)",
           "units" : "%",
-          "title" : "Oxygen Saturation"
+          "title" : "Oxygen Saturation" //Estimated Percentage Oxygen Saturation
         },
         "volumetric_backscatter" : {
           "column" : "volumetric_backscatter_650nm (m-1 sr-1)",
@@ -494,7 +494,6 @@
         .style("pointer-events", "all")
         .on("mouseover", function() { g.mouse_focus.style("display", null); })
         .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
-        //.on("mousemove", mousemove);
 
       g.line = d3.svg.line()
         .interpolate("monotone")
@@ -887,12 +886,12 @@
             d1 = data[i],
             d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0,
             chartMidPoint = (g.x.domain()[1] + g.x.domain()[0])/2,
-            xPosition = d[column_selected] > chartMidPoint ? -90 : 0;
-          
+            xPosition = d[column_selected] > chartMidPoint ? -100 : 0;
+        
         g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
 
         g.mouse_focus.select("text").text(d3.round(d[column_depth], 1) + " m - " + d3.round(d[column_selected], 2))
-          .attr("transform", "translate(" + xPosition + "," + 0 + ")");
+          .attr("transform", "translate(" + xPosition + "," + 0 + ")")
 
         });
 
@@ -918,8 +917,6 @@
           date_format = d3.time.format("%Y-%m-%d"),
           start = iso_format(date_start),
           end = iso_format(date_end);
-
-      //console.log(min, max, date_start, date_end, start, end, "slider");       
 
       $("#"+ tool.dom_target +"-profile-slider-left").html(date_format(start));
       $("#"+ tool.dom_target +"-profile-slider-right").html(date_format(end));
@@ -1219,10 +1216,10 @@
             $("<div />")
               .attr("id","ui-config-map-container")
               .css({
+                "display":"none",
                 "width":"400px",
                 "height":"400px",
                 "background-color":"red"
-
               })
               .append(
                   $("<div />")

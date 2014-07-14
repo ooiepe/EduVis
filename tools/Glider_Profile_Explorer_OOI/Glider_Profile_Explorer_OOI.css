@@ -1,6 +1,7 @@
 svg {
     font: 10px sans-serif;
 }
+
 .resize path {
     fill: #666;
     fill-opacity: .8;
@@ -20,6 +21,10 @@ svg {
 .template{
 
 	font-size: 18px;
+}
+
+.circle {
+    fill: #222;
 }
 
 #vistool-controls label{
