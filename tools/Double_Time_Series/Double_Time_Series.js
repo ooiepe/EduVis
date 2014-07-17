@@ -154,11 +154,13 @@
         "data" : {},
         // "target_div" : "Hello_World",
         "tools" : {},
+        "controls" : {
+          "dropdown1":{},
+          "dropdown2":{}
+        },
         "graph" : {}
     };
 
-    
-    
     /**
      * Initial setup of visualization tool
      * Called by init_tool
@@ -667,14 +669,8 @@
      * Called by setup
      */
     tool.select_createDropdowns = function(_target){
-     
-      console.log(tool.controls);
-      tool.controls;
 
-      //tool.controls.Data_Browser_Control.dropdown1 = {};
-      //tool.controls.Data_Browser_Control.dropdown2 = {};
-
-      var tc = EduVis.controls.Data_Browser_Control, 
+      var tc = tool.controls, 
           dd1 = tc.dropdown1,
           dd2 = tc.dropdown2,
           dd_width = (tool.graph.width/2);// - tool.graph.margin.left - tool.graph.margin.right
