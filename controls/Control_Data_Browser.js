@@ -3,7 +3,7 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 7/1/2014
+ * Revised 7/17/2014
  * Written by Michael Mills
  
 */
@@ -547,6 +547,8 @@
     // get the parameters from the json file.
      //$.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
       $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
+
+        control.parameters = data.parameters;
         
         //var parameters = this.db_data.parameters,
         var parameters = data.parameters,
@@ -568,7 +570,7 @@
               .append( 
                 $("<label/>")
                 .attr("for","db-select-"+param.name)
-                .html(param.name)
+                .html(control.parameter_clean_name( param.name ))
               )
               .append( 
                 $("<a></a>")
@@ -587,6 +589,9 @@
           "overflow-y":"scroll"
         })
         .appendTo( "#db-select-parameters" );
+
+        // load data cart after parameters definition is loaded
+        control.dataCart();
      });
 
 // //
@@ -595,6 +600,8 @@
 
       //$.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
         $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
+
+        control.networks = data.networks;
 
         //{ "networks": [ { "id": "ndbc", "name": "NDBC", "description": "National Data Buoy Center", "url": "http://sdf.ndbc.noaa.gov/" }, { "id": "co-ops", "name": "CO-OPS", "description": "Center for Operational Oceanographic Products and Services", "url": "http://opendap.co-ops.nos.noaa.gov/" } ] }
         
@@ -643,7 +650,7 @@
       // attach search to the button for now
       //$("#db-btn_search").on("click", control.searchQueue);
 
-      control.dataCart();
+      //control.dataCart();
 
     
 
@@ -863,14 +870,15 @@
 
       var network, station;
 
-      if(typeof(station_obj.feature.properties)==="object"){
+      if(typeof(station_obj.feature)==="object"){
         network = station_obj.feature.properties.network;
         station = station_obj.feature.properties.name;
       }
       else{
         network = station_obj.network;
-        station = station_obj.name;
+        station = station_obj.station;
       }
+      //console.log("data_cart_add_param", station, network, station_obj, param);
 
       control.dataCartAddParam(network,station,param);
 
@@ -961,14 +969,14 @@
 
       var network, station;
 
-      console.log("Station Object", "type: " + typeof(station_obj.properties), station_obj);
+      //console.log("Station Object", "type: " + typeof(station_obj.properties), station_obj);
 
       if(typeof(station_obj.feature)==="object"){
 
-        if(typeof(station_obj.feature.properties)==="object"){
+        //if(typeof(station_obj.feature.properties)==="object"){
           network = station_obj.feature.properties.network;
           station = station_obj.feature.properties.name;
-        }
+        //}
       }
       else{
         network = station_obj.network;
@@ -1037,7 +1045,7 @@
 
                             $("<label/>")
                                 .attr("for","select-" + station_dom_id + "_" + param)
-                                .html(param)
+                                .html(control.parameter_clean_name(param))
                         )
                         .append( 
 
@@ -1048,6 +1056,8 @@
                                 })
                                 .html("Add")
                                 .on("click", function(evt){
+
+                                    //console.log("station window add param", station_obj, param);
 
                                     //evt.stopPropagation();
                                     evt.stopImmediatePropagation();
@@ -1124,7 +1134,7 @@
                                 .append($("<td></td>")
                                   .html(dataAttr));
                                 
-                            console.log("attr", a, attr_val, dataAttr);
+                            //console.log("attr", a, attr_val, dataAttr);
 
                             table.append(row);
 
@@ -1194,8 +1204,8 @@
       var dc = $("#data-cart"),
           cart_networks = $("<div />");
 
-      $.each( tool.configuration.data_cart , function( network, station){
-            
+      $.each( tool.configuration.data_cart , function( network, stations){
+
         var cart_network = $("<div />")
             .addClass("cart-network");
             //.html("<h4>"+network+"</h4>");
@@ -1203,9 +1213,9 @@
         var cart_network_stations = $("<div />")
             .addClass("cart-stations");
 
-        $.each(station, function( station, station_obj){
+        $.each(stations, function( station, station_obj){
 
-          console.log(station, station_obj, network);
+          //console.log(station, station_obj, network);
 
           if(typeof station_obj.custom_name === "undefined"){
             station_obj.custom_name = network + " " + station;
@@ -1282,7 +1292,7 @@
 
                                           station_obj.custom_name = $(this).val();
 
-                                          console.log("Station Obj.custom name", station_obj.custom_name);
+                                          //console.log("Station Obj.custom name", station_obj.custom_name);
 
                                           sta.parent().find(".station-name")
                                             .html(station_obj.custom_name)
@@ -1373,7 +1383,7 @@
                 
             var station_param = $("<div></div>")
                 .addClass("cart-param")
-                .html(param)
+                .html(control.parameter_clean_name(param))
 
                 //mouseover of parameter item
                 .hover(
@@ -1395,8 +1405,6 @@
                       .addClass("cart-station-tools ui-icon ui-icon-circle-close")
 
                       .on("click", function(evt_param_remove_click){
-
-                        //console.log("param remove click");
                         
                         // click of remove button will delete the item from the cart
                         // do we want an ok prompt?
@@ -1536,6 +1544,20 @@
           .append(dom_station_window);
         });
       }
+    };
+
+    /* clean paramater names */
+
+    control.parameter_clean_name = function (clean_parameter){
+      var proper = "";
+      $.each(control.parameters,function(i,param){
+        if(param.name === clean_parameter){
+          $.each(param.name.split("_"),function(p,part){
+            proper += part.charAt(0).toUpperCase() + part.substr(1).toLowerCase() + " ";
+          });
+        }
+      });
+      return proper;
     };
 
     /*
