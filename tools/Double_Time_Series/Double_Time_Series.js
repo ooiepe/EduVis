@@ -304,7 +304,7 @@
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (0) + ") ")
         .text( 
-          this.configuration.network1 + " - " + this.configuration.station1 + " - " + this.configuration.parameter1
+          this.configuration.network1 + " - " + this.configuration.station1 + " - " + tool.proper_case(this.configuration.parameter1,"_")
         );
 
       g.stats1 = g.svg.append("text")
@@ -333,7 +333,7 @@
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.width/2+g.margin.left*4) + "," + (0) + ") ")
         .text( 
-          this.configuration.network2 + " - " + this.configuration.station2 + " - " + this.configuration.parameter2
+          this.configuration.network2 + " - " + this.configuration.station2 + " - " + tool.proper_case(this.configuration.parameter2,"_")
         );
 
       g.stats2 = g.svg.append("text")
@@ -575,9 +575,9 @@
             .ease("linear")
             .attr("d", line);
           
-          g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + this.configuration["parameter" + variable]);
+          g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + tool.proper_case(this.configuration["parameter" + variable],"_"));
 
-          g["ylabel"+variable].text(cols[1].key);
+          g["ylabel"+variable].text(tool.proper_case(cols[1].key,"_"));
           var datelimits = g.x.domain();
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
@@ -929,14 +929,14 @@
 
       $.each(dc[network][station].parameters,function(parameter){
 
-          // create new option and add it to the options array
-          var option = $("<option></option>")
-            .attr({
-              "value": parameter
-            })
-            .html(parameter);
+        // create new option and add it to the options array
+        var option = $("<option></option>")
+          .attr({
+            "value": parameter
+          })
+          .html(tool.proper_case(parameter,"_"));
 
-          options.push(option);
+        options.push(option);
 
       });
 
@@ -972,6 +972,20 @@
 
       return true;
 
+    };
+
+    // convert delimted string to proper case and removes delimter
+    // i.e. water_temperature --> Water Temperature
+    tool.proper_case = function(make_proper, delim){
+
+      var string_proper = "";
+
+      // convert make_proper to proper case.. split on delim
+      $.each(make_proper.split(delim),function(p,part){
+        string_proper += part.charAt(0).toUpperCase() + part.substr(1).toLowerCase() + " ";
+      });
+
+      return string_proper;
     };
 
     /**

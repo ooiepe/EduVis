@@ -769,7 +769,7 @@
             .attr("d", g.line1);
             
           g.title.text( this.configuration.network + " Station " + this.configuration.station);
-          g.ylabel.text(cols[1].key);
+          g.ylabel.text(tool.proper_case(cols[1].key,"_"));
           var datelimits = g.x.domain();
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
@@ -986,12 +986,13 @@
 
       // populate options array with parameters
       $.each(dc[network][station].parameters, function(parameter){
+        
         // create new option and add it to the options array
         var option = $("<option></option>")
           .attr({
             "value": parameter
           })
-          .html(parameter);
+          .html(tool.proper_case(parameter,"_"));
 
         options.push(option);
 
@@ -1032,6 +1033,20 @@
 
       return true;
 
+    };
+
+    // convert delimted string to proper case and removes delimter
+    // i.e. water_temperature --> Water Temperature
+    tool.proper_case = function(make_proper, delim){
+
+      var string_proper = "";
+
+      // convert make_proper to proper case.. split on delim
+      $.each(make_proper.split(delim),function(p,part){
+        string_proper += part.charAt(0).toUpperCase() + part.substr(1).toLowerCase() + " ";
+      });
+
+      return string_proper;
     };
 
     /**

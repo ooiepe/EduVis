@@ -57,9 +57,9 @@
 
             "scripts" : [
                 {
-                    "resource_type" : "tool",
+                    //"resource_type" : "tool",
                     "name": "leaflet_js",
-                    "url" : "js/leaflet.js",
+                    "url" : "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js",
                     "namespace" : "L",
                     "attributes":{}
                 },
@@ -79,6 +79,7 @@
                     "resource_type" : "tool",
                     "name": "Control_Data_Browser",
                     "url" : "js/Control_Data_Browser.js",
+                    "dependsOn" : ["leaflet_js"],
                     "attributes":{}
                 }
             ],
@@ -255,8 +256,6 @@
         .style("stroke","#a33333")
         .style("stroke-width","2px");
 
-       // add overlay here.. with mousemove event for X axis valuation
-
       g.mouse_focus = g.focus.append("g")
         .attr("class", "focus")
         .style("display", "none");
@@ -276,7 +275,6 @@
         .style("pointer-events", "all")
         .on("mouseover", function() { g.mouse_focus.style("display", null); })
         .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
-        //.on("mousemove", mousemove);
 
       g.line1 = d3.svg.line()
         .interpolate("monotone")
@@ -490,7 +488,7 @@
             .attr("d", g.line1);
           
           g.title.text( this.configuration.network + " Station " + this.configuration.station);
-          g.ylabel.text(cols[1].key);
+          g.ylabel.text(tool.proper_case(cols[1].key,"_"));
           var datelimits = g.x.domain();
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
@@ -714,14 +712,14 @@
 
       $.each(dc[network][station].parameters,function(parameter){
 
-          // create new option and add it to the options array
-          var option = $("<option></option>")
-            .attr({
-              "value": parameter
-            })
-            .html(parameter);
+        // create new option and add it to the options array
+        var option = $("<option></option>")
+          .attr({
+            "value": parameter
+          })
+          .html(tool.proper_case(parameter,"_"));
 
-          options.push(option);
+        options.push(option);
 
       });
 
@@ -759,6 +757,20 @@
 
       return true;
 
+    };
+
+    // convert delimted string to proper case and removes delimter
+    // i.e. water_temperature --> Water Temperature
+    tool.proper_case = function(make_proper, delim){
+
+      var string_proper = "";
+
+      // convert make_proper to proper case.. split on delim
+      $.each(make_proper.split(delim),function(p,part){
+        string_proper += part.charAt(0).toUpperCase() + part.substr(1).toLowerCase() + " ";
+      });
+
+      return string_proper;
     };
 
     /**
