@@ -454,6 +454,8 @@
               tool.select_updateStations("2");
               tool.select_updateParameters("2");
 
+              tool.update_map();
+
               control.apply_button_update("up-to-date");
 
            })
