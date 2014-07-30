@@ -1,7 +1,7 @@
 /*
 
  * OOI EPE - Single Time Series with Map (STSM)
- * Revised 7/1/2014
+ * Revised 7/30/2014
  * Written by Mike Mills and Sage Lichtenwalner
 
 */
@@ -957,7 +957,14 @@
               "value": network + "," + station
             })
             .html(
-              station_obj.custom_name
+               function(){
+                 if(typeof station_obj.custom_name === "undefined"){
+                   return network + " - " + station;
+                 }
+                 else{
+                   return station_obj.custom_name;
+                 }
+               }
             );
 
           options.push(option);
