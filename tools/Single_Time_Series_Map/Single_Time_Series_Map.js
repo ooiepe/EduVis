@@ -553,8 +553,8 @@
                 )
             }
 
-            //zoom to bounds
-            tool.leaflet_map.map.fitBounds(tool.leaflet_map.station_markers.getBounds());
+            // zoom to the bounds of the current stations. this should be loaded into a queue and called with map_stations_loaded();
+            tool.map_stations_loaded();
 
           });
         });
@@ -569,13 +569,47 @@
       })
     };
 
+    tool.map_stations_loaded = function(){
+
+      // need to consider a better method for queuing station callbacks
+      var stations_loaded = false;
+
+      // loop through cart. if isLoaded is true for all stations, run callbacks
+
+      // $.each(tool.configuration.data_cart, function(network, network_obj){
+      //   $.each(network_obj,function(station, station_obj){
+      //     if(station_obj){
+      //       console.log(station_obj);
+      //     }
+      //   }
+      // }
+
+      // for now, force zoom event when each station is added.
+      stations_loaded = true;
+
+      // if all stations have loaded, updated the map extent
+      if(stations_loaded){
+
+        //zoom to bounds of stations
+        tool.leaflet_map.map.fitBounds(tool.leaflet_map.station_markers.getBounds());
+      }
+      
+    };
+
     tool.update_map = function(){
 
-      this.leaflet_map.station_markers.eachLayer(function(layer){
-        layer.removeLayer();
+      tool.leaflet_map.station_markers.eachLayer(function(layer){
+        //layer.removeLayer();
+
+        tool.leaflet_map.map.removeLayer(layer);
+        tool.leaflet_map.station_markers.removeLayer(layer);
+        console.log("LAYER-->", layer);
       })
 
-      this.init_map();
+      tool.leaflet_map.map.invalidateSize();
+
+      tool.init_map();
+    
     }
 
     /**
@@ -648,8 +682,8 @@
           }
         });
 
-        // are we sure we want to updated the graph here?
-        tool.draw();
+        // // are we sure we want to updated the graph here?
+        // tool.draw();
     };
 
     /**
@@ -853,9 +887,14 @@
               })
               .on("change", function(evt){
 
+                // update station in map
+                tool.graph_update_sta(evt.target.value);
+
                 // update network and station in config
                 if(tool.select_updateParameters()){
-                  tool.graph_update_sta(evt.target.value);
+
+                  // station has parameter available, update graph accordingly
+                  tool.draw();
                 }
                 else{
                   // set option shere
