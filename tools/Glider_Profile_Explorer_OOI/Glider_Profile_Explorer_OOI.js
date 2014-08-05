@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 7/6/2014
+ * Revised 8/5/2014
  * Written by Mike Mills
 
 */
@@ -60,8 +60,13 @@
                 "url": "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"
               },
               {
+                "name" : "jquery_1.11", 
+                "url" : "https://code.jquery.com/jquery-1.11.1.min.js",
+              },
+              {
                 "name" : "jquery_ui_js", 
-                "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
+                "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
+                "dependsOn":["jquery_1.11"]
               }
             ],
 
@@ -74,12 +79,8 @@
               //     "name": "leaflet-markercluster-default",
               //     "src": "css/MarkerCluster.Default.css"
               // },
-              {
-                  "name" : "jquery-ui-css",
-                  "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
-              },
               {   "name": "jquery-smoothness",
-                  "src": "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+                  "src": "http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css"
               },
               {
                   "name": "leaflet-css",
