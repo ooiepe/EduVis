@@ -1,8 +1,8 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 8/5/2014
- * Written by Mike Mills
+ * Revised 8/6/2014
+ * Written by Mike Mills, Rutgers University
 
 */
 
@@ -394,15 +394,18 @@
       // initialize the map
       tool.map_setup();
 
-      //console.log("tool loaded");
-
+      
       // hack to invalidate the map bounds.
-      $('.nav-tabs a[href="#ev-instance-preview"]').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-        tool.leaflet_map.map.invalidateSize();
-        tool.leaflet_map.map.fitBounds(tool.leaflet_map.layer_locations.getBounds());
-      });
+      $('.nav-tabs a[href="#ev-instance-preview"]')
+        .on("click", function (e) {
+          //e.preventDefault();
+          //$(this).tab('show');
+          setTimeout(function() {
+            tool.leaflet_map.map.invalidateSize();
+            tool.leaflet_map.map.fitBounds(tool.leaflet_map.layer_locations.getBounds());
+         }, 10);
+
+        });
 
       EduVis.tool.load_complete(this);
 
