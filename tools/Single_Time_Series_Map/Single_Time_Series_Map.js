@@ -1,7 +1,7 @@
 /*
 
  * OOI EPE - Single Time Series with Map (STSM)
- * Revised 7/30/2014
+ * Revised 9/8/2014
  * Written by Mike Mills and Sage Lichtenwalner
 
 */
@@ -12,7 +12,7 @@
 
     var tool = {
         "name" : "Single_Time_Series_Map",
-        "version" : "0.3.2",
+        "version" : "0.3.3",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -44,10 +44,22 @@
                 "namespace" : "L"
               },
               {
+                "resource_type" : "tool",
+                "name": "leaflet_markercluster",
+                "url" : "js/leaflet.markercluster.js",
+                "namespace" : "L",
+                "dependsOn" : ["leaflet_js"],
+                "attributes":{}
+              },
+              {
+                "name" : "jquery_1.11", 
+                "url" : "https://code.jquery.com/jquery-1.11.1.min.js",
+              },
+              {
                 "name" : "jquery_ui_js", 
-                "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js"
+                "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
+                "dependsOn":["jquery_1.11"]
               }
-
             ],
             "stylesheets" : [
               {
@@ -56,7 +68,7 @@
               },
               {
                 "name" : "jquery-ui-css",
-                "src" : "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+                "src": "http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css"
               },
               {
                 "name": "leaflet-css",
@@ -67,31 +79,13 @@
           "controls" : {
 
             "scripts" : [
-                {
-                    //"resource_type" : "tool",
-                    "name": "leaflet_js",
-                    "url" : "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js",
-                    "namespace" : "L",
-                    "attributes":{}
-                },
-                {
-                    "resource_type" : "tool",
-                    "name": "leaflet_markercluster",
-                    "url" : "js/leaflet.markercluster.js",
-                    "namespace" : "L",
-                    "dependsOn" : ["leaflet_js"],
-                    "attributes":{}
-                },  
-                {
-                    "name" : "jquery_ui_js", 
-                    "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
-                },
-                {
-                    "resource_type" : "tool",
-                    "name": "Control_Data_Browser",
-                    "url" : "js/Control_Data_Browser.js",
-                    "attributes":{}
-                }
+              
+              {
+                "resource_type" : "tool",
+                "name": "Control_Data_Browser",
+                "url" : "js/Control_Data_Browser.js",
+                "attributes":{}
+              }
             ],
 
             "stylesheets" : [
@@ -106,19 +100,8 @@
                 {
                     "name": "leaflet-markercluster-default",
                     "src": "css/MarkerCluster.Default.css"
-                },
-                {
-                    "name" : "jquery-ui-css",
-                    "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
-                },
-                {   "name": "jquery-smoothness",
-                    "src": "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
-                },
-                {
-                    "name": "leaflet-css",
-                    "src": "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css"
-
                 }
+                
             ],
 
 
@@ -153,6 +136,18 @@
                   "air_temperature":{}
                 },
                 "custom_name":"NDBC 44025"
+              }
+            },
+            "CO-OPS": {
+              "2695540": {
+                "name": "2695540",
+                "network": "CO-OPS",
+                "parameters": {
+                  "air_pressure": {},
+                  "air_temperature": {}
+                },
+                "custom_name": "CO-OPS 2695540",
+                "station": "2695540"
               }
             }
           }
@@ -561,11 +556,13 @@
       });
       
       // hack to invalidate the map bounds and show the appropriate zoom.
-      $('.nav-tabs a[href="#ev-instance-preview"]').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-        tool.leaflet_map.map.invalidateSize();
-        tool.leaflet_map.map.fitBounds(tool.leaflet_map.station_markers.getBounds());
+      $('.nav-tabs a[href="#ev-instance-preview"]').on("click",function (e) {
+        //e.preventDefault();
+        //$(this).tab('show');
+        setTimeout(function(){
+          tool.leaflet_map.map.invalidateSize();
+          tool.leaflet_map.map.fitBounds(tool.leaflet_map.station_markers.getBounds());
+        },500);
       })
     };
 
@@ -1093,6 +1090,14 @@
       });
 
       return string_proper;
+    };
+
+    /**
+     * Called by data browser control
+     */
+    tool.update_callback = function(){
+
+        tool.update_map();
     };
 
     /**
