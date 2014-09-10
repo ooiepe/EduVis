@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 7/1/2014
+ * Revised 9/10/2014
  * Written by Michael Mills and Sage Lichtenwalner
 */
 
@@ -8,7 +8,7 @@
     "use strict";
     var tool = {
         "name" : "Double_Time_Series",
-        "version" : "0.3.3",
+        "version" : "0.3.4",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
           {
@@ -35,8 +35,13 @@
                 }
               },
               {
+                "name" : "jquery_1.11", 
+                "url" : "https://code.jquery.com/jquery-1.11.1.min.js",
+              },
+              {
                 "name" : "jquery_ui_js", 
-                "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
+                "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
+                "dependsOn":["jquery_1.11"]
               }
             ],
             "stylesheets" : [
@@ -160,6 +165,8 @@
         },
         "graph" : {}
     };
+
+
 
     /**
      * Initial setup of visualization tool
@@ -864,14 +871,7 @@
               "value": network + "," + station
             })
             .html(
-              function(){
-                if(typeof station_obj.custom_name === "undefined"){
-                  return network + " - " + station;
-                }
-                else{
-                  return station_obj.custom_name;
-                }
-              }
+              typeof station_obj.custom_name === "undefined" ? network + " - " + station : station_obj.custom_nam
             );
 
           options.push(option);
@@ -994,6 +994,11 @@
 
       return string_proper;
     };
+
+    /**
+     * Called by data browser control
+     */
+    tool.update_callback = function(){};
 
     /**
      * Initialize tool

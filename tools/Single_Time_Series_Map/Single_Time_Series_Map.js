@@ -1,7 +1,7 @@
 /*
 
  * OOI EPE - Single Time Series with Map (STSM)
- * Revised 9/8/2014
+ * Revised 9/10/2014
  * Written by Mike Mills and Sage Lichtenwalner
 
 */
@@ -12,7 +12,7 @@
 
     var tool = {
         "name" : "Single_Time_Series_Map",
-        "version" : "0.3.3",
+        "version" : "0.3.4",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {

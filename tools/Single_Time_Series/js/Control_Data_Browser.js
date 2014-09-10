@@ -3,8 +3,8 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 7/17/2014
- * Written by Michael Mills
+ * Revised 9/10/2014
+ * Written by Michael Mills, Rutgers University
  
 */
 
@@ -16,7 +16,7 @@
     control = {
 
     "name":"Data_Browser_Control",
-    "version" : "0.1",
+    "version" : "0.2.1",
     "description" : "This controls allows the user to select Time Series Datasets via a map and search criteria interface. The search is supported by EPE Data Services.",
     "authors" : [
       {
@@ -385,7 +385,6 @@
           $("<div/>", {
             "id":"db-data-cart"
           })
-          //.sortable()
         )
       )
        .append(
@@ -403,60 +402,7 @@
               "margin-right":"10px"
             })
             .html('Apply') //icon-exclamation-sign
-            .on("click",function(){
-
-              var config = tool.configuration;
-
-              // default chart properties
-             
-              // updated by the visualization
-
-              // "station" : "44033",
-              // "network" : "NDBC",
-              // "parameter" : "water_temperature",
-
-              // updated by the data browser
-               
-              config["date_type"] = $("#db-dates-dropdown").val();
-
-              if(config["date_type"] == "archived"){
-               
-                config["start_date"] =  $("#db-date-start").val();
-                config["end_date"] =  $("#db-date-end").val();
-                config["realtime_days"] = 0; //? set to zero?
-
-              }
-              else{
-
-                //var tmpDate = new Date(),
-                    // month,
-                    // day,
-                    // dateString;
-
-                // month = tmpDate.getMonth() + 1;
-                // month = month<10? "0" + month : month;
-
-                // day = tmpDate.getDate();
-                // day = day<10 ? "0" + day : day;
-
-                // dateString = tmpDate.getFullYear() + "-" + month + "-" + day;
-
-                config["end_date"] =  "now";
-                config["start_date"] =  $("#db-reatltime_days").val();
-
-                config["realtime_days"] =  $("#db-reatltime_days").val();
-
-              }
-  
-              tool.select_updateStations("1");
-              tool.select_updateParameters("1");
-
-              tool.select_updateStations("2");
-              tool.select_updateParameters("2");
-
-              control.apply_button_update("up-to-date");
-
-           })
+            .on("click", control.apply_button_press)
           )
           .append(
             $('<img src="'+ EduVis.Environment.getPathTool(tool.name) + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
@@ -1586,6 +1532,69 @@
 
       }
     };
+
+    control.apply_button_press = function(evt){
+
+      var btn_apply = $(evt.target);
+
+      // check to see if button is disabled, if not, apply changes
+      if(!btn_apply.hasClass('disabled')){
+
+        var config = tool.configuration;
+
+        // default chart properties
+        // updated by the visualization
+
+        // "station" : "44033",
+        // "network" : "NDBC",
+        // "parameter" : "water_temperature",
+
+        // updated by the data browser
+         
+        config["date_type"] = $("#db-dates-dropdown").val();
+
+        if(config["date_type"] == "archived"){
+         
+          config["start_date"] =  $("#db-date-start").val();
+          config["end_date"] =  $("#db-date-end").val();
+          config["realtime_days"] = 0; //? set to zero?
+
+        }
+        else{
+
+          //var tmpDate = new Date(),
+              // month,
+              // day,
+              // dateString;
+
+          // month = tmpDate.getMonth() + 1;
+          // month = month<10? "0" + month : month;
+
+          // day = tmpDate.getDate();
+          // day = day<10 ? "0" + day : day;
+
+          // dateString = tmpDate.getFullYear() + "-" + month + "-" + day;
+
+          config["end_date"] =  "now";
+          config["start_date"] =  $("#db-reatltime_days").val();
+
+          config["realtime_days"] =  $("#db-reatltime_days").val();
+
+        }
+
+        tool.select_updateStations("1");
+        tool.select_updateParameters("1");
+
+        tool.select_updateStations("2");
+        tool.select_updateParameters("2");
+
+        tool.update_callback();
+
+        control.apply_button_update("up-to-date");
+      }
+
+    };
+
 
   // set default for search
   control.searchActive = false;

@@ -1,7 +1,7 @@
 /*
 
  * OOI EPE - Single Time Series (STS)
- * Revised 7/1/2014
+ * Revised 9/10/2014
  * Written by Mike Mills and Sage Lichtenwalner
  
 */
@@ -10,7 +10,7 @@
     "use strict";
     var tool = {
         "name" : "Single_Time_Series",
-        "version" : "0.3.2",
+        "version" : "0.3.3",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -772,6 +772,12 @@
 
       return string_proper;
     };
+
+
+    /**
+     * Called by data browser control
+     */
+    tool.update_callback = function(){};
 
     /**
      * Initialize tool
