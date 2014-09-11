@@ -1,7 +1,7 @@
 /*
 
  * OOI EPE - Single Time Series (STS)
- * Revised 9/10/2014
+ * Revised 9/11/2014
  * Written by Mike Mills and Sage Lichtenwalner
  
 */
@@ -10,7 +10,7 @@
     "use strict";
     var tool = {
         "name" : "Single_Time_Series",
-        "version" : "0.3.3",
+        "version" : "0.3.4",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -37,8 +37,13 @@
                 }
               },
               {
+                "name" : "jquery_1.11", 
+                "url" : "https://code.jquery.com/jquery-1.11.1.min.js",
+              },
+              {
                 "name" : "jquery_ui_js", 
-                "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
+                "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
+                "dependsOn":["jquery_1.11"]
               }
             ],
             "stylesheets" : [
@@ -125,24 +130,26 @@
           "start_date": "2013-01-01",
           "end_date": "2013-12-31",
           "date_type" : "archived",
-          "data_cart" : {
-            "NDBC": { 
-              "44033": { 
-                "parameters": {
-                  "water_temperature":{},
-                  "air_temperature":{}
-                },
-                "custom_name":"NDBC 44033"
-              },
-              "44025": { 
-                "parameters": {
-                  "water_temperature":{},
-                  "air_temperature":{},
-                },
-                "custom_name":"NDBC 44025"
+          "data_cart" : [
+            {
+              "network" : "NDBC",
+              "station" : "44033",
+              "custom_name":"NDBC 44033",
+              "parameters": {
+                "water_temperature":{},
+                "air_temperature":{}
+              }
+            },
+            {
+              "network" : "NDBC",
+              "station" : "44025",
+              "custom_name":"NDBC 44025",
+              "parameters": {
+                "water_temperature":{},
+                "air_temperature":{}
               }
             }
-          }
+          ]
         },
 
         "data" : {},
@@ -416,11 +423,11 @@
           end;
 
       if(config.date_type == "realtime"){
-        start = config.realtime_days,
+        start = config.realtime_days;
         end = "now";  
       }
       else{
-        start = config.start_date,
+        start = config.start_date;
         end = config.end_date;
       }
 
@@ -627,29 +634,26 @@
       $("#"+tool.dom_target+"_select-stations").empty();
 
       // build the stations
-      $.each(config.data_cart, function(network, network_obj){
-
-        $.each(network_obj,function(station, station_obj){
+      $.each(config.data_cart, function(index, s){
 
           // create new option and add it to the options array
           var option = $("<option/>")
             .attr({
-              "value": network + "," + station
+              "value": s.network + "," + s.station
             })
             .html(
               function(){
-                if(typeof station_obj.custom_name === "undefined"){
-                  return network + " - " + station;
+                if(typeof s.custom_name === "undefined"){
+                  return s.network + " - " + s.station;
                 }
                 else{
-                  return station_obj.custom_name;
+                  return s.custom_name;
                 }
               }
             );
 
           options.push(option);
 
-        });
       });
 
       // add all the options from the options array to the select
@@ -698,19 +702,16 @@
           config = tool.configuration,
           dc = config.data_cart,
           options = [],
-          selected_param;
-          // need to condition for param that is not available in a newly updated list (when station changes and the new station does not have the previously selected param.. in that case, just take the first parameter of the list.. and put an exclaimation next to the dropdown to indicated update ened)
-
-        // reference to param
-        // does current param exist in list?
+          selected_param,
+          data_cart_index = tool.station_get_index(station);
       
       $(".param-icon").remove();
 
       $("#"+tool.dom_target+"_select-parameters")
-      .empty()
-      .append("<option>..updating..</option>");
+        .empty()
+        .append("<option>..updating..</option>");
 
-      $.each(dc[network][station].parameters,function(parameter){
+      $.each(dc[data_cart_index].parameters,function(parameter){
 
         // create new option and add it to the options array
         var option = $("<option></option>")
@@ -773,6 +774,16 @@
       return string_proper;
     };
 
+    /** Find station array index by station name **/
+    tool.station_get_index = function(station){
+
+      var dc = tool.configuration.data_cart, index = false;
+
+      $.each(dc,function(i,s){
+        if(s.station == station){index = i};
+      });
+      return index;
+    }
 
     /**
      * Called by data browser control

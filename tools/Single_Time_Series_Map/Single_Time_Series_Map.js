@@ -1,7 +1,7 @@
 /*
 
  * OOI EPE - Single Time Series with Map (STSM)
- * Revised 9/10/2014
+ * Revised 9/11/2014
  * Written by Mike Mills and Sage Lichtenwalner
 
 */
@@ -12,7 +12,7 @@
 
     var tool = {
         "name" : "Single_Time_Series_Map",
-        "version" : "0.3.4",
+        "version" : "0.3.5",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -121,36 +121,35 @@
           "start_date": "2013-07-01",
           "end_date": "2013-07-20",
           "date_type" : "archived",
-          "data_cart" : {
-            "NDBC": { 
-              "44033": { 
-                "parameters": {
-                  "water_temperature":{},
-                  "air_temperature":{}
-                },
-                "custom_name":"NDBC 44033"
-              },
-              "44025": { 
-                "parameters": {
-                  "water_temperature":{},
-                  "air_temperature":{}
-                },
-                "custom_name":"NDBC 44025"
+          "data_cart" : [
+            { 
+              "network":"NDBC",
+              "station": "44033",
+              "custom_name":"NDBC 44033",
+              "parameters": {
+                "water_temperature":{},
+                "air_temperature":{}
               }
             },
-            "CO-OPS": {
-              "2695540": {
-                "name": "2695540",
-                "network": "CO-OPS",
-                "parameters": {
-                  "air_pressure": {},
-                  "air_temperature": {}
-                },
-                "custom_name": "CO-OPS 2695540",
-                "station": "2695540"
+            {
+              "network": "NDBC",
+              "station": "44025",
+              "custom_name":"NDBC 44025",
+              "parameters": {
+                "water_temperature":{},
+                "air_temperature":{}
+              }
+            },
+            {
+              "network": "CO-OPS",
+              "station": "2695540",
+              "custom_name": "CO-OPS 2695540",
+              "parameters": {
+                "air_pressure": {},
+                "air_temperature": {}
               }
             }
-          }
+          ]
         },
 
         "data" : {},
@@ -478,18 +477,20 @@
 
     tool.init_map = function(){
 
-      $.each(tool.configuration.data_cart, function(network, network_obj){
 
-        $.each(network_obj,function(station, station_obj){
+      $.each(tool.configuration.data_cart, function(index, station_obj){
 
-          // request station data for single station. no support for multiple stations
-          $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
+        var s = station_obj;
+        //$.each(network_obj,function(station, station_obj){
 
-            console.log("**** station data **** ", data);
+          // request station data
+          $.getJSON( "http://epedata.oceanobservatories.org/stations/" + s.network + "/" + s.station, function( data ) {
+
+            //console.log("**** station data **** ", data);
 
             var options = $.extend(true, {
-                "station":station,
-                "network":network,
+                "station":s.station,
+                "network":s.network,
                 "description": data.description
               }, tool.leaflet_map.styles.station);
 
@@ -530,7 +531,7 @@
               .addTo(tool.leaflet_map.station_markers);
 
             // set default selected station and station details
-            if(tool.configuration.station == station){
+            if(tool.configuration.station == s.station){
               //stationMarker.openPopup();
 
               stationMarker.setStyle(tool.leaflet_map.styles.station_click);
@@ -552,7 +553,8 @@
             tool.map_stations_loaded();
 
           });
-        });
+        
+
       });
       
       // hack to invalidate the map bounds and show the appropriate zoom.
@@ -600,7 +602,7 @@
 
         tool.leaflet_map.map.removeLayer(layer);
         tool.leaflet_map.station_markers.removeLayer(layer);
-        console.log("LAYER-->", layer);
+        //console.log("LAYER-->", layer);
       })
 
       tool.leaflet_map.map.invalidateSize();
@@ -660,7 +662,7 @@
 
         tool.leaflet_map.station_markers.eachLayer(function(layer){
           
-          console.log("LAYER", layer, layer.getLatLng(), layer.latitude);
+          //console.log("LAYER", layer, layer.getLatLng(), layer.latitude);
 
           if(station == layer.options.station){
             layer.setStyle(tool.leaflet_map.styles.station_click);
@@ -729,11 +731,11 @@
           end;
 
       if(config.date_type == "realtime"){
-        start = config.realtime_days,
+        start = config.realtime_days;
         end = "now";  
       }
       else{
-        start = config.start_date,
+        start = config.start_date;
         end = config.end_date;
       }
 
@@ -743,7 +745,7 @@
         '&parameter=' + parameter + 
         '&start_time=' + start +
         '&end_time=' + end;
-    }
+    };
     
     /**
      * Update visualization with new data
@@ -757,7 +759,7 @@
 
         $("#"+tool.dom_target+"_tool-status").html(
           $('<i class="icon-exclamation-sign param-icon"></i><i style="color:red" class="param-icon">Data is not available for this selection.</i>')
-        )
+        );
 
       }
       else{
@@ -814,7 +816,7 @@
           d3.selectAll('.axis line, .axis path')
             .style("fill","none")
             .style("stroke","#999")
-            .style("stroke-width","1px")
+            .style("stroke-width","1px");
             //.style("shape-rendering","crispEdges")
           d3.selectAll('.y.axis line')
             .style("stroke-opacity",".4");
@@ -944,29 +946,26 @@
       $("#"+tool.dom_target+"_select-stations").empty();
 
       // build the stations
-      $.each(config.data_cart, function(network, network_obj){
-
-        $.each(network_obj,function(station, station_obj){
+      $.each(config.data_cart, function(index, s){
 
           // create new option and add it to the options array
           var option = $("<option/>")
             .attr({
-              "value": network + "," + station
+              "value": s.network + "," + s.station
             })
             .html(
                function(){
-                 if(typeof station_obj.custom_name === "undefined"){
-                   return network + " - " + station;
+                 if(typeof s.custom_name === "undefined"){
+                   return s.network + " - " + s.station;
                  }
                  else{
-                   return station_obj.custom_name;
+                   return s.custom_name;
                  }
                }
             );
 
           options.push(option);
 
-        });
       });
 
       // add all the options from the options array to the select
@@ -1015,7 +1014,9 @@
           config = tool.configuration,
           dc = config.data_cart,
           options = [],
-          selected_param;
+          selected_param,
+          data_cart_index = tool.station_get_index(station);
+
           // need to condition for param that is not available in a newly updated list (when station changes and the new station does not have the previously selected param.. in that case, just take the first parameter of the list.. and put an exclaimation next to the dropdown to indicated update ened)
 
         // reference to param
@@ -1028,7 +1029,7 @@
         .append("<option>..updating..</option>");
 
       // populate options array with parameters
-      $.each(dc[network][station].parameters, function(parameter){
+      $.each(dc[data_cart_index].parameters, function(parameter){
         
         // create new option and add it to the options array
         var option = $("<option></option>")
@@ -1091,6 +1092,17 @@
 
       return string_proper;
     };
+
+    /** Find station array index by station name **/
+    tool.station_get_index = function(station){
+
+      var dc = tool.configuration.data_cart, index = false;
+
+      $.each(dc,function(i,s){
+        if(s.station == station){index = i};
+      });
+      return index;
+    }
 
     /**
      * Called by data browser control

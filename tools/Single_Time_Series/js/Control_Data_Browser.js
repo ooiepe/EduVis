@@ -3,7 +3,7 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 9/10/2014
+ * Revised 9/11/2014
  * Written by Michael Mills, Rutgers University
  
 */
@@ -16,7 +16,7 @@
     control = {
 
     "name":"Data_Browser_Control",
-    "version" : "0.2.1",
+    "version" : "0.2.2",
     "description" : "This controls allows the user to select Time Series Datasets via a map and search criteria interface. The search is supported by EPE Data Services.",
     "authors" : [
       {
@@ -598,9 +598,6 @@
 
       //control.dataCart();
 
-    
-
-  
 };
 
    /** 
@@ -1148,184 +1145,185 @@
     control.dataCart = function(){
 
       var dc = $("#data-cart"),
-          cart_networks = $("<div />");
+          cart_stations = $("<div />").addClass("cart-stations");
 
-      $.each( tool.configuration.data_cart , function( network, stations){
+      $.each( tool.configuration.data_cart , function( index, station_obj){
 
-        var cart_network = $("<div />")
-            .addClass("cart-network");
-            //.html("<h4>"+network+"</h4>");
+        var s = station_obj;
 
-        var cart_network_stations = $("<div />")
-            .addClass("cart-stations");
+/*
+        { 
+          "network":"NDBC",
+          "station": "44033",
+          "custom_name":"NDBC 44033",
+          "parameters": {
+            "water_temperature":{},
+            "air_temperature":{}
+          }
+        }
+*/
 
-        $.each(stations, function( station, station_obj){
+        if(typeof s.custom_name === "undefined"){
+          s.custom_name = s.network + " " + s.station;
+        } 
 
-          //console.log(station, station_obj, network);
+        var cart_station = $("<div />")
+          .addClass("cart-station")
+          .append(
+            $("<div />")
+              .addClass("station-name-edit")
+              .css("display","none")
+          )
+          .append(
+            $("<div />")
+              .addClass("station-name")
+              .html(s.custom_name)
+              .click(function(){
+                  control.stationWindowUpdate(s);
+              })
+              .hover(
+                // this hover element is the edit and remove button
+                function() {
+                  var sta = $(this);
+                  sta.css("text-decoration","underline");
 
-          if(typeof station_obj.custom_name === "undefined"){
-            station_obj.custom_name = network + " " + station;
-            
-          } 
-          station_obj.network = network;
-          station_obj.station = station;         
-
-          var cart_network_station = $("<div />")
-            .addClass("cart-station")
-            .append(
-              $("<div />")
-                .addClass("station-name-edit")
-                .css("display","none")
-            )
-            .append(
-              $("<div />")
-                .addClass("station-name")
-                .html(station_obj.custom_name)
-                .click(function(){
-                    control.stationWindowUpdate(station_obj);
-                })
-                .hover(
-                  // this hover element is the edit and remove button
-                  function() {
-                    var sta = $(this);
-                    sta.css("text-decoration","underline");
-
-                    // is there already a span element? if so, remove it
-                    if(sta.parent().has( "span" ).length > 0){
-                      sta.find(".cart-station-tools").remove();
-                    }
-                        
-                    var tmpSpan = $("<span />")
-                      //.html("&nbsp;&nbsp;")
-                      .css({
-                          "position":"relative",
-                          "top":"0",
-                          "float":"right",
-                          "margin":"2px"
-                          //"border":"1px solid red",
-                      })
-                      .append(
-                        $("<span />")
-                          .css("float","left")
-                          .attr("title","Edit Name for " + station)
-                          .addClass("cart-station-tools ui-icon ui-icon-pencil")
-
-                          .on("click", function(evt_station_edit_name_click){
-
-                            var station_input; 
-                            $(tmpSpan).remove();
-
-                             // load input box and cancel button
-                            var current_name = sta.find(".station-name").html();
-
-                            //console.log("station remove click");
-                            sta.parent().find(".station-name")
-                              .css("display","none");
-
-                            sta.parent().find(".station-name-edit")
-                              .css("display","block")
-                              .empty()
-                              .append(
-
-                                $("<div />")
-                                  .append(
-                                    station_input = $("<input />")
-                                      .attr("type","text")
-                                      .addClass("input input-medium")
-                                      .val(station_obj.custom_name)
-                                      .keypress(function(e){
-                                        if(e.which == 13) {
-
-                                          station_obj.custom_name = $(this).val();
-
-                                          //console.log("Station Obj.custom name", station_obj.custom_name);
-
-                                          sta.parent().find(".station-name")
-                                            .html(station_obj.custom_name)
-                                            .css("display","block");
-                                          
-                                          sta.parent().find(".station-name-edit")
-                                            .css("display","none")
-                                        }
-                                      })
-                                      //.on("click", function(e){e.stopImmediatePropagation();})
-                                  )
-                                  .append(
-                                    $("<span />")
-                                    .css("float","right")
-                                      .addClass("cart-station-tools ui-icon ui-icon-circle-close")
-                                      .on("click",function(evt){
-                                        
-                                        sta.parent().find(".station-name")
-                                          .html(station_obj.custom_name);
-
-                                      })
-                                  )
-                                  .append(
-                                    $("<span />")
-                                    .css("float","right")
-                                      .addClass("cart-station-tools ui-icon ui-icon-circle-check")
-                                      .on("click",function(evt){
-
-                                        station_obj.custom_name = station_input.val();
-                                        
-                                        sta.parent().find(".station-name")
-                                          .html(station_obj.custom_name)
-                                          .css("display","block");
-                                        
-                                        sta.parent().find(".station-name-edit")
-                                          .css("display","none")
-
-                                      })
-                                  )
-                                  .hover(function(hover_evt){
-                                    hover_evt.stopImmediatePropagation();
-                                  })
-
-                              );
-
-                            evt_station_edit_name_click.stopImmediatePropagation();
-
-                            control.apply_button_update("modified");
-
-                          })
-
-                      )
-                      .append(
-                        $("<span />")
-                          .css("float","left")
-                          .attr("title","Remove Station " + station)
-                          .addClass("cart-station-tools ui-icon ui-icon-circle-close")
-
-                          .on("click", function(evt_station_remove_click){
-
-                            evt_station_remove_click.stopImmediatePropagation();
-
-                            delete tool.configuration.data_cart[network][station];
-
-                            $(".cart-param-tools").remove();
-
-                            sta.parent().fadeOut();
-
-                            control.apply_button_update("modified");
-
-                          })
-                      )
-                      .prependTo(sta);
-                      
-                  },
-                  function() {
-                    $( this )
-                      .css("text-decoration","none")
-                      .find( "span" ).remove();
+                  // is there already a span element? if so, remove it
+                  if(sta.parent().has( "span" ).length > 0){
+                    sta.find(".cart-station-tools").remove();
                   }
-                )
-            );
+                      
+                  var tmpSpan = $("<span />")
+                    //.html("&nbsp;&nbsp;")
+                    .css({
+                        "position":"relative",
+                        "top":"0",
+                        "float":"right",
+                        "margin":"2px"
+                        //"border":"1px solid red",
+                    })
+                    .append(
+                      $("<span />")
+                        .css("float","left")
+                        .attr("title","Edit Name for " + s.station)
+                        .addClass("cart-station-tools ui-icon ui-icon-pencil")
+
+                      .on("click", function(evt_station_edit_name_click){
+
+                        var station_input; 
+                        $(tmpSpan).remove();
+
+                         // load input box and cancel button
+                        var current_name = sta.find(".station-name").html();
+
+                        //console.log("station remove click");
+                        sta.parent().find(".station-name")
+                          .css("display","none");
+
+                        sta.parent().find(".station-name-edit")
+                          .css("display","block")
+                          .empty()
+                          .append(
+
+                            $("<div />")
+                              .append(
+                                station_input = $("<input />")
+                                  .attr("type","text")
+                                  .addClass("input input-medium")
+                                  .val(s.custom_name)
+                                  .keypress(function(e){
+                                    if(e.which == 13) {
+
+                                      s.custom_name = $(this).val();
+
+                                      //console.log("Station Obj.custom name", station_obj.custom_name);
+
+                                      sta.parent().find(".station-name")
+                                        .html(s.custom_name)
+                                        .css("display","block");
+                                      
+                                      sta.parent().find(".station-name-edit")
+                                        .css("display","none")
+                                    }
+                                  })
+                                  //.on("click", function(e){e.stopImmediatePropagation();})
+                              )
+                              .append(
+                                $("<span />")
+                                .css("float","right")
+                                  .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+                                  .on("click",function(evt){
+                                    
+                                    sta.parent().find(".station-name")
+                                      .html(s.custom_name);
+
+                                  })
+                              )
+                              .append(
+                                $("<span />")
+                                .css("float","right")
+                                  .addClass("cart-station-tools ui-icon ui-icon-circle-check")
+                                  .on("click",function(evt){
+
+                                    s.custom_name = station_input.val();
+                                    
+                                    sta.parent().find(".station-name")
+                                      .html(s.custom_name)
+                                      .css("display","block");
+                                    
+                                    sta.parent().find(".station-name-edit")
+                                      .css("display","none")
+
+                                  })
+                              )
+                              .hover(function(hover_evt){
+                                hover_evt.stopImmediatePropagation();
+                              })
+
+                          );
+
+                        evt_station_edit_name_click.stopImmediatePropagation();
+
+                        control.apply_button_update("modified");
+
+                      })
+
+                    )
+                    .append(
+                    $("<span />")
+                      .css("float","left")
+                      .attr("title","Remove Station " + s.station)
+                      .addClass("cart-station-tools ui-icon ui-icon-circle-close")
+
+                      .on("click", function(evt_station_remove_click){
+
+                        evt_station_remove_click.stopImmediatePropagation();
+
+                        // need function to find and delete specific station
+                        tool.configuration.data_cart.splice(index,1);
+
+                        $(".cart-param-tools").remove();
+
+                        sta.parent().fadeOut();
+
+                        control.apply_button_update("modified");
+
+                      })
+                  )
+                  .prependTo(sta);
+                    
+                },
+                function() {
+                  $( this )
+                    .css("text-decoration","none")
+                    .find( "span" ).remove();
+                }
+              )
+          );
             
           var station_params = $("<div></div>")
               .addClass("cart-params");
 
-          $.each(station_obj.parameters, function(param){
+          $.each(s.parameters, function(param){
                 
             var station_param = $("<div></div>")
                 .addClass("cart-param")
@@ -1357,7 +1355,7 @@
 
                         evt_param_remove_click.stopImmediatePropagation();
 
-                        delete tool.configuration.data_cart[network][station]["parameters"][param];
+                        delete tool.configuration.data_cart[index]["parameters"][param];
 
                         $(".cart-param-tools").remove();
 
@@ -1375,28 +1373,21 @@
 
             station_params.append(station_param);                   
 
-          });
-
-          cart_network_station
-            .append(station_params);
-
-          cart_network_stations
-            .append(cart_network_station);
-
         });
 
-        cart_network
-          .append(cart_network_stations);
+        cart_station
+          .append(station_params);
 
-        cart_networks
-          .append(cart_network);
+        cart_stations
+          .append(cart_station);
 
       });
 
+
       // clear and update data cart
       $("#db-data-cart")
-      .empty()
-      .append(cart_networks);
+        .empty()
+        .append(cart_stations);
 
       //$(".db-data-cart").draggable("option", "handle", "h4");
 
@@ -1594,7 +1585,6 @@
       }
 
     };
-
 
   // set default for search
   control.searchActive = false;
