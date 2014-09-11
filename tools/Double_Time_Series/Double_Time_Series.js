@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 9/10/2014
+ * Revised 9/11/2014
  * Written by Michael Mills and Sage Lichtenwalner
 */
 
@@ -8,7 +8,7 @@
     "use strict";
     var tool = {
         "name" : "Double_Time_Series",
-        "version" : "0.3.4",
+        "version" : "0.3.5",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
           {
@@ -132,24 +132,26 @@
           "start_date": "2013-01-01",
           "end_date": "2013-12-31",
           "date_type" : "archived",
-          "data_cart" : {
-            "NDBC": { 
-              "44033": { 
-                "parameters": {
-                  "water_temperature":{},
-                  "air_temperature":{}
-                },
-                "custom_name":"NDBC 44033"
-              },
-              "44025": { 
-                "parameters": {
-                  "water_temperature":{},
-                  "air_temperature":{}
-                },
-                "custom_name":"NDBC 44025"
+          "data_cart" : [
+            {
+              "network" : "NDBC",
+              "station" : "44033",
+              "custom_name":"NDBC 44033",
+              "parameters": {
+                "water_temperature":{},
+                "air_temperature":{}
+              }
+            },
+            {
+              "network" : "NDBC",
+              "station" : "44025",
+              "custom_name":"NDBC 44025",
+              "parameters": {
+                "water_temperature":{},
+                "air_temperature":{}
               }
             }
-          },
+          ],
 
           //not updated
           "line_color1":"#a33333",
@@ -523,7 +525,7 @@
      */    
     tool.updategraph = function(data, variable) {
 
-      console.log("variable: ", variable);
+      //console.log("variable: ", variable);
 
       if(typeof data === "undefined"){
 
@@ -861,22 +863,19 @@
       $("#"+tool.dom_target+"_select-stations-" + variable).empty();
 
       // build the stations
-      $.each(config.data_cart, function(network, network_obj){
-
-        $.each(network_obj,function(station, station_obj){
+       $.each(config.data_cart, function(index, s){
 
           // create new option and add it to the options array
           var option = $("<option/>")
             .attr({
-              "value": network + "," + station
+              "value": s.network + "," + s.station
             })
             .html(
-              typeof station_obj.custom_name === "undefined" ? network + " - " + station : station_obj.custom_nam
+              typeof s.custom_name === "undefined" ? s.network + " - " + s.station : s.custom_name
             );
 
           options.push(option);
 
-        });
       });
 
       // add all the options from the options array to the select
@@ -922,7 +921,8 @@
           config = tool.configuration,
           dc = config.data_cart,
           options = [],
-          selected_param;
+          selected_param,
+          data_cart_index = tool.station_get_index(station);
           // need to condition for param that is not available in a newly updated list (when station changes and the new station does not have the previously selected param.. in that case, just take the first parameter of the list.. and put an exclaimation next to the dropdown to indicated update ened)
 
         // reference to param
@@ -931,10 +931,10 @@
       $(".param-icon").remove();
 
       $("#"+tool.dom_target+"_select-parameters-"+ variable)
-      .empty()
-      .append("<option>..updating..</option>");
+        .empty()
+        .append("<option>..updating..</option>");
 
-      $.each(dc[network][station].parameters,function(parameter){
+      $.each(dc[data_cart_index].parameters,function(parameter){
 
         // create new option and add it to the options array
         var option = $("<option></option>")
@@ -994,6 +994,17 @@
 
       return string_proper;
     };
+
+     /** Find station array index by station name **/
+    tool.station_get_index = function(station){
+
+      var dc = tool.configuration.data_cart, index = false;
+
+      $.each(dc,function(i,s){
+        if(s.station == station){index = i};
+      });
+      return index;
+    }
 
     /**
      * Called by data browser control
