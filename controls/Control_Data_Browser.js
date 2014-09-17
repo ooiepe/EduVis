@@ -3,7 +3,7 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 9/11/2014
+ * Revised 9/16/2014
  * Written by Michael Mills, Rutgers University
  
 */
@@ -16,7 +16,7 @@
     control = {
 
     "name":"Data_Browser_Control",
-    "version" : "0.2.2",
+    "version" : "0.2.3",
     "description" : "This controls allows the user to select Time Series Datasets via a map and search criteria interface. The search is supported by EPE Data Services.",
     "authors" : [
       {
@@ -833,18 +833,30 @@
      */
     control.dataCartAddParam = function(network,station,param){
         
-      var data_cart_item = {};
-         
-      data_cart_item[network] = {};
-      data_cart_item[network][station] = {};
-      data_cart_item[network][station]["name"] = station;
-      data_cart_item[network][station]["network"] = network;
-      data_cart_item[network][station]["parameters"] = {};
-      data_cart_item[network][station]["parameters"][param]={};
-      
-      // extend the cart item into the cart.. bascially, just appending the parameter.
-      $.extend(true, tool.configuration.data_cart, data_cart_item);
+      var dc = tool.configuration.data_cart,
+        dc_index = tool.station_get_index(station),
+        dc_obj,
+        param_obj = {};
 
+      param_obj[param] = {};
+
+      // if station does not exist, add to array, otherwise update parameter
+      if(dc_index === false){
+
+        dc_obj = {
+          "network" : network,
+          "station" : station,          
+          "custom_name" : network + " " + station,
+          "parameters" : param_obj
+        };
+
+        dc.push(dc_obj);
+      }
+      else{
+        $.extend(true, dc[dc_index]["parameters"], param_obj);
+      }
+      
+      // update apply button
       control.apply_button_update("modified");
     };
 
