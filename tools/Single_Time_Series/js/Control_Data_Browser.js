@@ -16,7 +16,7 @@
     control = {
 
     "name":"Data_Browser_Control",
-    "version" : "0.2.3",
+    "version" : "0.2.4",
     "description" : "This controls allows the user to select Time Series Datasets via a map and search criteria interface. The search is supported by EPE Data Services.",
     "authors" : [
       {
@@ -1181,6 +1181,7 @@
 
         var cart_station = $("<div />")
           .addClass("cart-station")
+          .attr("data-id", index)
           .append(
             $("<div />")
               .addClass("station-name-edit")
@@ -1401,7 +1402,12 @@
         .empty()
         .append(cart_stations);
 
-      //$(".db-data-cart").draggable("option", "handle", "h4");
+      cart_stations
+        .sortable({
+          change : function(evt,ui){
+            control.apply_button_update("modified");
+          }
+        });
 
     };
 
@@ -1543,7 +1549,17 @@
       // check to see if button is disabled, if not, apply changes
       if(!btn_apply.hasClass('disabled')){
 
-        var config = tool.configuration;
+        var config = tool.configuration,
+            x=0,
+            sorted_ary=[],
+            sorted_cart = $( ".cart-stations" ).sortable( "toArray", {"attribute":"data-id"});
+
+        for(; x<sorted_cart.length;x++){
+          sorted_ary.push(config.data_cart[sorted_cart[x]]);
+        }
+
+        // update the array with the newly sorted array
+        config.data_cart = sorted_ary;
 
         // default chart properties
         // updated by the visualization
@@ -1551,7 +1567,6 @@
         // "station" : "44033",
         // "network" : "NDBC",
         // "parameter" : "water_temperature",
-
         // updated by the data browser
          
         config["date_type"] = $("#db-dates-dropdown").val();
