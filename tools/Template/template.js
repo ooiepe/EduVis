@@ -6,85 +6,108 @@
 
 (function (eduVis) {
 
-    "use strict";
+  "use strict";
 
-    var tool = {
+  var tool = {
 
-        "name" : "Template",
-        "description" : "A Tool Template.",
-        "url" : "",
+      "name" : "Template",
+      "description" : "A Tool Template.",
+      "url" : "",
 
-        "version" : "0.0.1",
-        "authors" : [
+      "version" : "0.0.1",
+      "authors" : [
+          {
+              "name" : "Michael Mills",
+              "association" : "Rutgers University",
+              "url" : "http://marine.rutgers.edu/~mmills"
+          }
+      ],
+      
+      "resources" : {
+
+          //
+        "tool":{
+          "scripts" : [
             {
-                "name" : "Michael Mills",
-                "association" : "Rutgers University",
-                "url" : "http://marine.rutgers.edu/~mmills"
+              "name" : "d3",
+              "url" : "http://d3js.org/d3.v3.js",
+              "global_reference" : "d3",
+              "attributes" : {
+                  "charset" : "utf-8"
+              }
+            },
+            {
+              "name" : "jquery_ui_js", 
+              "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
             }
-        ],
-        
-        "resources" : {
-
-            "scripts" : [
-                {
-                    "name" : "d3",
-                    "url" : "http://d3js.org/d3.v3.min.js",
-                    "global_reference" : "d3"
-                }
-            ],
-
-            "stylesheets" : [
-                {
-                    "name" : "jquery-ui",
-                    "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
-                }
-            ],
-
-            "datasets" : [] 
-            
+          ],
+          "stylesheets" : [
+            { 
+              "name" : "Testing.css",
+              "src" : "Testing.css"
+            },
+            // {
+            //   "name" : "jquery-ui-css",
+            //    "src" : "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+            // }
+          ]
         },
+        "controls":{
 
-        "configuration" : {
-        	"alertMessage" : "this is an Alert Message."
-        },
+          "scripts" : [
+            // {
+            //     "name" : "jquery_ui_js", 
+            //     "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
+            // }
+          ],
 
-        "controls" : {
+          "stylesheets" : [
+            // {
+            //     "name" : "jquery-ui-css",
+            //     "src" : "http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"
+            // },
+            // {   "name": "jquery-smoothness",
+            //     "src": "http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+            // },
+            // {
+            //     "name": "leaflet-css",
+            //     "src": "http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css"
+            // }
+          ]
+        }
+      },     
 
-            "alertMessage" : {
+      "configuration" : {
+        "property_name" : "value"
+      },
 
-                "type" : "textbox",
-                "label" : "Testing the Text Box",
-                "tooltip": "What is a tooltip?",
-                "default_value" : "This is a test",
-                "description" : "this control is for testing the text box of template.js"
-            }
-        },
-        "data" : {},
-        "target_div" : "Template",
-        "tools" : {}
+      "target_div" : "Template"
 
-    };
+  };
 
-    tool.Template = function( _target ){
+  tool.Template = function( _target ){
 
-      	//document.getElementById(_target_div).innerHTML = "TEMPLATE TOOL LOADED";
+    // This is the main tool function. 
+    // It must be named the same as the tool directory.
 
-      	alert(tool.configuration.alertMessage);
+    
+    // The EduVis load_complete function is a simple console.log 
+    // notification indicating the tool has loaded.
+    EduVis.tool.load_complete(this);
 
-        EduVis.tool.load_complete(this);
+  };
 
-    };
+  tool.init = function() {
 
-    tool.init = function() {
+    // The init function is required. This is how all tools are initialized.
+    // Here you can perform pre tool functions, if necessary.
 
-        // todo: include instance in call
-        //console.log(" ... template init..... ", this)
-        this.Template(this.dom_target);
+    this.Template(this.dom_target);
 
-    };
+  };
 
-    // extend base object with tool..
-    EduVis.tool.tools[tool.name] = tool;
+  // extend base object with tool..
+  EduVis.tool.tools[tool.name] = tool;
 
 }(EduVis));
 
