@@ -433,6 +433,7 @@ Written by Michael Mills, Rutgers University
 
                     parent_tool.configuration.date_start = $("#config-date_start-input").val();
                     parent_tool.configuration.date_end = $("#config-date_end-input").val();
+                    parent_tool.configuration.dataset_id = $("#config-dataset_id-select").val();
 
                     // update map
                     parent_tool.map_update();

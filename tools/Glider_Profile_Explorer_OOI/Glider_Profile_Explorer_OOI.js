@@ -93,7 +93,6 @@
 
         "configuration" : {
           "dataset_id" : "OOI-GP05MOAS-GL001",
-          "dataset_name" : "GP05MOAS", 
           "profile_id" : "1",
           "parameter" : "temperature",
           "date_start": "2013-09-17",
@@ -254,7 +253,7 @@
               
               $("<div />")
                 .attr("id", "gpe-map-title")
-                .html(tool.configuration.dataset_name + " Profile Locations")
+                .html(tool.configuration.dataset_id + " Profile Locations")
             )
             .append(
 
@@ -480,7 +479,7 @@
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (0) + ") ")
-        .text(tool.configuration.dataset_name);
+        .text(tool.configuration.dataset_id);
         //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
 
       g.subtitle = g.svg.append("text")
@@ -831,7 +830,7 @@
         profile_date = data[0]["time (UTC)"].slice(0,10);
         
         g.title.text(
-          tool.configuration.dataset_name + " - " + profile_date
+          tool.configuration.dataset_id + " - " + profile_date
         );
 
         g.subtitle.text(
