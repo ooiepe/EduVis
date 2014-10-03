@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 10/1/2014
+ * Revised 10/4/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Explorer",
         "url" : "",
 
-        "version" : "0.3.3",
+        "version" : "0.4.0",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -664,6 +664,11 @@
           mapObj.map.removeLayer(mapObj.layer_locations);
         }
 
+        // shortcuts
+        var pl = tool.leaflet_map.poly_line,
+            layer_loc = tool.leaflet_map.layer_locations,
+            map_styles = tool.mapping.styles;
+
         mapObj.layer_locations = new L.geoJson(mapObj.locationsFeatureCollection,{
           onEachFeature: function (location, location_feature) {
 
@@ -673,8 +678,8 @@
             mapObj.profile_ids.set(location.properties.profile_id, location.properties.time);
             
             // add the profile location to the profile track
-            tool.leaflet_map.poly_line
-              .addLatLng(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
+            
+            pl.addLatLng(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
 
             // add click event for the profile
             location_feature.on({
@@ -687,11 +692,11 @@
                 var profile_id = e.target.feature.properties.profile_id;
 
                 // only update the style for the selected profile
-                tool.leaflet_map.layer_locations.setStyle(function(feature) {
+                layer_loc.setStyle(function(feature) {
                   if (feature.properties.profile_id == profile_id) {
-                    return tool.mapping.styles.profile_click;
+                    return map_styles.profile_click;
                   }
-                  return tool.mapping.styles.profile;
+                  return map_styles.profile;
                 });
 
                 // update the graph and slider
@@ -956,100 +961,6 @@
         }
       );
     };
-
-    // tool.config_dateRange_slider = function(date_start, date_end, range_start, range_end){
-        
-    //   $("#ui-config-dateRange-slider").remove();
-
-    //     var margin = {
-    //         top: 0,
-    //         right: 40,
-    //         bottom: 20,
-    //         left: 40
-    //     },
-    //         width = 500 - margin.left - margin.right,
-    //         height = 50 - margin.top - margin.bottom,
-    //         date_format = d3.time.format("%Y-%m-%d");
-
-    //     var iso_format = d3.time.format.iso.parse,
-            
-    //         start = date_format.parse(date_start),
-    //         end = date_format.parse(date_end);
-
-    //     var range_date_start = range_start || date_start,
-    //         range_date_end = range_end || date_end;
-
-    //     var x = d3.time.scale.utc()
-    //         .range([0, width])
-    //         .domain([start, end]);
-
-    //     // set the extent to the selected range within the full range
-    //     var brush = d3.svg.brush()
-    //         .x(x)
-    //         .extent([date_format.parse(range_date_start), date_format.parse(range_date_end)])
-    //         .on("brushstart", brushstart)
-    //         .on("brush", brushmove)
-    //         .on("brushend", brushend);
-
-    //     var arc = d3.svg.arc()
-    //         .outerRadius(height / 2)
-    //         .startAngle(0)
-    //         .endAngle(function (d, i) {
-    //         return i ? -Math.PI : Math.PI;
-    //     });
-
-    //     var svg = d3.select("#ui-config-dateRange").append("svg")
-    //         .attr("id","ui-config-dateRange-slider")
-    //         .attr("width", width + margin.left + margin.right)
-    //         .attr("height", height + margin.top + margin.bottom)
-    //         .append("g")
-    //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    //     var tick_interpolate = d3.interpolate(start, end);
-    //     var dd = [0, 0.25, 0.5, 0.75, 1].map(function (a) {
-    //         return iso_format(tick_interpolate(a));
-    //     });
-
-    //     svg.append("g")
-    //         .attr("class", "x axis")
-    //         .attr("transform", "translate(0," + height + ")")
-    //         .call(
-    //           d3.svg.axis().scale(x)
-    //             .orient("bottom")
-    //             .tickValues(dd)
-    //             .tickFormat(date_format)
-    //         );
-
-    //     var brushg = svg.append("g")
-    //         .attr("class", "brush")
-    //         .call(brush);
-
-    //     brushg.selectAll(".resize").append("path")
-    //       .attr("transform", "translate(0," + height / 2 + ")")
-    //       .attr("d", arc);
-
-    //     brushg.selectAll("rect")
-    //       .attr("height", height);
-
-    //     brushstart();
-    //     brushmove();
-
-    //     function brushstart() {
-    //         svg.classed("selecting", true);
-    //     }
-
-    //     function brushmove() {
-    //         var s = brush.extent();
-            
-    //         $("#config-date_start-input").val(date_format(s[0]));
-    //         $("#config-date_end-input").val(date_format(s[1]));
-    //     }
-
-    //     function brushend() {
-    //         svg.classed("selecting", !d3.event.target.empty());
-    //     }
-
-    // };
 
     tool.slider_update = function(profile_id){
 

@@ -2,7 +2,7 @@
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
  
-Revised 10/1/2014
+Revised 10/3/2014
 Written by Michael Mills, Rutgers University
  
 */
@@ -13,9 +13,8 @@ Written by Michael Mills, Rutgers University
 
   var parent_tool,
     control = {
-
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.0.1",
+    "version" : "0.1.0",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -124,8 +123,10 @@ Written by Michael Mills, Rutgers University
         $("#config-date_start-input").val(date_format(s[0]));
         $("#config-date_end-input").val(date_format(s[1]));
 
-        control.poly_track_selected_update(s[0],s[1]);
-
+        // limit execution does not seem to have an effect
+        L.Util.limitExecByInterval(
+          control.poly_track_selected_update(s[0],s[1]),
+          1000, this);
     }
 
     function brushend() {
@@ -135,8 +136,6 @@ Written by Michael Mills, Rutgers University
   };
 
   control.poly_track_selected_update = function(start,end){
-
-    console.log("start - end", start,end);
     
     // get full track from poly_track
     var track_geojson = control.config_controls.leaflet_map.track_full_geojson,
@@ -156,9 +155,9 @@ Written by Michael Mills, Rutgers University
           poly_coords.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
         }
       }
-     });
+    });
 
-     config_mapObj.poly_line_selected.setLatLngs(poly_coords);
+    config_mapObj.poly_line_selected.setLatLngs(poly_coords);
 
   };
 
@@ -172,6 +171,8 @@ Written by Michael Mills, Rutgers University
         iso_format = d3.time.format.iso.parse,
         date_format = d3.time.format("%Y-%m-%d"),
         slider = control.config_controls.slider;
+
+        control.iso_format = iso_format;
         
         slider.date_start = config.date_start;
         slider.date_end = config.date_end;
@@ -291,14 +292,90 @@ Written by Michael Mills, Rutgers University
                   config_mapObj.track_full_geojson = geodata;
 
                   var poly_coords = [], poly_coords_selected = [];
+
+                  // remove geoJson point layer if its already on the map
+                  if(typeof config_mapObj.track_full_L_geoJson !== "undefined"){
+                    config_mapObj.map.removeLayer(config_mapObj.track_full_L_geoJson);
+                  }
                   
                   config_mapObj.track_full_L_geoJson = L.geoJson(geodata,{
 
                     onEachFeature: function (location, location_feature) {
 
+
+                      location_feature.on({
+                        "click": function(e){
+
+                          var start = iso_format($("#config-date_start-input").val()),
+                            end = iso_format($("#config-date_end-input").val()),
+                            profile_time = iso_format(e.target.feature.properties.time),
+                            content, position;
+
+                            // set as start date
+                            if(profile_time <= start){
+                              content = '<a id="track_profile_set_start" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>Start Date</b></a>';
+                              //position="start";
+                            }
+                            else if(profile_time <= end){
+                              
+                              content = '<a id="track_profile_set_start" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>Start Date</b></a>' +
+                                        '<a id="track_profile_set_end" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>End Date</b>.</a>';
+                                    //position = "both";
+                            }
+                            else{
+                              content = '<a id="track_profile_set_end" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>End Date</b>.</a>';
+                            }
+
+                          // create popup and add it to the map
+                          var popup = L.popup()
+                            .setLatLng(e.target._latlng)
+                            .setContent(content)
+                            .openOn(config_mapObj.map);
+
+                          $("#track_profile_set_start").on("click",function(e){
+                            
+                            var date_start = $("#config-date_start-input"),
+                                date_end = $("#config-date_end-input"),
+                                slider = control.config_controls.slider; 
+
+                              // update the start date
+                              date_start.val($(this).attr("data-attr-date"));
+
+                              control.config_dateRange_slider(slider.date_start, slider.date_end, date_start.val(), date_end.val());
+                          });
+
+                          $("#track_profile_set_end").on("click",function(e){
+
+                            var date_start = $("#config-date_start-input"),
+                                date_end = $("#config-date_end-input");
+
+                              date_end.val($(this).attr("data-attr-date"));
+
+                              control.config_dateRange_slider(slider.date_start, slider.date_end, date_start.val(), date_end.val());
+                          
+                          });
+                        }
+                      });
+
+
+                      //location_feature.bindPopup(control.track_profile_click(iso_format(location.properties.time)));
+
                       poly_coords.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
 
                     },
+                    pointToLayer: function (location, latlng) {
+                      return L.circleMarker(
+                        latlng, 
+                        {
+                          radius: 3,
+                          fillColor: "#ff0000",
+                          color: "#000",
+                          weight: 1,
+                          opacity: 1,
+                          fillOpacity: 0.8
+                        }
+                      );
+                    }
                   });
                      
                   // set the selected L geoJson in the control map object for later reference 
@@ -323,6 +400,9 @@ Written by Michael Mills, Rutgers University
 
                     }
                   });
+
+                  // add points
+                  config_mapObj.map.addLayer(config_mapObj.track_full_L_geoJson);
 
                   // update the poly line full track
                   config_mapObj.poly_line_track.setLatLngs(poly_coords);
