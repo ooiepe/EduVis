@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 10/4/2014
+ * Revised 10/6/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Explorer",
         "url" : "",
 
-        "version" : "0.4.0",
+        "version" : "0.4.1",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -839,7 +839,7 @@
         );
 
         g.subtitle.text(
-          " Profile: "+ pid 
+          column_selected_title + " Profile: "+ pid 
         );
         //+ " Lat: " + lat + " Long:" + lng
 
