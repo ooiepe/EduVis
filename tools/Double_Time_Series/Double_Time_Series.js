@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 9/11/2014
+ * Revised 10/6/2014
  * Written by Michael Mills and Sage Lichtenwalner
 */
 
@@ -8,7 +8,7 @@
     "use strict";
     var tool = {
         "name" : "Double_Time_Series",
-        "version" : "0.3.5",
+        "version" : "0.3.6",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
           {
@@ -182,7 +182,9 @@
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
       
-      g.parseDate = d3.time.format.iso.parse;
+      g.parseDate = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse;
+      g.parseDateConfig = d3.time.format.utc("%Y-%m-%d").parse;
+
       g.formatDate = d3.time.format("%Y-%m-%d");
       
       g.x = d3.time.scale.utc().range([0, g.width]);
@@ -511,7 +513,8 @@
         end = config.end_date;
       }
 
-      return 'http://epedata.oceanobservatories.org/timeseries?' + 
+      //return 'http://epedata.oceanobservatories.org/timeseries?' + 
+      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -570,8 +573,8 @@
             g.x.domain(d3.extent(data, (function(d) { return d.date; })));
             x.domain(d3.extent(data, (function(d) { return d.date; })));
           } else {
-            g.x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
-            x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
+            g.x.domain([g.parseDateConfig(this.configuration.start_date),g.parseDateConfig(this.configuration.end_date)]).nice();
+            x.domain([g.parseDateConfig(this.configuration.start_date),g.parseDateConfig(this.configuration.end_date)]).nice();
           }
           // Update the Y domains to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();

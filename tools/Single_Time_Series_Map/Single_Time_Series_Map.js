@@ -285,9 +285,11 @@
       g.width = width_chart_container - g.margin.left - g.margin.right;
       g.height = height_chart_container - g.margin.top - g.margin.bottom;
       
-      g.parseDate = d3.time.format.iso.parse;
+      g.parseDate = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse;
+      g.parseDateConfig = d3.time.format.utc("%Y-%m-%d").parse;
+
       g.formatDate = d3.time.format("%Y-%m-%d");
-      
+
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
       
@@ -484,7 +486,8 @@
         //$.each(network_obj,function(station, station_obj){
 
           // request station data
-          $.getJSON( "http://epedata.oceanobservatories.org/stations/" + s.network + "/" + s.station, function( data ) {
+          //http://epedata.oceanobservatories.org/stations/
+          $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + s.network + "/" + s.station, function( data ) {
 
             //console.log("**** station data **** ", data);
 
@@ -739,7 +742,8 @@
         end = config.end_date;
       }
 
-      return 'http://epedata.oceanobservatories.org/timeseries?' + 
+      //'http://epedata.oceanobservatories.org/timeseries?'
+       return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -781,6 +785,7 @@
               bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
           data.forEach(function(d) {
+
             d.date = g.parseDate(d[cols[0].key]);
             d.data = +d[cols[1].key];
           }); 
@@ -789,7 +794,7 @@
           if(this.configuration.date_type == "realtime"){
             g.x.domain(d3.extent(data, (function(d) { return d.date; })));
           } else {
-            g.x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
+            g.x.domain([g.parseDateConfig(this.configuration.start_date),g.parseDateConfig(this.configuration.end_date)]).nice();
           }
           // Updte the Y domain to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();

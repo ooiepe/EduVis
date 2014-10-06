@@ -3,7 +3,7 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 9/16/2014
+ * Revised 10/6/2014
  * Written by Michael Mills, Rutgers University
  
 */
@@ -16,7 +16,7 @@
     control = {
 
     "name":"Data_Browser_Control",
-    "version" : "0.2.4",
+    "version" : "0.2.5",
     "description" : "This controls allows the user to select Time Series Datasets via a map and search criteria interface. The search is supported by EPE Data Services.",
     "authors" : [
       {
@@ -489,10 +489,8 @@
 //
 // PARAMETERS
 //
-
-    // get the parameters from the json file.
-     //$.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
-      $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
+      //http://epedata.oceanobservatories.org/parameters
+      $.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
 
         control.parameters = data.parameters;
         
@@ -544,8 +542,8 @@
 // // networks
 // //
 
-      //$.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
-        $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
+        //$.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
+        $.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
 
         control.networks = data.networks;
 
@@ -712,10 +710,8 @@
             control.map.removeLayer(control.layer_station_markers);
         }
 
-        //var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + control.stationSearch();
-
-        var search_stations_query = "http://epedata.oceanobservatories.org/" + control.stationSearch();
-
+        //var search_stations_query = "http://epedata.oceanobservatories.org/" + control.stationSearch();
+        var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + control.stationSearch();
 
         $.getJSON( search_stations_query, function(geodata){
 
@@ -958,7 +954,8 @@
             // coordinates -- + "(" + station.geometry.coordinates[0] + ", " + station.geometry.coordinates[1] + ")"
             // request station from data-services
 
-            $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
+            //http://epedata.oceanobservatories.org/stations/
+            $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
                 // get reference to drop down
                 // if exists, check for presence of current network/station
 
@@ -1425,8 +1422,9 @@
           //console.log("station already present")
       }
       else{
-
-        $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
+        // http://epedev.oceanobservatories.org/timeseries/
+        //http://epedata.oceanobservatories.org/stations/
+        $.getJSON( " http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
 
           //console.log("**** station data **** ", data);
 

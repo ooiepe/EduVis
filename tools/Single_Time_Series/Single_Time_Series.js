@@ -219,7 +219,9 @@
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
       
-      g.parseDate = d3.time.format.iso.parse;
+      g.parseDate = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse;
+      g.parseDateConfig = d3.time.format.utc("%Y-%m-%d").parse;
+
       g.formatDate = d3.time.format("%Y-%m-%d");
       
       g.x = d3.time.scale.utc().range([0, g.width]);
@@ -431,7 +433,8 @@
         end = config.end_date;
       }
 
-      return 'http://epedata.oceanobservatories.org/timeseries?' + 
+      //"http://epedev.oceanobservatories.org/timeseries/stations/"
+      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
         'network=' + network + 
         '&station=' + station + 
         '&parameter=' + parameter + 
@@ -482,7 +485,7 @@
           if(this.configuration.date_type == "realtime"){
             g.x.domain(d3.extent(data, (function(d) { return d.date; })));
           } else {
-            g.x.domain([g.parseDate(this.configuration.start_date),g.parseDate(this.configuration.end_date)]).nice();
+            g.x.domain([g.parseDateConfig(this.configuration.start_date),g.parseDateConfig(this.configuration.end_date)]).nice();
           }
           // Updte the Y domain to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
