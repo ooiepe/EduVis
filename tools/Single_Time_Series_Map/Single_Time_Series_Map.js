@@ -515,8 +515,7 @@
                 $("#" + tool.dom_target + "-sts-map-metadata")
                   .html(
                     '<div class="station_popup">'+
-                    //'<div class="popup-title">' + data.network + ' ' + data.name + '</div>'+
-                    '<div class="popup-title">' + data.description.replace(/-/g, "<br />") + '</div>'+
+                    '<div class="popup-title">' + data.description.replace(/ - /g, "<br />") + '</div>'+
                     '<div class="popup-desc"> '+
                       'Lat: ' + data.latitude + '<br />'+
                       'Lng: ' + data.longitude +
