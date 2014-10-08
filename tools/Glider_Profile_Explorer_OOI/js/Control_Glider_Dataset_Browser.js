@@ -1,10 +1,10 @@
 /*
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
- 
-Revised 10/3/2014
+
+Revised 10/8/2014
 Written by Michael Mills, Rutgers University
- 
+
 */
 
 (function (eduVis) {
@@ -14,7 +14,7 @@ Written by Michael Mills, Rutgers University
   var parent_tool,
     control = {
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.1.0",
+    "version" : "0.1.1",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -37,7 +37,7 @@ Written by Michael Mills, Rutgers University
   };
 
   control.config_dateRange_slider = function(date_start, date_end, range_start, range_end){
-        
+
     $("#ui-config-dateRange-slider").remove();
 
     var margin = {
@@ -51,7 +51,7 @@ Written by Michael Mills, Rutgers University
         date_format = d3.time.format("%Y-%m-%d");
 
     var iso_format = d3.time.format.iso.parse,
-        
+
         start = date_format.parse(date_start),
         end = date_format.parse(date_end);
 
@@ -119,7 +119,7 @@ Written by Michael Mills, Rutgers University
 
     function brushmove() {
         var s = brush.extent();
-        
+
         $("#config-date_start-input").val(date_format(s[0]));
         $("#config-date_end-input").val(date_format(s[1]));
 
@@ -133,13 +133,16 @@ Written by Michael Mills, Rutgers University
         svg.classed("selecting", !d3.event.target.empty());
     }
 
+    control.config_controls.brush = brush;
+
   };
 
   control.poly_track_selected_update = function(start,end){
-    
+
     // get full track from poly_track
     var track_geojson = control.config_controls.leaflet_map.track_full_geojson,
-        iso_format = d3.time.format.iso.parse;
+        iso_format = d3.time.format.iso.parse,
+        date_format = d3.time.format("%Y-%m-%d").parse;
 
     var poly_coords = [],
       config = control.parent_tool.configuration,
@@ -149,7 +152,7 @@ Written by Michael Mills, Rutgers University
 
       onEachFeature: function (location, location_feature) {
 
-        var date_compare = iso_format(location.properties.time);
+        var date_compare = date_format(location.properties.time.substring(0,10));
 
         if((date_compare >= start ) && (date_compare <= end)){
           poly_coords.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
@@ -173,7 +176,7 @@ Written by Michael Mills, Rutgers University
         slider = control.config_controls.slider;
 
         control.iso_format = iso_format;
-        
+
         slider.date_start = config.date_start;
         slider.date_end = config.date_end;
 
@@ -181,7 +184,7 @@ Written by Michael Mills, Rutgers University
         slider.date_range_end = config.date_end;
 
         var erddap_ref = settings.erddap_parameter_metadata,
-      
+
         dropdown_deployment = $("<div />")
           .append(
             $("<h2 />")
@@ -229,7 +232,7 @@ Written by Michael Mills, Rutgers University
                   if(glider_datasets[c].datasetID == dataset_val){
 
                     ds_obj = glider_datasets[c];
-                    
+
                     date_start_ds = iso_format(ds_obj.minTime);
                     date_end_ds = iso_format(ds_obj.maxTime);
                     minLat = +ds_obj.minLatitude;
@@ -254,7 +257,7 @@ Written by Michael Mills, Rutgers University
 
                   slider.date_range_start = config.date_start;
                   slider.date_range_end = config.date_end;
-                  
+
                   control.config_dateRange_slider( slider.date_start, slider.date_end, slider.date_range_start, slider.date_range_end);
                 }
                 else{
@@ -283,7 +286,7 @@ Written by Michael Mills, Rutgers University
                 // query json object of dataset
                 $.getJSON( "http://erddap.marine.rutgers.edu/erddap/tabledap/" + dataset_val + ".geoJson?profile_id,time,latitude,longitude",
                   function(geodata){
-                  
+
                   console.log("track data returned...");
 
                   var config_mapObj = control.config_controls.leaflet_map;
@@ -297,7 +300,7 @@ Written by Michael Mills, Rutgers University
                   if(typeof config_mapObj.track_full_L_geoJson !== "undefined"){
                     config_mapObj.map.removeLayer(config_mapObj.track_full_L_geoJson);
                   }
-                  
+
                   config_mapObj.track_full_L_geoJson = L.geoJson(geodata,{
 
                     onEachFeature: function (location, location_feature) {
@@ -308,22 +311,23 @@ Written by Michael Mills, Rutgers University
 
                           var start = iso_format($("#config-date_start-input").val()),
                             end = iso_format($("#config-date_end-input").val()),
-                            profile_time = iso_format(e.target.feature.properties.time),
+                            profile_date = e.target.feature.properties.time.substring(0,10),
+                            profile_time = iso_format(profile_date),
                             content, position;
 
                             // set as start date
                             if(profile_time <= start){
-                              content = '<a id="track_profile_set_start" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>Start Date</b></a>';
+                              content = '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>';
                               //position="start";
                             }
                             else if(profile_time <= end){
-                              
-                              content = '<a id="track_profile_set_start" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>Start Date</b></a>' +
-                                        '<a id="track_profile_set_end" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>End Date</b>.</a>';
+
+                              content = '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>' +
+                                        '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
                                     //position = "both";
                             }
                             else{
-                              content = '<a id="track_profile_set_end" data-attr-date="'+e.target.feature.properties.time.substring(0,10)+'" class="btn">Set as <b>End Date</b>.</a>';
+                              content = '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
                             }
 
                           // create popup and add it to the map
@@ -333,10 +337,10 @@ Written by Michael Mills, Rutgers University
                             .openOn(config_mapObj.map);
 
                           $("#track_profile_set_start").on("click",function(e){
-                            
+
                             var date_start = $("#config-date_start-input"),
                                 date_end = $("#config-date_end-input"),
-                                slider = control.config_controls.slider; 
+                                slider = control.config_controls.slider;
 
                               // update the start date
                               date_start.val($(this).attr("data-attr-date"));
@@ -352,7 +356,7 @@ Written by Michael Mills, Rutgers University
                               date_end.val($(this).attr("data-attr-date"));
 
                               control.config_dateRange_slider(slider.date_start, slider.date_end, date_start.val(), date_end.val());
-                          
+
                           });
                         }
                       });
@@ -365,7 +369,7 @@ Written by Michael Mills, Rutgers University
                     },
                     pointToLayer: function (location, latlng) {
                       return L.circleMarker(
-                        latlng, 
+                        latlng,
                         {
                           radius: 3,
                           fillColor: "#ff0000",
@@ -377,15 +381,15 @@ Written by Michael Mills, Rutgers University
                       );
                     }
                   });
-                     
-                  // set the selected L geoJson in the control map object for later reference 
+
+                  // set the selected L geoJson in the control map object for later reference
                   // can be set to local value for memory savings if necessary
                   config_mapObj.track_selected_L_geoJson = L.geoJson(geodata,{
 
                     onEachFeature: function (location, location_feature) {
 
-                      var date_compare = iso_format(location.properties.time);
-                      
+                      var date_compare = iso_format(location.properties.time.substring(0,10));
+
                       // if its the currently selected dataset in the configuration, use configuraiton dates, otherwise use full dataset dates
                       if(config.dataset_id == dataset_val){
 
@@ -409,7 +413,7 @@ Written by Michael Mills, Rutgers University
 
                   // update the poly line selection track
                   config_mapObj.poly_line_selected.setLatLngs(poly_coords_selected);
-                  
+
                   // zoom the bounds of the track
                   config_mapObj.map.fitBounds(config_mapObj.poly_line_track.getBounds());
               })
@@ -426,8 +430,8 @@ Written by Michael Mills, Rutgers University
                 //"background-color":"red"
               })
               .append(
-                  
-                  // control.config_controls["ui_config_map"] = 
+
+                  // control.config_controls["ui_config_map"] =
                   $("<div />")
                   .attr("id","ui-config-map")
                   .css({
@@ -498,7 +502,7 @@ Written by Michael Mills, Rutgers University
                       .val(config.date_end)
                   )
               )
-          )        
+          )
           .append(
             $("<div />")
               .attr("id","ui-config-apply")
@@ -525,13 +529,13 @@ Written by Michael Mills, Rutgers University
 
         // list of erddap variables that we are interested in
         var erddap_variables = [
-          "datasetID", 
+          "datasetID",
           "institution",
-          "minLongitude", 
-          "maxLongitude", 
-          "minLatitude", 
-          "maxLatitude", 
-          "minTime", 
+          "minLongitude",
+          "maxLongitude",
+          "minLatitude",
+          "maxLatitude",
+          "minTime",
           "maxTime"
         ];
 
@@ -543,7 +547,7 @@ Written by Michael Mills, Rutgers University
         $.getJSON('http://erddap.marine.rutgers.edu/erddap/tabledap/allDatasets.json?' +
             erddap_variables.join(',') +'&institution="OOI"',
           function(json) {
-            
+
             var ds = json, datasets = [],
               ci = 0,
               clen = ds.table.columnNames.length;
@@ -578,7 +582,7 @@ Written by Michael Mills, Rutgers University
 
             // console.log(datasets);
             $.each(datasets, function(i,dset){
-              
+
                $("#config-dataset_id-select")
                  .append('<option value="' + dset["datasetID"] +'">' + dset["datasetID"]+'</option>');
             });
@@ -597,9 +601,9 @@ Written by Michael Mills, Rutgers University
             };
 
             // add the ocean basemap to the map tool control
-            control.config_controls.leaflet_map.oceanBasemap_layer = new L.TileLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",{ 
-              maxZoom: 19, 
-              attribution: 'Tile Layer: &copy; Esri' 
+            control.config_controls.leaflet_map.oceanBasemap_layer = new L.TileLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",{
+              maxZoom: 19,
+              attribution: 'Tile Layer: &copy; Esri'
             }).addTo(control.config_controls.leaflet_map.map);
 
             // add the blank poly line for the full track
@@ -625,7 +629,7 @@ Written by Michael Mills, Rutgers University
         .fail(function (resp) {
           console.log("request failed", resp);
         });
-    
+
   };
 
   if ( 'object' !== typeof EduVis.controls ) {
