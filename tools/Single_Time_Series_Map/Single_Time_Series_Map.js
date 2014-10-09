@@ -1,18 +1,18 @@
 /*
 
  * OOI EPE - Single Time Series with Map (STSM)
- * Revised 9/11/2014
+ * Revised 10/9/2014
  * Written by Mike Mills and Sage Lichtenwalner
 
 */
 
 (function (eduVis) {
-    
+
     "use strict";
 
     var tool = {
         "name" : "Single_Time_Series_Map",
-        "version" : "0.3.5",
+        "version" : "0.3.6",
         "description" : "This tool allows you to create an interactive time series graph of selected stations and variables. You can also customize the date range that is displayed.",
         "authors" : [
             {
@@ -52,11 +52,11 @@
                 "attributes":{}
               },
               {
-                "name" : "jquery_1.11", 
+                "name" : "jquery_1.11",
                 "url" : "https://code.jquery.com/jquery-1.11.1.min.js",
               },
               {
-                "name" : "jquery_ui_js", 
+                "name" : "jquery_ui_js",
                 "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
                 "dependsOn":["jquery_1.11"]
               }
@@ -79,7 +79,7 @@
           "controls" : {
 
             "scripts" : [
-              
+
               {
                 "resource_type" : "tool",
                 "name": "Control_Data_Browser",
@@ -101,12 +101,12 @@
                     "name": "leaflet-markercluster-default",
                     "src": "css/MarkerCluster.Default.css"
                 }
-                
+
             ],
 
 
           },
-          "datasets" : []            
+          "datasets" : []
         },
 
         // default chart properties
@@ -115,14 +115,14 @@
           "station" : "44025",
           "network" : "NDBC",
           "parameter" : "water_temperature",
-          
+
           // update by browser
           "realtime_days" : "2",
           "start_date": "2013-07-01",
           "end_date": "2013-07-20",
           "date_type" : "archived",
           "data_cart" : [
-            { 
+            {
               "network":"NDBC",
               "station": "44033",
               "custom_name":"NDBC 44033",
@@ -159,7 +159,7 @@
     };
 
     tool.controls = {
-    
+
       "layer_station_markers" : {},
       "timerSearchProgress" : {},
       "timerSearchQueue" : {},
@@ -183,14 +183,14 @@
         }
       },
 
-      "styleStationHighlight" : { 
+      "styleStationHighlight" : {
           weight: 5,
           color: '#666',
           dashArray: '',
           fillOpacity: 0.6
       },
 
-      "styleStationClicked" : { 
+      "styleStationClicked" : {
           weight: 8,
           color: '#ff0000',
           dashArray: '',
@@ -204,15 +204,15 @@
           opacity: 1,
           fillOpacity: 0.8
       }
-        
+
     };
-    
+
     /**
      * Initial setup of visualization tool
      * Called by init_tool
      */
     tool.setup = function( _target ){
-      
+
       var g = this.graph,
         width_chart_container = 580,
         height_chart_container = 400,
@@ -260,7 +260,7 @@
             .css({
               "position":"absolute",
               "left" : width_chart_container + "px"
-             
+
             })
             .append(
               $("<div />")
@@ -284,7 +284,7 @@
       g.margin = {top: 26, right: 25, bottom: 40, left: 60};
       g.width = width_chart_container - g.margin.left - g.margin.right;
       g.height = height_chart_container - g.margin.top - g.margin.bottom;
-      
+
       g.parseDate = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse;
       g.parseDateConfig = d3.time.format.utc("%Y-%m-%d").parse;
 
@@ -292,23 +292,23 @@
 
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
-      
+
       g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(12).tickSize(5,0,0);
       g.yAxis = d3.svg.axis().scale(g.y).orient("left").tickSize(-g.width,0,0);
-      
+
       g.svg = d3.select("#"+ _target + "-sts-chart").append("svg")
         .attr("id",_target+"_svggraph")
         .attr("width", g.width + g.margin.left + g.margin.right)
         .attr("height", g.height + g.margin.top + g.margin.bottom)
         .style("font-size","11px")
         .style("font-family","Tahoma, Geneva, sans-serif");
-      
+
       g.svg.append("defs").append("clipPath")
           .attr("id", _target+"_clip")
         .append("rect")
           .attr("width", g.width)
           .attr("height", g.height);
-      
+
       g.chart = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
@@ -317,7 +317,7 @@
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
         .call(g.xAxis);
-        
+
       g.chart.append("g")
         .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
@@ -358,7 +358,7 @@
         .on("mouseover", function() { g.mouse_focus.style("display", null); })
         .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
         //.on("mousemove", mousemove);
-      
+
       g.title = g.svg.append("text")
         .attr("class", "gtitle")
         .attr("text-anchor", "middle")
@@ -367,7 +367,7 @@
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
         .text( this.configuration.network + " Station " + this.configuration.station);
-      
+
       g.ylabel = g.svg.append("text")
         .attr("id", _target+"_ylabel")
         .attr("class", "glabel")
@@ -450,7 +450,7 @@
 
       //extend marker
       tool.stationCircleMarker = L.CircleMarker.extend({
-         options: { 
+         options: {
             station: 'station',
             network: 'network',
             description:"description"
@@ -464,9 +464,9 @@
         // ,noWrap : true
       });
 
-      tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.leaflet_map.oceanBasemap_url,{ 
-        maxZoom: 19, 
-        attribution: 'Tile Layer: &copy; Esri' 
+      tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.leaflet_map.oceanBasemap_url,{
+        maxZoom: 19,
+        attribution: 'Tile Layer: &copy; Esri'
       })
       .addTo(tool.leaflet_map.map);
 
@@ -486,8 +486,9 @@
         //$.each(network_obj,function(station, station_obj){
 
           // request station data
-          //http://epedata.oceanobservatories.org/stations/
-          $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + s.network + "/" + s.station, function( data ) {
+          // DEV  - http://epedev.oceanobservatories.org/timeseries/stations/
+          // DATA - http://epedata.oceanobservatories.org/stations/
+          $.getJSON( "http://epedata.oceanobservatories.org/stations/" + s.network + "/" + s.station, function( data ) {
 
             //console.log("**** station data **** ", data);
 
@@ -511,7 +512,7 @@
                 $("#" + tool.dom_target + "_select-stations")
                   .val(data.network + "," + data.name)
                   .change();
-                
+
                 $("#" + tool.dom_target + "-sts-map-metadata")
                   .html(
                     '<div class="station_popup">'+
@@ -555,10 +556,10 @@
             tool.map_stations_loaded();
 
           });
-        
+
 
       });
-      
+
       // hack to invalidate the map bounds and show the appropriate zoom.
       $('.nav-tabs a[href="#ev-instance-preview"]').on("click",function (e) {
         //e.preventDefault();
@@ -594,7 +595,7 @@
         //zoom to bounds of stations
         tool.leaflet_map.map.fitBounds(tool.leaflet_map.station_markers.getBounds());
       }
-      
+
     };
 
     tool.update_map = function(){
@@ -610,16 +611,16 @@
       tool.leaflet_map.map.invalidateSize();
 
       tool.init_map();
-    
+
     }
 
     /**
-     * Draw first dataset following initial tool setup 
+     * Draw first dataset following initial tool setup
      * Called by init_tool
      */
     tool.draw = function() {
       var url = tool.createUrl();
-      
+
       $('<img class="loading-icon"' + '" src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series_Map/img/loading_small.gif" />')
         .appendTo($("#"+tool.dom_target+"_tool-status"))
 
@@ -628,7 +629,7 @@
         $(".loading-icon").remove();
 
         if(typeof data !== "undefined"){
-          tool.update_graph(data);  
+          tool.update_graph(data);
         }
         else{
           if(typeof error !== "undefined"){
@@ -644,7 +645,7 @@
     };
 
     /**
-     * Update graph and config when station pulldown is changed 
+     * Update graph and config when station pulldown is changed
      */
     tool.graph_update_sta = function(network_station){
         var net_sta = network_station.split(","),
@@ -663,7 +664,7 @@
         tool.leaflet_map.station_markers.setStyle(tool.leaflet_map.styles.station);
 
         tool.leaflet_map.station_markers.eachLayer(function(layer){
-          
+
           //console.log("LAYER", layer, layer.getLatLng(), layer.latitude);
 
           if(station == layer.options.station){
@@ -688,7 +689,7 @@
     };
 
     /**
-     * Update graph and config when parameter pulldown is changed 
+     * Update graph and config when parameter pulldown is changed
      */
     tool.graph_update_param = function(parameter){
 
@@ -699,7 +700,7 @@
     };
 
     /**
-     * Update graph and config when start date is changed 
+     * Update graph and config when start date is changed
      * Not currently used?
      */
     function graph_update_sd(evt){
@@ -709,7 +710,7 @@
         tool.draw();
     }
     /**
-     * Update graph and config when end date is changed 
+     * Update graph and config when end date is changed
      * Not currently used?
      */
     function graph_update_ed(evt){
@@ -722,7 +723,7 @@
     /**
      * Create the URL to request timeseries data
      * Called by draw and graph_update
-     */    
+     */
     tool.createUrl = function(){
 
       var config = this.configuration,
@@ -734,26 +735,27 @@
 
       if(config.date_type == "realtime"){
         start = config.realtime_days;
-        end = "now";  
+        end = "now";
       }
       else{
         start = config.start_date;
         end = config.end_date;
       }
 
-      //'http://epedata.oceanobservatories.org/timeseries?'
-       return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
-        'network=' + network + 
-        '&station=' + station + 
-        '&parameter=' + parameter + 
+      // DEV  - http://epedev.oceanobservatories.org/timeseries/timeseries?
+      // DATA - http://epedata.oceanobservatories.org/timeseries?
+       return 'http://epedata.oceanobservatories.org/timeseries?' +
+        'network=' + network +
+        '&station=' + station +
+        '&parameter=' + parameter +
         '&start_time=' + start +
         '&end_time=' + end;
     };
-    
+
     /**
      * Update visualization with new data
      * Called by draw and graph_update
-     */    
+     */
     tool.update_graph = function(data) {
 
       if(typeof data === "undefined"){
@@ -787,7 +789,7 @@
 
             d.date = g.parseDate(d[cols[0].key]);
             d.data = +d[cols[1].key];
-          }); 
+          });
 
           // Update X domain to use date range from the tool when in archive mode, otherwise use the range of the returned data.
           if(this.configuration.date_type == "realtime"){
@@ -797,14 +799,14 @@
           }
           // Updte the Y domain to use the range of the returned data.
           g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
-          
+
           g.svg.selectAll("path.line")
             .data([data])
             .transition()
             .duration(1000)
             .ease("linear")
             .attr("d", g.line1);
-            
+
           g.title.text( this.configuration.network + " Station " + this.configuration.station);
           g.ylabel.text(tool.proper_case(cols[1].key,"_"));
           var datelimits = g.x.domain();
@@ -813,10 +815,10 @@
           g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
           //console.log(stats);
 
-          // update x and y axis 
+          // update x and y axis
           d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
           d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
-          
+
           d3.selectAll('.axis line, .axis path')
             .style("fill","none")
             .style("stroke","#999")
@@ -844,12 +846,12 @@
           });
         }
       }
-      
+
       // remove loading image
       $(".loading-icon").remove();
 
     };
-    
+
     /**
      * Calculates general statistics on data
      * Called by update_graph
@@ -871,7 +873,7 @@
      * Called by setup
      */
     tool.select_createDropdowns = function(_target){
-     
+
       var tool_controls = $("<div/>")
         .css({
           "text-align" : "center",
@@ -918,7 +920,7 @@
               .on("change", function(evt){
 
                 $(".param-icon").remove();
-                
+
                 tool.graph_update_param(evt.target.value)
 
               })
@@ -944,37 +946,36 @@
     tool.select_updateStations = function(){
 
       var config = tool.configuration,
-        options = [];
+        options = [],
+        len = config.data_cart.length,
+        x=0;
 
       // clear the current stations
       $("#"+tool.dom_target+"_select-stations").empty();
 
-      // build the stations
-      $.each(config.data_cart, function(index, s){
+      for(;x<len;x++){
 
-          // create new option and add it to the options array
-          var option = $("<option/>")
-            .attr({
-              "value": s.network + "," + s.station
-            })
-            .html(
-               function(){
-                 if(typeof s.custom_name === "undefined"){
-                   return s.network + " - " + s.station;
-                 }
-                 else{
-                   return s.custom_name;
-                 }
-               }
-            );
+        var s = config.data_cart[x];
+        var option = $("<option/>")
+          .attr({
+            "value": s.network + "," + s.station
+          })
+          .html(
+            function(){
+              if(typeof s.custom_name === "undefined"){
+                return s.network + " - " + s.station;
+              }
+              else{
+                return s.custom_name;
+              }
+            }
+          );
 
-          options.push(option);
+        options.push(option);
 
-      });
+      }
 
       // add all the options from the options array to the select
-
-      // find network-station in dropdown.. if not exists.. choose one
 
       $("#"+tool.dom_target+"_select-stations")
         .append(options);
@@ -986,9 +987,9 @@
 
         $("#"+tool.dom_target+"_select-stations option:first")
         .prop("selected", "selected");
-          
+
         var net_sta = $("#"+tool.dom_target+"_select-stations").val().split(",");
-            
+
         config.network = net_sta[0];
         config.station = net_sta[1];
 
@@ -999,8 +1000,6 @@
           .val(config.network + "," + config.station);
 
       }
-
-      //console.log("*****" + config.network + "," + config.station);
 
     };
 
@@ -1025,7 +1024,7 @@
 
         // reference to param
         // does current param exist in list?
-      
+
       $(".param-icon").remove();
 
       $("#"+tool.dom_target+"_select-parameters")
@@ -1034,7 +1033,7 @@
 
       // populate options array with parameters
       $.each(dc[data_cart_index].parameters, function(parameter){
-        
+
         // create new option and add it to the options array
         var option = $("<option></option>")
           .attr({
@@ -1061,9 +1060,9 @@
 
       if(selected_param.length == 0){
 
-        // update the configuration network and station 
+        // update the configuration network and station
         var net_sta = $("#"+tool.dom_target+"_select-stations").val().split(",");
-        
+
         config.network = net_sta[0];
         config.station = net_sta[1];
 
@@ -1113,6 +1112,9 @@
      */
     tool.update_callback = function(){
 
+        tool.select_updateStations();
+        tool.select_updateParameters();
+
         tool.update_map();
     };
 
@@ -1135,7 +1137,7 @@
       tool.controls = {};
       tool.controls.Data_Browser_Control = EduVis.controls.Data_Browser_Control;
       tool.controls.Data_Browser_Control.init(tool);
-       
+
     };
 
     // extend base object with tool..

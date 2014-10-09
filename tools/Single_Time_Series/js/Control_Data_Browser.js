@@ -3,9 +3,9 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 10/6/2014
+ * Revised 10/9/2014
  * Written by Michael Mills, Rutgers University
- 
+
 */
 
 (function (eduVis) {
@@ -49,14 +49,14 @@
       }
     },
 
-    "styleStationHighlight" : { 
+    "styleStationHighlight" : {
         weight: 5,
         color: '#666',
         dashArray: '',
         fillOpacity: 0.6
     },
 
-    "styleStationClicked" : { 
+    "styleStationClicked" : {
         weight: 8,
         color: '#ff0000',
         dashArray: '',
@@ -70,7 +70,7 @@
         opacity: 1,
         fillOpacity: 0.8
     }
-      
+
   };
 
   control.init = function(parent_tool){
@@ -268,7 +268,7 @@
                 .html("<b>Days Prior<b>")
               )
               .append(
-                
+
               )
               .append(
 
@@ -406,7 +406,7 @@
           )
           .append(
             $('<img src="'+ EduVis.Environment.getPathTool(tool.name) + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
-          )   
+          )
       ),
 
       db_footer = $("<div/>", {
@@ -463,15 +463,15 @@
 
       // set esri tile service url for ocean basemap
       var oceanBasemap_url = 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
-      
+
       // set leaflet layer of esri ocean basmap
-      oceanBasemap_layer = new L.TileLayer(oceanBasemap_url,{ 
-        maxZoom: 19, 
-        attribution: 'Tile Layer: &copy; Esri' 
+      oceanBasemap_layer = new L.TileLayer(oceanBasemap_url,{
+        maxZoom: 19,
+        attribution: 'Tile Layer: &copy; Esri'
       })
       .addTo(control.map),
 
-      // set resize timer for window 
+      // set resize timer for window
       resizeTimer;
 
       control.map.on('viewreset', function(){
@@ -479,7 +479,7 @@
           control.searchData();
         }
       });
-      
+
       control.map.on('dragend', function(){
         if(control.searchActive === true){
           control.searchData();
@@ -489,21 +489,22 @@
 //
 // PARAMETERS
 //
-      //http://epedata.oceanobservatories.org/parameters
-      $.getJSON( "http://epedev.oceanobservatories.org/timeseries/parameters", function( data ) {
+      // Data - http://epedata.oceanobservatories.org/parameters
+      // Dev  - http://epedev.oceanobservatories.org/timeseries/parameters"
+      $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
 
         control.parameters = data.parameters;
-        
+
         //var parameters = this.db_data.parameters,
         var parameters = data.parameters,
         selects = [];
 
         $.each( parameters, function( params, param) {
 
-          selects.push( 
+          selects.push(
             $("<div/>")
               .attr("title", param.description)
-              .append( 
+              .append(
                 $("<input />")
                 .attr({
                   "id":"db-select-"+param.name,
@@ -511,19 +512,19 @@
                   "value":param.name
                 })
               )
-              .append( 
+              .append(
                 $("<label/>")
                 .attr("for","db-select-"+param.name)
                 .html(control.parameter_clean_name( param.name ))
               )
-              .append( 
+              .append(
                 $("<a></a>")
                 .attr("title", param.description)
               )
           );
 
         });
-       
+
         $( "<div/>", {
           "class": "db-select-list",
           "html": selects
@@ -542,23 +543,24 @@
 // // networks
 // //
 
-        //$.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
-        $.getJSON( "http://epedev.oceanobservatories.org/timeseries/networks", function( data ) {
+        // DEV  - "http://epedev.oceanobservatories.org/timeseries/networks"
+        // DATA - "http://epedata.oceanobservatories.org/networks"
+        $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
 
         control.networks = data.networks;
 
         //{ "networks": [ { "id": "ndbc", "name": "NDBC", "description": "National Data Buoy Center", "url": "http://sdf.ndbc.noaa.gov/" }, { "id": "co-ops", "name": "CO-OPS", "description": "Center for Operational Oceanographic Products and Services", "url": "http://opendap.co-ops.nos.noaa.gov/" } ] }
-        
+
         //var networks = this.db_data.networks,
         var networks = data.networks,
         selects = [];
 
         $.each( networks, function( networks, network) {
 
-          selects.push( 
+          selects.push(
             $("<div/>")
             .attr("title", network.description)
-            .append( 
+            .append(
               $("<input />")
               .attr({
                   "id":"db-select-" + network.name,
@@ -566,13 +568,13 @@
                   "value":network.name
               })
             )
-            .append( 
+            .append(
 
               $("<label/>")
               .attr("for","db-select-" + network.name)
               .html(network.name)
             )
-            .append( 
+            .append(
 
               $("<a></a>")
               .attr("title", network.description)
@@ -580,7 +582,7 @@
             )
           );
         });
-     
+
         $( "<div/>", {
           "class": "db-select-list",
           html: selects
@@ -598,7 +600,7 @@
 
 };
 
-   /** 
+   /**
       verify the date range is only 1 year
     */
 
@@ -606,7 +608,7 @@
 
       var el_date_start = $("#db-date-start"),
           el_date_end = $("#db-date-end"),
-          
+
           date_start = new Date(el_date_start.val()),
           date_end = new Date(el_date_end.val()),
 
@@ -617,8 +619,8 @@
 
           diff_ms = Math.abs(date_start_ms - date_end_ms),
           diff_days = Math.floor(diff_ms/oneday_ms);
-        
-          if(diff_days > 366){  
+
+          if(diff_days > 366){
             return false;
           }else{
             return true;
@@ -657,7 +659,7 @@
 
     /**
      * Perform delayed station search
-     * Attached to search button in init_controls 
+     * Attached to search button in init_controls
      */
     control.searchQueue = function(){
 
@@ -666,11 +668,11 @@
             time_overall = 2000,
             time_interval = time_overall/time_segments,
             time_progress_interval = 100/time_segments;
-        
+
         // turn on the progress bar and set value to 25
         $( "#db-search-progress" )
         .progressbar({"enabled":true, value: time_progress_interval});
-        
+
         // clear interval
         clearInterval(control._timerSearchProgress);
 
@@ -686,7 +688,7 @@
 
         clearTimeout(control._timerSearchQueue);
         control._timerSearchQueue = setTimeout(function(){
-            
+
           // tun the search timer
           control.searchData();
 
@@ -710,8 +712,9 @@
             control.map.removeLayer(control.layer_station_markers);
         }
 
-        //var search_stations_query = "http://epedata.oceanobservatories.org/" + control.stationSearch();
-        var search_stations_query = "http://epedev.oceanobservatories.org/timeseries/" + control.stationSearch();
+        // DEV  - http://epedev.oceanobservatories.org/timeseries/
+        // DATA - http://epedata.oceanobservatories.org/
+        var search_stations_query = "http://epedata.oceanobservatories.org/" + control.stationSearch();
 
         $.getJSON( search_stations_query, function(geodata){
 
@@ -722,7 +725,7 @@
             layer_stations = new L.GeoJSON(stationsFeatureCollection,
             {
                 onEachFeature: function (station, station_feature) {
-                    
+
                //   layer.bindPopup(
                         // station.properties.description
                //   );
@@ -737,7 +740,7 @@
 
                             // network and station name are needed for the station pull
                             //http://ooi.dev/epe/data-services/stations/CO-OPS/UNI1024
-                            
+
                             //todo: show station being clicked.. epedev-232
                             var layer = e.target;
                             layer.setStyle(tool.styleStationClicked);
@@ -767,7 +770,7 @@
                         "mouseout": function(e){
 
                             var layer = e.target;
-                
+
                             layer.setStyle(control.styleStationReset);
 
                             if (!L.Browser.ie && !L.Browser.opera) {
@@ -782,15 +785,15 @@
 
                     return L.circleMarker(latlng, control.stationMarkerOptions[station.properties.network]);
                 }
-            
+
             });
 
             control.layer_station_markers = new L.markerClusterGroup();
-            
+
             control.layer_station_markers
                 .addLayer(layer_stations);
                 //.addLayers([if we want to add multiple layers]);
-            
+
             //this.map.addLayer(this.layer_station_markers);
             control.map.addLayer(control.layer_station_markers);
 
@@ -822,13 +825,13 @@
       control.dataCartAddParam(network,station,param);
 
     };
-    
+
     /**
      * Adds a network,station,parameter to the configuration
      * Called by data_cart_add_param and stationWindowUpdate_fromCart
      */
     control.dataCartAddParam = function(network,station,param){
-        
+
       var dc = tool.configuration.data_cart,
         dc_index = tool.station_get_index(station),
         dc_obj,
@@ -841,7 +844,7 @@
 
         dc_obj = {
           "network" : network,
-          "station" : station,          
+          "station" : station,
           "custom_name" : network + " " + station,
           "parameters" : param_obj
         };
@@ -851,16 +854,16 @@
       else{
         $.extend(true, dc[dc_index]["parameters"], param_obj);
       }
-      
+
       // update apply button
       control.apply_button_update("modified");
     };
 
     /**
-     * Extracts the bounds of the current map view 
+     * Extracts the bounds of the current map view
      * Called by stationSearch
      * @param {object} reference to global map
-     * @return {String} the map bounding box string "lng_min,lat_min,lng_max,lat_max" - bbox 
+     * @return {String} the map bounding box string "lng_min,lat_min,lng_max,lat_max" - bbox
      */
     control.searchMapBounds = function(_map){
       // example return bbox string "-73.970947265625,40.54720023441049,-71.28753662109375,41.88592102814744"
@@ -868,10 +871,10 @@
       return _map.getBounds().toBBoxString();
     };
 
-    /** 
+    /**
      * Set a style of the feature to prove interaction
      * Not currently used?
-     * @param {event click object e} 
+     * @param {event click object e}
      */
     control.highlightFeature = function(){
         var layer = e.target;
@@ -933,7 +936,7 @@
         network = station_obj.network;
         station = station_obj.station;
       }
-      
+
         var station_dom_id = "station-" + network + "-"+station;
 
         if( $("#" + station_dom_id).length > 0){
@@ -954,8 +957,9 @@
             // coordinates -- + "(" + station.geometry.coordinates[0] + ", " + station.geometry.coordinates[1] + ")"
             // request station from data-services
 
-            //http://epedata.oceanobservatories.org/stations/
-            $.getJSON( "http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
+            // DEV  - "http://epedev.oceanobservatories.org/timeseries/stations/"
+            // DATA - "http://epedata.oceanobservatories.org/stations/
+            $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
                 // get reference to drop down
                 // if exists, check for presence of current network/station
 
@@ -988,18 +992,18 @@
                   });
 
                   $.each(data.parameters, function(parameters, param){
-                    
+
                     //console.log("param",param);
 
-                    dom_station_window.append( $("<div/>") 
-                        
-                        .append( 
+                    dom_station_window.append( $("<div/>")
+
+                        .append(
 
                             $("<label/>")
                                 .attr("for","select-" + station_dom_id + "_" + param)
                                 .html(control.parameter_clean_name(param))
                         )
-                        .append( 
+                        .append(
 
                             $("<div />")
                                 .attr({
@@ -1018,7 +1022,7 @@
                                     control.dataCart();
                                 })
                         )
-                        .append( 
+                        .append(
 
                             $("<a></a>")
                                 .attr("title", param.description)
@@ -1034,15 +1038,15 @@
 // "description":
 // "longitude": "
 // "latitude": "3
-// "start_time": 
+// "start_time":
 // "end_time": "9
-// "parameters": 
+// "parameters":
 
                 // format the station window details
                 $("#db-station-details")
                 .empty()
                 .append(
-                  
+
                   $("<div/>")
                     .append(
                       $("<div/>")
@@ -1085,7 +1089,7 @@
                                   .html(attr_val))
                                 .append($("<td></td>")
                                   .html(dataAttr));
-                                
+
                             //console.log("attr", a, attr_val, dataAttr);
 
                             table.append(row);
@@ -1126,7 +1130,7 @@
 
         if(el_start_time !== ""){
             start_time = el_start_time;
-            
+
             if(el_end_time === ""){
                 end_time = start_time;
             }
@@ -1161,7 +1165,7 @@
         var s = station_obj;
 
 /*
-        { 
+        {
           "network":"NDBC",
           "station": "44033",
           "custom_name":"NDBC 44033",
@@ -1174,7 +1178,7 @@
 
         if(typeof s.custom_name === "undefined"){
           s.custom_name = s.network + " " + s.station;
-        } 
+        }
 
         var cart_station = $("<div />")
           .addClass("cart-station")
@@ -1201,7 +1205,7 @@
                   if(sta.parent().has( "span" ).length > 0){
                     sta.find(".cart-station-tools").remove();
                   }
-                      
+
                   var tmpSpan = $("<span />")
                     //.html("&nbsp;&nbsp;")
                     .css({
@@ -1219,7 +1223,7 @@
 
                       .on("click", function(evt_station_edit_name_click){
 
-                        var station_input; 
+                        var station_input;
                         $(tmpSpan).remove();
 
                          // load input box and cancel button
@@ -1250,7 +1254,7 @@
                                       sta.parent().find(".station-name")
                                         .html(s.custom_name)
                                         .css("display","block");
-                                      
+
                                       sta.parent().find(".station-name-edit")
                                         .css("display","none")
                                     }
@@ -1262,7 +1266,7 @@
                                 .css("float","right")
                                   .addClass("cart-station-tools ui-icon ui-icon-circle-close")
                                   .on("click",function(evt){
-                                    
+
                                     sta.parent().find(".station-name")
                                       .html(s.custom_name);
 
@@ -1275,11 +1279,11 @@
                                   .on("click",function(evt){
 
                                     s.custom_name = station_input.val();
-                                    
+
                                     sta.parent().find(".station-name")
                                       .html(s.custom_name)
                                       .css("display","block");
-                                    
+
                                     sta.parent().find(".station-name-edit")
                                       .css("display","none")
 
@@ -1308,7 +1312,6 @@
 
                         evt_station_remove_click.stopImmediatePropagation();
 
-                        // need function to find and delete specific station
                         tool.configuration.data_cart.splice(index,1);
 
                         $(".cart-param-tools").remove();
@@ -1320,7 +1323,7 @@
                       })
                   )
                   .prependTo(sta);
-                    
+
                 },
                 function() {
                   $( this )
@@ -1329,12 +1332,12 @@
                 }
               )
           );
-            
+
           var station_params = $("<div></div>")
               .addClass("cart-params");
 
           $.each(s.parameters, function(param){
-                
+
             var station_param = $("<div></div>")
                 .addClass("cart-param")
                 .html(control.parameter_clean_name(param))
@@ -1344,11 +1347,11 @@
                   function() {
                     var par = $(this);
 
-                    $( par ).append( 
+                    $( par ).append(
                       $("<span/>")
                       .html(
                           "&nbsp;&nbsp;"
-                          
+
                       )//'<img src="' + EduVis.Environment.getPathTools() + 'Single_Time_Series/img/x_black.png" />'
                       .css({
                         "float":"right",
@@ -1359,7 +1362,7 @@
                       .addClass("cart-station-tools ui-icon ui-icon-circle-close")
 
                       .on("click", function(evt_param_remove_click){
-                        
+
                         // click of remove button will delete the item from the cart
                         // do we want an ok prompt?
 
@@ -1381,7 +1384,7 @@
                   }
                 );
 
-            station_params.append(station_param);                   
+            station_params.append(station_param);
 
         });
 
@@ -1423,8 +1426,8 @@
       }
       else{
         // http://epedev.oceanobservatories.org/timeseries/
-        //http://epedata.oceanobservatories.org/stations/
-        $.getJSON( " http://epedev.oceanobservatories.org/timeseries/stations/" + network + "/" + station, function( data ) {
+        // http://epedata.oceanobservatories.org/stations/
+        $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
 
           //console.log("**** station data **** ", data);
 
@@ -1441,20 +1444,20 @@
               });
 
           $.each(data.parameters, function(parameters, param){
-              
+
             //console.log("param",param);
 
-            dom_station_window.append( 
+            dom_station_window.append(
 
               $("<div/>")
               .css({"overflow":"overlay"})
-              
-              .append( 
+
+              .append(
                 $("<label/>")
                 .attr("for","select-" + station_dom_id + "_" + param)
                 .html(param)
               )
-              .append( 
+              .append(
 
                 $("<a/>")
                 .attr({
@@ -1515,7 +1518,7 @@
 
     /*
      * Update the Apply button by enabling or disabling via class and changing icon between exlamation mark or checkmark
-     * 
+     *
     */
     control.apply_button_update = function(status){
 
@@ -1526,7 +1529,7 @@
           .attr('class', 'btn btn-medium')
           .html('Apply');
           // <i class="icon-exclamation-sign"></i>'
-        
+
       }
       else if(status == "up-to-date"){
 
@@ -1550,12 +1553,13 @@
         var config = tool.configuration,
             x=0,
             sorted_ary=[],
-            sorted_cart = $( ".cart-stations" ).sortable( "toArray", {"attribute":"data-id"});
+            sorted_cart = $( ".cart-stations" ).sortable( "toArray", {"attribute":"data-id"}),
+            len = sorted_cart.length;
 
-        for(; x<sorted_cart.length;x++){
-          sorted_ary.push(config.data_cart[sorted_cart[x]]);
+        for(; x<len;x++){
+          if(typeof config.data_cart[sorted_cart[x]] !== "undefined")
+            sorted_ary.push(config.data_cart[sorted_cart[x]]);
         }
-
         // update the array with the newly sorted array
         config.data_cart = sorted_ary;
 
@@ -1566,11 +1570,11 @@
         // "network" : "NDBC",
         // "parameter" : "water_temperature",
         // updated by the data browser
-         
+
         config["date_type"] = $("#db-dates-dropdown").val();
 
         if(config["date_type"] == "archived"){
-         
+
           config["start_date"] =  $("#db-date-start").val();
           config["end_date"] =  $("#db-date-end").val();
           config["realtime_days"] = 0; //? set to zero?
@@ -1597,12 +1601,6 @@
           config["realtime_days"] =  $("#db-reatltime_days").val();
 
         }
-
-        tool.select_updateStations("1");
-        tool.select_updateParameters("1");
-
-        tool.select_updateStations("2");
-        tool.select_updateParameters("2");
 
         tool.update_callback();
 

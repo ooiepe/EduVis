@@ -1,6 +1,6 @@
 /**
  * OOI EPE - Double Time Series (STS)
- * Revised 10/6/2014
+ * Revised 10/9/2014
  * Written by Michael Mills and Sage Lichtenwalner
 */
 
@@ -35,11 +35,11 @@
                 }
               },
               {
-                "name" : "jquery_1.11", 
+                "name" : "jquery_1.11",
                 "url" : "https://code.jquery.com/jquery-1.11.1.min.js",
               },
               {
-                "name" : "jquery_ui_js", 
+                "name" : "jquery_ui_js",
                 "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
                 "dependsOn":["jquery_1.11"]
               }
@@ -73,9 +73,9 @@
                     "namespace" : "L",
                     "dependsOn" : ["leaflet_js"],
                     "attributes":{}
-                },  
+                },
                 {
-                    "name" : "jquery_ui_js", 
+                    "name" : "jquery_ui_js",
                     "url" : "http://code.jquery.com/ui/1.10.3/jquery-ui.js",
                 },
                 {
@@ -114,7 +114,7 @@
 
 
           },
-          "datasets" : []            
+          "datasets" : []
         },
 
         // default chart properties
@@ -126,7 +126,7 @@
           "station2" : "44033",
           "network2" : "NDBC",
           "parameter2" : "air_temperature",
-          
+
           // update by browser
           "realtime_days" : "2",
           "start_date": "2013-01-01",
@@ -181,12 +181,12 @@
       g.margin = {top: 40, right: 60, bottom: 40, left: 60};
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
-      
+
       g.parseDate = d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse;
       g.parseDateConfig = d3.time.format.utc("%Y-%m-%d").parse;
 
       g.formatDate = d3.time.format("%Y-%m-%d");
-      
+
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
 
@@ -195,24 +195,24 @@
 
       g.y1 = d3.scale.linear().range([g.height, 0]);
       g.y2 = d3.scale.linear().range([g.height, 0]);
-      
+
       g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(12).tickSize(5,0,0);
       g.yAxis1 = d3.svg.axis().scale(g.y1).orient("left");//.tickSize(0,0,0);
       g.yAxis2 = d3.svg.axis().scale(g.y2).orient("right");//.tickSize(0,0,0);
-      
+
       g.svg = d3.select("#"+_target).append("svg")
         .attr("id",_target+"_svggraph")
         .attr("width", g.width + g.margin.left + g.margin.right)
         .attr("height", g.height + g.margin.top + g.margin.bottom)
         .style("font-size","11px")
         .style("font-family","Tahoma, Geneva, sans-serif");
-      
+
       g.svg.append("defs").append("clipPath")
           .attr("id", _target+"_clip")
         .append("rect")
           .attr("width", g.width)
           .attr("height", g.height);
-      
+
       g.focus = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
@@ -221,12 +221,12 @@
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
         .call(g.xAxis);
-        
+
       g.focus.append("g")
         .attr("id", _target+"_yAxis1")
         .attr("class", "y axis var1")
         .call(g.yAxis1);
-      
+
       g.focus.append("g")
         .attr("id", _target+"_yAxis2")
         .attr("class", "y axis var2")
@@ -285,15 +285,15 @@
         .attr("height", g.height)
         .style("fill", "none")
         .style("pointer-events", "all")
-        .on("mouseover", function() { 
+        .on("mouseover", function() {
           g.mouse_focus1.style("display", null);
           g.mouse_focus2.style("display", null);
         })
-        .on("mouseout", function() { 
+        .on("mouseout", function() {
           g.mouse_focus1.style("display", "none");
           g.mouse_focus2.style("display", "none");
         });
-      
+
 
       // g.title = g.svg.append("text")
       //   .attr("class", "gtitle")
@@ -302,7 +302,7 @@
       //   .attr("y", 0)
       //   .attr("dy", ".75em")
       //   .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
-      //   .text( 
+      //   .text(
       //     this.configuration.network1 + " Station " + this.configuration.station1 + " AND "+
       //     this.configuration.network2 + " Station " + this.configuration.station2
       //   );
@@ -314,7 +314,7 @@
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (0) + ") ")
-        .text( 
+        .text(
           this.configuration.network1 + " - " + this.configuration.station1 + " - " + tool.proper_case(this.configuration.parameter1,"_")
         );
 
@@ -343,7 +343,7 @@
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.width/2+g.margin.left*4) + "," + (0) + ") ")
-        .text( 
+        .text(
           this.configuration.network2 + " - " + this.configuration.station2 + " - " + tool.proper_case(this.configuration.parameter2,"_")
         );
 
@@ -364,7 +364,7 @@
           "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
         })
         .attr("transform", "translate(" + (g.width + g.margin.right/3) + "," + (0) + ") ");
-      
+
       g.ylabel1 = g.svg.append("text")
         .attr("id", _target+"_ylabel1")
         .attr("class", "glabel")
@@ -405,24 +405,24 @@
       //   .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (22) + ") ")
       //   .text( "Statistics");
 
-      
+
       tool.select_createDropdowns(_target);
-      
+
       tool.select_updateStations("1");
       tool.select_updateStations("2");
-      
+
       tool.select_updateParameters("1");
       tool.select_updateParameters("2");
 
     };
 
     /**
-     * Draw first dataset following initial tool setup 
+     * Draw first dataset following initial tool setup
      * Called by init_tool
      */
     tool.draw = function(variable) {
       var url = tool.createUrl(variable);
-      
+
       $('<img style="height:28px;" class="loading-icon' +variable + '"  src="' + EduVis.Environment.getPathTool(tool.name) + '/img/loading_small.gif" />')
         .appendTo($("#"+tool.dom_target+"_tool-status"+variable));
 
@@ -431,7 +431,7 @@
         $(".loading-icon"+variable).remove();
 
         if(typeof data !== "undefined"){
-          tool.updategraph(data,variable);  
+          tool.updategraph(data,variable);
         }
         else{
           if(typeof error !== "undefined"){
@@ -445,7 +445,7 @@
     };
 
     /**
-     * Update graph and config when station pulldown is changed 
+     * Update graph and config when station pulldown is changed
      */
     tool.graph_update_sta = function(network_station,variable){
         var net_sta = network_station.split(","),
@@ -460,7 +460,7 @@
     };
 
     /**
-     * Update graph and config when parameter pulldown is changed 
+     * Update graph and config when parameter pulldown is changed
      */
     tool.graph_update_param = function(parameter,variable){
 
@@ -471,7 +471,7 @@
     };
 
     // /**
-    //  * Update graph and config when start date is changed 
+    //  * Update graph and config when start date is changed
     //  * Not currently used?
     //  */
     // function graph_update_sd(evt,variable){
@@ -481,7 +481,7 @@
     //     tool.draw(variable);
     // }
     // /**
-    //  * Update graph and config when end date is changed 
+    //  * Update graph and config when end date is changed
     //  * Not currently used?
     //  */
     // function graph_update_ed(evt,variable){
@@ -494,7 +494,7 @@
     /**
      * Create the URL to request timeseries data
      * Called by draw and graph_update
-     */    
+     */
     tool.createUrl = function(variable){
 
       var config = this.configuration,
@@ -506,26 +506,27 @@
 
       if(config.date_type == "realtime"){
         start = config.realtime_days;
-        end = "now";  
+        end = "now";
       }
       else{
         start = config.start_date;
         end = config.end_date;
       }
 
-      //return 'http://epedata.oceanobservatories.org/timeseries?' + 
-      return 'http://epedev.oceanobservatories.org/timeseries/timeseries?' + 
-        'network=' + network + 
-        '&station=' + station + 
-        '&parameter=' + parameter + 
+      // DEV  - http://epedev.oceanobservatories.org/timeseries/timeseries?
+      // DATA - http://epedata.oceanobservatories.org/timeseries?
+      return 'http://epedata.oceanobservatories.org/timeseries?' +
+        'network=' + network +
+        '&station=' + station +
+        '&parameter=' + parameter +
         '&start_time=' + start +
         '&end_time=' + end;
     };
-    
+
     /**
      * Update visualization with new data
      * Called by draw and graph_update
-     */    
+     */
     tool.updategraph = function(data, variable) {
 
       //console.log("variable: ", variable);
@@ -564,7 +565,7 @@
           data.forEach(function(d) {
             d.date = g.parseDate(d[cols[0].key]);
             d.data = +d[cols[1].key];
-          }); 
+          });
 
           g["ts_data" + variable] = data;
 
@@ -586,22 +587,22 @@
             .duration(1000)
             .ease("linear")
             .attr("d", line);
-          
+
           g["title"+variable].text( this.configuration["network" + variable] + " " + this.configuration["station" + variable] + " " + tool.proper_case(this.configuration["parameter" + variable],"_"));
 
           g["ylabel"+variable].text(tool.proper_case(cols[1].key,"_"));
           var datelimits = g.x.domain();
           g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
           var stats = tool.average(data);
-          
+
           g["stats"+variable].text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-          
-          // update x and y axis 
+
+          // update x and y axis
           d3.select("#"+tool.dom_target+"_yAxis"+variable).call(g["yAxis"+variable]);
 
           // update correct axis
           d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
-          
+
           d3.selectAll('.axis line, .axis path')
             .style("fill","none")
             .style("stroke","#999")
@@ -641,7 +642,7 @@
                 .text(g.formatDate(d1.date) + " - " + d3.round(d1.data,4))
                 .attr("transform", "translate(" + xPosition + "," + 0 + ")");
             }
-            
+
             if(typeof d2 !== undefined){
               g.mouse_focus2
                 .attr("transform", "translate(" + g.x2(d2.date) + "," + g.y2(d2.data) + ")");
@@ -654,12 +655,12 @@
 
         }
       }
-      
+
       // remove loading image
       $(".loading-icon"+variable).remove();
 
     };
-    
+
     /**
      * Calculates general statistics on data
      * Called by updategraph
@@ -682,7 +683,7 @@
      */
     tool.select_createDropdowns = function(_target){
 
-      var tc = tool.controls, 
+      var tc = tool.controls,
           dd1 = tc.dropdown1,
           dd2 = tc.dropdown2,
           dd_width = (tool.graph.width/2);// - tool.graph.margin.left - tool.graph.margin.right
@@ -695,7 +696,7 @@
           "float" : "left",
           "padding-left" : tool.graph.margin.left + "px",
           "text-align":"center"
-          
+
         })
         .append(
           $("<div />")
@@ -745,7 +746,7 @@
               .on("change", function(evt){
 
                 $(".param-icon").remove();
-                
+
                 tool.graph_update_param(evt.target.value,"1");
 
               })
@@ -756,7 +757,7 @@
               })
             )
           );
-      
+
 
       dd2 = $("<div/>",{
           "id": _target+"_tool-dropdown-2"
@@ -769,7 +770,7 @@
         })
         .append(
           $("<div />")
-          
+
           .append(
             $("<span/>")
               .html("Station 2:&nbsp;")
@@ -816,7 +817,7 @@
               .on("change", function(evt){
 
                 $(".param-icon").remove();
-                
+
                 tool.graph_update_param(evt.target.value,"2");
 
               })
@@ -844,7 +845,7 @@
 
           //dropdowns 1
           .append( dd1 )
-          
+
           //dropdowns 2
           .append( dd2 )
         )
@@ -860,30 +861,36 @@
     tool.select_updateStations = function(variable){
 
       var config = tool.configuration,
-        options = [];
+          options = [],
+          len = config.data_cart.length,
+          x=0;
 
       // clear the current stations
       $("#"+tool.dom_target+"_select-stations-" + variable).empty();
 
-      // build the stations
-       $.each(config.data_cart, function(index, s){
+      for(;x<len;x++){
 
-          // create new option and add it to the options array
-          var option = $("<option/>")
-            .attr({
-              "value": s.network + "," + s.station
-            })
-            .html(
-              typeof s.custom_name === "undefined" ? s.network + " - " + s.station : s.custom_name
-            );
+        var s = config.data_cart[x];
+        var option = $("<option/>")
+          .attr({
+            "value": s.network + "," + s.station
+          })
+          .html(
+            function(){
+              if(typeof s.custom_name === "undefined"){
+                return s.network + " - " + s.station;
+              }
+              else{
+                return s.custom_name;
+              }
+            }
+          );
 
-          options.push(option);
+        options.push(option);
 
-      });
+      };
 
       // add all the options from the options array to the select
-
-      // find network-station in dropdown.. if not exists.. choose one
 
       $("#"+tool.dom_target+"_select-stations-" + variable)
         .append(options);
@@ -895,9 +902,9 @@
 
         $("#"+tool.dom_target+"_select-stations-"+ variable + " option:first")
         .prop("selected", "selected");
-          
+
         var net_sta = $("#"+tool.dom_target+"_select-stations-" + variable).val().split(",");
-            
+
         config.network1 = net_sta[0];
         config.station1 = net_sta[1];
 
@@ -906,7 +913,6 @@
 
         $("#"+tool.dom_target+"_select-stations-" + variable)
           .val(config["network" + variable] + "," + config["station" + variable]);
-
       }
     };
 
@@ -930,7 +936,7 @@
 
         // reference to param
         // does current param exist in list?
-      
+
       $(".param-icon").remove();
 
       $("#"+tool.dom_target+"_select-parameters-"+ variable)
@@ -1012,7 +1018,15 @@
     /**
      * Called by data browser control
      */
-    tool.update_callback = function(){};
+    tool.update_callback = function(){
+
+      // add this to the appropriate callbacks
+      tool.select_updateStations("1");
+      tool.select_updateParameters("1");
+
+      tool.select_updateStations("2");
+      tool.select_updateParameters("2");
+    };
 
     /**
      * Initialize tool
@@ -1035,7 +1049,7 @@
       tool.controls = {};
       tool.controls.Data_Browser_Control = EduVis.controls.Data_Browser_Control;
       tool.controls.Data_Browser_Control.init(tool);
-       
+
     };
 
     // extend base object with tool..
