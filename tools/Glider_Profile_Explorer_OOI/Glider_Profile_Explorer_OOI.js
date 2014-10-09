@@ -24,7 +24,7 @@
                 "url" : "http://marine.rutgers.edu/~mmills"
             }
         ],
-        
+
         "resources" : {
 
           "tool": {
@@ -41,11 +41,11 @@
                 "url": "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"
               },
               {
-                "name" : "jquery_1.11", 
+                "name" : "jquery_1.11",
                 "url" : "http://code.jquery.com/jquery-1.11.1.min.js",
               },
               {
-                "name" : "jquery_ui_js", 
+                "name" : "jquery_ui_js",
                 "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
                 "dependsOn":["jquery_1.11"]
               }
@@ -88,7 +88,7 @@
           },
 
           "datasets" : []
-            
+
         },
 
         "configuration" : {
@@ -149,9 +149,9 @@
     };
 
     tool.Glider_Profile_Explorer_OOI = function( _target ){
-     
+
       // parameters
-        
+
       // 0 profile_id (1)
       // 1 time (UTC)
       // 2 latitude (degrees_north) -- na
@@ -218,7 +218,7 @@
           "units" : "uMol L-1",
           "title" : "Oxygen Concentration"
         },
-        
+
         "oxygen_saturation" : {
           "column" : "oxygen_saturation (%)",
           "units" : "%",
@@ -250,7 +250,7 @@
               "width":"400px"
             })
             .append(
-              
+
               $("<div />")
                 .attr("id", "gpe-map-title")
                 .html(tool.configuration.dataset_id + " Profile Locations")
@@ -271,7 +271,7 @@
                     .append(
                       $("<span />")
                         .css({
-                            "float":"left", 
+                            "float":"left",
                             "width":"80px",
                             "font-size": "12px",
                             "text-align":"center",
@@ -305,7 +305,7 @@
                     .append(
                       $("<span />")
                         .css({
-                          "float":"right", 
+                          "float":"right",
                           "width":"80px",
                           "font-size": "12px",
                           "text-align":"center",
@@ -313,7 +313,7 @@
                         })
                         .html( '<i style="margin:0 auto;" class="ui-icon ui-icon-arrowthick-1-e"></i>')
                         .on("click", function(){
-                          
+
                           var slider = $("#"+ _target + "-profile-slider"),
                             val = slider.slider("option","value");
 
@@ -362,7 +362,7 @@
       // initialize the map
       tool.map_setup();
 
-      
+
       // hack to invalidate the map bounds.
       $('.nav-tabs a[href="#ev-instance-preview"]')
         .on("click", function (e) {
@@ -394,28 +394,28 @@
       g.margin = {top: 40, right: 10, bottom: 40, left: 46};
       g.width = 400 - g.margin.left - g.margin.right;
       g.height = 450 - g.margin.top - g.margin.bottom;
-      
+
       //g.parseDate = d3.time.format.iso.parse;
-      
+
       g.x = d3.scale.linear().range([0, g.width]);
       g.y = d3.scale.linear().range([0, g.height]);
-      
+
       g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10);//.tickSize(5,0,0);
       g.yAxis = d3.svg.axis().scale(g.y).orient("left");//.tickSize(0,0,0);
-      
+
       g.svg = d3.select("#"+_target + "-viz-container").append("svg")
         .attr("id",_target+"_svggraph")
         .attr("width", g.width + g.margin.left + g.margin.right)
         .attr("height", g.height + g.margin.top + g.margin.bottom)
         .style("font-size","11px")
         .style("font-family","Tahoma, Geneva, sans-serif");
-      
+
       g.svg.append("defs").append("clipPath")
           .attr("id", _target+"_clip")
         .append("rect")
           .attr("width", g.width)
           .attr("height", g.height);
-      
+
       g.chart = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
@@ -429,7 +429,7 @@
           //,"stroke-width":"1px"
         })
         .call(g.xAxis);
-        
+
       g.chart.append("g")
         .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
@@ -439,7 +439,7 @@
           "stroke-width":"1px"
         })
         .call(g.yAxis);
-      
+
       g.chart.append("path")
         .attr("class", "line")
         .attr("d", g.line)
@@ -490,7 +490,7 @@
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (18) + ") ")
         .text(
-          column_selected_title + " Profile: "+ config.profile_id 
+          column_selected_title + " Profile: "+ config.profile_id
         );
 
       // g.stats = g.svg.append("text")
@@ -535,7 +535,7 @@
 
       // create reference to dropdown
       var parameter_dropdown = $("#"+ _target + "-control-parameter-dropdown");
-      
+
       // add parameters to dropdowns
       $.each(erddap_ref.parameters, function (index, parameter_option) {
 
@@ -553,7 +553,7 @@
       parameter_dropdown
         .val( tool.configuration.parameter )
         .on("change", function(a){
-          
+
           tool.configuration.parameter = $(this).val();
           tool.graph_update(tool.configuration.profile_id);
         });
@@ -591,7 +591,7 @@
           base_url += p + "=" + v + "&";
         }
       });
-      
+
       return dataset_url;
 
     };
@@ -609,7 +609,7 @@
           "oceanBasemap_layer" : {},
           "layer_collection":[],
           "profile_ids" : {},
-          
+
         };
 
         // initialize map
@@ -621,9 +621,9 @@
 
         // set esri tile service url for ocean basemap
         // set leaflet layer of esri ocean basmap
-        tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.mapping.oceanBasemap_url,{ 
-          maxZoom: 19, 
-          attribution: 'Tile Layer: &copy; Esri' 
+        tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.mapping.oceanBasemap_url,{
+          maxZoom: 19,
+          attribution: 'Tile Layer: &copy; Esri'
         }).addTo(tool.leaflet_map.map);
 
         tool.map_update();
@@ -652,9 +652,9 @@
         mapObj.poly_line = L.polyline( [], {color: 'white'})
           .addTo(mapObj.map);
       }
-      
+
       $.getJSON( tool.mapping.locations_query() , function(geodata){
-        
+
         // console.log(geodata);
         mapObj.profile_ids = d3.map();
 
@@ -676,23 +676,23 @@
 
             // add the key value pair.. profile_id, time
             mapObj.profile_ids.set(location.properties.profile_id, location.properties.time);
-            
+
             // add the profile location to the profile track
-            
+
             pl.addLatLng(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
 
             // add click event for the profile
             location_feature.on({
 
               "click": function(e){
-                
+
                 // update the profile style on click
                 //profile.setStyle(tool.mapping.styles.profile_click);
 
                 var profile_id = e.target.feature.properties.profile_id;
 
                 // only update the style for the selected profile
-                layer_loc.setStyle(function(feature) {
+                e.target.setStyle(function(feature) {
                   if (feature.properties.profile_id == profile_id) {
                     return map_styles.profile_click;
                   }
@@ -723,7 +723,7 @@
               "mouseout": function(e){
 
                 var layer = e.target;
-    
+
                 //layer.setStyle(tool.controls.styleStationReset);
 
                 if (!L.Browser.ie && !L.Browser.opera) {
@@ -745,7 +745,7 @@
         tool.set_slider(0, mapObj.profile_ids.size()-1, d3.min(mapObj.profile_ids.values() ), d3.max(mapObj.profile_ids.values() ));
 
         //console.log("map profiles map", mapObj.profile_ids);
-        
+
         // add layer to map
         map.addLayer(mapObj.layer_locations);
 
@@ -756,7 +756,7 @@
         tool.init_graph(mapObj.profile_ids.keys()[0]);
 
       }); // end get json
- 
+
     };
 
     tool.init_graph = function(pid){
@@ -765,12 +765,12 @@
       var profile_id = pid,
           lat, lng;
 
-      // only update the style for the 
+      // only update the style for the
       tool.leaflet_map.layer_locations.setStyle(function(feature) {
         if (feature.properties.profile_id == profile_id) {
           lng = d3.round(feature.geometry.coordinates[0],4);
           lat = d3.round(feature.geometry.coordinates[1],4);
-          
+
           return tool.mapping.styles.profile_click;
         }
         return tool.mapping.styles.profile;
@@ -798,7 +798,7 @@
         //     //column_date = erddap_meta.time.column,
         //     column_depth = erddap_meta.depth.column,
         //     column_selected = erddap_meta[tool.configuration.parameter].column,
-        //     column_selected_title = erddap_meta[tool.configuration.parameter].column,            
+        //     column_selected_title = erddap_meta[tool.configuration.parameter].column,
 
         var erddap_ref = tool.settings.erddap_parameter_metadata,
             column_depth = erddap_ref.depth.column,
@@ -819,10 +819,10 @@
 
         // update x and y domains depth and the selected
         g.x.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
-        
+
         // update the y domain to use the range of the returned data.
         g.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
-        
+
         // update chart line
         g.svg.selectAll("path.line")
           .data([data])
@@ -830,25 +830,25 @@
           .duration(1000)
           .ease("linear")
           .attr("d", g.line);
-        
+
         // update chart title with profile id and date
         profile_date = data[0]["time (UTC)"].slice(0,10);
-        
+
         g.title.text(
           tool.configuration.dataset_id + " - " + profile_date
         );
 
         g.subtitle.text(
-          column_selected_title + " Profile: "+ pid 
+          column_selected_title + " Profile: "+ pid
         );
         //+ " Lat: " + lat + " Long:" + lng
 
         g.xlabel.text(
-          column_selected_title + 
+          column_selected_title +
           (erddap_ref[config.parameter].units !== "" ? " (" + erddap_ref[config.parameter].units + ")" : "")
         );
 
-        // // update x and y axis 
+        // // update x and y axis
         d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
         d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
 
@@ -864,7 +864,7 @@
             d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0,
             chartMidPoint = (g.x.domain()[1] + g.x.domain()[0])/2,
             xPosition = d[column_selected] > chartMidPoint ? -100 : 0;
-        
+
         g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
 
         g.mouse_focus.select("text").text(d3.round(d[column_depth], 1) + " m - " + d3.round(d[column_selected], 2))
@@ -883,7 +883,7 @@
       //console.log("update selected profile", tool.leaflet_map.selected_profile);
 
       // get associated profile
-     
+
     };
 
     tool.set_slider = function( min, max, date_start, date_end) {
@@ -905,27 +905,27 @@
           //value:self.getProfileKey(self.configuration.profile_id)
           //value: self.configuration.profile_id,
           slide: function(event, ui) {
-            
+
             // tool.leaflet_map.selected_profile.setStyle(function(feature) {
             //   if (feature.properties.profile_id == profile_id) {
             //   //  lng = d3.round(feature.geometry.coordinates[0],4);
-            //   //   lat = d3.round(feature.geometry.coordinates[1],4);           
+            //   //   lat = d3.round(feature.geometry.coordinates[1],4);
             //     return tool.mapping.styles.profile_click;
             //   }
             //   return tool.mapping.styles.profile_selected;
             // });
-            
+
             // lookup up slider value in map, get associated profile id
-            // ui value is current slider position            
+            // ui value is current slider position
             var profile_id = tool.sliderKeys[ui.value];
 
             tool.configuration.profile_id = profile_id;
-          
+
             tool.leaflet_map.layer_locations.setStyle(function(feature) {
               if (feature.properties.profile_id == profile_id) {
                 return tool.mapping.styles.profile_selected;
               }
-              return tool.mapping.styles.profile;       
+              return tool.mapping.styles.profile;
             });
 
           },
@@ -935,21 +935,21 @@
             // var profile = e.target,
             // lng = d3.round(profile.feature.geometry.coordinates[0],4),
             // lat = d3.round(profile.feature.geometry.coordinates[1],4);
-            
+
             //profile.setStyle(tool.mapping.styles.profile_click);
             var profile_id = tool.sliderKeys[ui.value],
                 lat, lng;
 
             tool.configuration.profile_id = profile_id;
 
-            // only update the style for the 
+            // only update the style for the
             tool.leaflet_map.layer_locations.setStyle(function(feature) {
               if (feature.properties.profile_id == profile_id) {
                 lng = d3.round(feature.geometry.coordinates[0],4);
                 lat = d3.round(feature.geometry.coordinates[1],4);
 
                 tool.leaflet_map.map.panTo([lat,lng]);
-                
+
                 return tool.mapping.styles.profile_click;
               }
               return tool.mapping.styles.profile;
