@@ -233,7 +233,7 @@
         },
 
         //"parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
-        "parameters" : ["temperature", "salinity", "conductivity"]
+        "parameters" : ["temperature", "salinity", "density", "conductivity"]
       };
 
 
@@ -403,7 +403,7 @@
       g.x = d3.scale.linear().range([0, g.width]);
       g.y = d3.scale.linear().range([0, g.height]);
 
-      g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10);//.tickSize(5,0,0);
+      g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(8);//.tickSize(5,0,0);
       g.yAxis = d3.svg.axis().scale(g.y).orient("left");//.tickSize(0,0,0);
 
       g.svg = d3.select("#"+_target + "-viz-container").append("svg")
@@ -567,7 +567,7 @@
       var tabledap_url = "http://erddap.marine.rutgers.edu/erddap/tabledap/",
       dataset_url = dataset_id + ".csvp?",
       //columns_default = ["time","depth", "salinity", "temperature", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter_650nm"],
-      columns_default = ["time","depth", "salinity", "temperature", "conductivity"],
+      columns_default = ["time","depth", "salinity", "temperature", "conductivity","density"],
       columns = typeof columns_selected === "object" ? columns_selected : columns_default,
       query = "&profile_id=" + profile_id + "&" + columns.join("!=NaN&") + "!=NaN&orderBy(%22depth%22)";
 
