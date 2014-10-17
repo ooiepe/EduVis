@@ -92,7 +92,7 @@
         },
 
         "configuration" : {
-          "dataset_id" : "OOI-GP05MOAS-GL001",
+          "dataset_id" : "",
           "profile_id" : "1",
           "parameter" : "temperature",
           "date_start": "2013-09-17",
@@ -142,6 +142,8 @@
             }
           },
         "locations_query" : function(){
+
+            //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.geoJson?profile_id,time,latitude,longitude
             return "http://erddap.marine.rutgers.edu/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
          }
        }
@@ -230,7 +232,8 @@
           "title" : "Volumetric Backscatter 650nm"
         },
 
-        "parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
+        //"parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
+        "parameters" : ["temperature", "salinity", "conductivity"]
       };
 
 
@@ -563,10 +566,16 @@
     tool.erddap_request_profile = function(dataset_id, profile_id, columns_selected){
       var tabledap_url = "http://erddap.marine.rutgers.edu/erddap/tabledap/",
       dataset_url = dataset_id + ".csvp?",
-      columns_default = ["time","depth", "salinity", "temperature", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter_650nm"],
+      //columns_default = ["time","depth", "salinity", "temperature", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter_650nm"],
+      columns_default = ["time","depth", "salinity", "temperature", "conductivity"],
       columns = typeof columns_selected === "object" ? columns_selected : columns_default,
       query = "&profile_id=" + profile_id + "&" + columns.join("!=NaN&") + "!=NaN&orderBy(%22depth%22)";
 
+//http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.csv?profile_id,time,latitude,longitude
+      console.log("QUERY FOR CSV: ", query)
+// SALINITY: http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.htmlTable?time,latitude,longitude,profile_id,salinity&salinity!=NaN
+//http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_319-20140420T2200.csvp?profile_id,time,depth,salinity,temperature,conductivity
+// &profile_id=1&time!=NaN&depth!=NaN&salinity!=NaN&temperature!=NaN&conductivity!=NaN!=NaN&orderBy(%22depth%22)
       return tabledap_url + dataset_url + "profile_id," +columns.join(",") + query;
     };
 
