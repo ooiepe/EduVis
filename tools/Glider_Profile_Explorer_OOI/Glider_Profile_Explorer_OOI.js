@@ -191,7 +191,7 @@
           "title" : "Depth (m)"
         },
         "salinity" : {
-          "column" : "salinity (1)",
+          "column" : "salinity (1e-3)",
           "units" : "",
           "title" : "Salinity" // Sea Water Practical Salinity
         },
@@ -478,7 +478,7 @@
       g.title = g.svg.append("text")
         .attr("class", "gtitle")
         .attr("text-anchor", "left")
-        .style("font-size", "16px")
+        .style("font-size", "12px")
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (0) + ") ")
