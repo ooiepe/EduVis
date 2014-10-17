@@ -9,10 +9,12 @@
 <body>
 <div>
   <select id="tool_name">
+    <option value="Glider_Profile_Explorer_OOI">Glider_Profile_Explorer_OOI</option>
+    <option value="Glider_Profile_Comparer_OOI">Glider_Profile_Comparer_OOI</option>
     <option value="Single_Time_Series">Single_Time_Series</option>
     <option value="Single_Time_Series_Map">Single_Time_Series_Map</option>
     <option value="Double_Time_Series">Double_Time_Series</option>
-    <option value="Glider_Profile_Explorer_OOI">Glider_Profile_Explorer_OOI</option>
+
   </select>
   <div id="tool_load" class="btn">load tool</div>
 </div>
@@ -47,11 +49,11 @@
           <p><em>Here is a preview of the custom visualization tool you have made.  This is what others will see when you share it.</em></p>
           <div id="vistool"></div>
         </div>
-        
+
         <div class="tab-pane" id="ev-instance-configuration">
           <!-- tab preview -->
           <p><em>Click the Extract Button Below to View the Tool Configuration</em></p>
-          
+
           <div style="margin-bottom:20px;">
             <button class="btn" id="config-extract-update" name="config-extract-update" value="Extract Configuration">Extract Configuration</button>
           </div>
@@ -76,7 +78,7 @@
   // Last Update: 5/12/2014
 
   // Change the tool name below to the tool you would like to view
-  //var __CFG_Tool_Name__ = "Single_Time_Series_Map"; 
+  //var __CFG_Tool_Name__ = "Single_Time_Series_Map";
 
   var __CFG_Tool_Name__ = "Single_Time_Series";////Glider_Profile_Explorer_OOI
 
@@ -87,21 +89,21 @@
 
     // pull the configuration from the default tool instance
     var config = EduVis.tool.instances[$("#tool_name").val()]["default"].configuration;
-      
+
     // update the configuration value of the textarea
     // use undefined, 2 (indentation level) for pretty print
     $("#config-view").val(JSON.stringify(config, null, 2));
-  
+
     return true;
   }
-  
+
   (function(){
 
     // add an event to the submit button
     $('#config-extract-update').click(function(){
       return EduVis_extract();
     });
-    
+
     // set the EduVis, tools, and resources paths
     // EduVis.Environment.setPaths(
     //  'http://ooi.dev/epe/epedev/threedotone/sites/default/files/evtools/EduVis/', // eduvis
@@ -113,8 +115,8 @@
       .on("click", function(){
 
         EduVis.tool.load(
-          { 
-            "name" : $("#tool_name").val(), 
+          {
+            "name" : $("#tool_name").val(),
             "tool_container_div": "vistool",
             //"instance_config": "",
             "isEdit" : true
@@ -123,8 +125,28 @@
 
       })
 
+    var toolName = getParameterByName("tool");
+
+    if(typeof toolName !== "undefined"){
+
+      EduVis.tool.load({
+          "name" : toolName,
+          "tool_container_div": "vistool",
+          //"instance_config": "",
+          "isEdit" : true
+      });
+
+    }
+
+    function getParameterByName(name) {
+      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+          results = regex.exec(location.search);
+      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
   }());
-  
+
 </script>
 </body>
 </html>
