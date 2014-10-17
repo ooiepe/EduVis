@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 10/6/2014
+ * Revised 10/17/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Explorer",
         "url" : "",
 
-        "version" : "0.4.1",
+        "version" : "0.4.2",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -92,11 +92,11 @@
         },
 
         "configuration" : {
-          "dataset_id" : "",
-          "profile_id" : "1",
+          "dataset_id" : "CE05MOAS-ce_319-20140420T2200",
+          "profile_id" : "157",
           "parameter" : "temperature",
-          "date_start": "2013-09-17",
-          "date_end": "2014-03-03"
+          "date_start": "2014-04-24",
+          "date_end": "2014-05-19"
         },
 
         "data" : {},
