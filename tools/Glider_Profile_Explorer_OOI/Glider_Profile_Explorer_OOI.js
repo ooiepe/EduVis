@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 10/17/2014
+ * Revised 10/20/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Explorer",
         "url" : "",
 
-        "version" : "0.4.2",
+        "version" : "0.4.3",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -471,12 +471,12 @@
         .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
 
       g.line = d3.svg.line()
-        .interpolate("monotone")
+        //.interpolate("monotone")
         .x(function(d) { return g.x(d[erddap_ref[config.parameter].column]); })
         .y(function(d) { return g.y(d[column_depth]); });
 
       g.title = g.svg.append("text")
-        .attr("class", "gtitle")
+        .attr("class", "gtitle_dataset")
         .attr("text-anchor", "left")
         .style("font-size", "12px")
         .attr("y", 0)
@@ -485,15 +485,24 @@
         .text(tool.configuration.dataset_id);
         //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
 
-      g.subtitle = g.svg.append("text")
-        .attr("class", "gsubtitle")
+      g.subtitle_datetime = g.svg.append("text")
+        .attr("class", "gsubtitle_datetime")
         .attr("text-anchor", "left")
         .style("font-size", "11px")
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (18) + ") ")
+        .text("");
+
+      g.subtitle_profileID = g.svg.append("text")
+        .attr("class", "gsubtitle_profileID")
+        .attr("text-anchor", "right")
+        .style("font-size", "11px")
+        .attr("y", 0)
+        .attr("dy", ".75em")
+        .attr("transform", "translate(" + (g.margin.left + 280) + "," + (18) + ") ")
         .text(
-          column_selected_title + " Profile: "+ config.profile_id
+          "Profile: "+ config.profile_id
         );
 
       // g.stats = g.svg.append("text")
@@ -841,16 +850,19 @@
           .attr("d", g.line);
 
         // update chart title with profile id and date
-        profile_date = data[0]["time (UTC)"].slice(0,10);
+        profile_date = data[0]["time (UTC)"];
 
         g.title.text(
-          tool.configuration.dataset_id + " - " + profile_date
+          tool.configuration.dataset_id
         );
 
-        g.subtitle.text(
-          column_selected_title + " Profile: "+ pid
+        g.subtitle_datetime.text(
+          profile_date
         );
-        //+ " Lat: " + lat + " Long:" + lng
+
+        g.subtitle_profileID.text(
+         " Profile: "+ pid
+       );
 
         g.xlabel.text(
           column_selected_title +
