@@ -81,7 +81,7 @@
 
               "stylesheets" : [
                 {
-                  "name" : "Glider_Profile_Comparer_OOI",
+                  "name" : "Glider_Profile_Comparer_OOI_css",
                   "src" : "Glider_Profile_Comparer_OOI.css"
                 },
               ]
@@ -225,19 +225,28 @@
 
     tool.Glider_Profile_Comparer_OOI = function( _target ){
 
+      var c=this.configuration;
+      // set up data objects and data requests
       tool.DATA.init();
 
+      // update data
+
+      // define controls
       tool.UI.init();
 
+      // create controls
       tool.UI.setup();
 
-      tool.update_chart(this.configuration.dataset_id, this.configuration.profile_id);
+      // update charts
+      tool.update_charts(this.configuration.dataset_id, this.configuration.profile_id);
 
+      tool.update_profile_collection(
+        c.dataset_id,
+        c.profile_id,
+        c.date_start,
+        c.date_end
+      );
 
-//http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.csvp?profile_id,temperature,salinity,conductivity&profile_id=207&temperature!=NaN&salinity!=NaN&conductivity!=NaN&orderBy(%22depth%22)
-      // check all data sources and download
-      // 1. track data.. profile ID / time
-      // 2. initial profile
 
       // set up UI
       // event UI
@@ -246,9 +255,53 @@
 
     };
 
-    tool.update_chart = function(dataset_id, profile_id){
+
+    // called by update_profile_collection on request callback
+
+    tool.update_slider = function(){
+
+      // create new slider
+
+      console.log("UPDATE SLIDER????? 265")
+
+    };
+
+    tool.update_profile_collection = function(dataset_id, profile_id, date_start, date_end){
+
+      console.log("DOWNLOAD Track Data", tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end,undefined ,".csv"));
+
+      // profile_id,time,latitude,longitude
+      // ,UTC,degrees_north,degrees_east
+
+      d3.csv(tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end, undefined ,".csv"), function(d,i) {
+        return {
+
+          ind : i,
+          profile_id: d.profile_id,
+          time: d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse(d.time),
+          lat: d.latitude,
+          lon: d.longitude
+
+        };
+      }, function(error, rows) {
+
+        tool.DATA.profile_collection = rows;
+
+        // console.log("rows");
+        // console.log(rows);
+        tool.update_slider();
+
+      });
+
+      // update slider
+
+    };
+
+    tool.update_charts = function(dataset_id, profile_id){
 
       d3.csv( tool.DATA.erddap_endpoints.profile(dataset_id, profile_id), function(error,data){
+
+        if(error){console.log(error);}
 
         var erddap_ref = tool.settings.erddap_parameter_metadata,
             column_depth = erddap_ref.depth.column,
@@ -714,6 +767,25 @@
         320,400,
         "select_var2");
 
+
+  /*
+
+      Slider
+
+  */
+
+      tool.UI.slider = svg_slider("svg_container",config.date_start, config.date_end, function(profile_id){
+
+          tool.update_charts(tool.configuration.dataset_id, profile_id);
+
+      });
+
+      console.log("SLICKER", "df");
+
+      // var slider = tool.UI.slider;
+      // slider.x.domain([10,300]);
+      // slider.call(tool.UI.slider.axisG);
+
       // set UI references for later data updates
 
       tool.UI.chart1 = chart1;
@@ -751,15 +823,16 @@
             //"volumetric_backscatter_650nm"
           ];
 
-      function _glider_track(dataset_id, date_start, date_end, variables) {
+      function _glider_track(dataset_id, date_start, date_end, variables, return_type) {
 
           // use user-defined variables array or local array
           var vars_track = typeof (variables) === "undefined" ? errdap_track_vars : variables,
-              query = "&time%3E=" + date_end +
+              return_data_type = typeof (return_type) === "undefined" ? ".geoJson" : return_type,
+              query = "&time%3E=" + date_start +
                       "&time%3C=" + date_end;
 
           // build request url
-          return errdap_tabledap + dataset_id + ".geoJson?" + vars_track.join(",") + query;
+          return errdap_tabledap + dataset_id + return_data_type + "?" + vars_track.join(",") + query;
 
       };
 
@@ -1358,7 +1431,117 @@
 
 
 
+/* SVG Slider */
 
+  var svg_slider = function(dom_element, time_start, time_end, onEndCallback){
+
+    var svg_slider = {};
+
+    var date_format = d3.time.format("%Y-%m-%d"),
+        iso_format = d3.time.format.iso.parse;
+
+    // var dd = [0, 0.25, 0.5, 0.75, 1].map(function (a) {
+    //     return iso_format(tick_interpolate(a));
+    // });
+
+    var start = iso_format(time_start);
+    var end = iso_format(time_end);
+
+    var tick_interpolate = d3.interpolate(start, end);
+    var dd = [0, 1].map(function (a) {
+        return iso_format(tick_interpolate(a));
+    });
+
+    var margin = {top: 0, right: 0, bottom: 0, left: 0},
+        width = 400 - margin.left - margin.right,
+        height = 300 - margin.bottom - margin.top;
+
+    //console.log(tool.DATA.profile_collection);
+    var x = d3.time.scale()
+        .range([0, width])
+        .domain([start,end])
+        //.domain([0, data.length])
+        .clamp(true);
+
+    var brush = d3.svg.brush()
+        .x(x)
+        .extent([0, 0])
+        .on("brush", brushed)
+        .on("brushend", brushend);
+
+
+    var svg = d3.select("#"+dom_element).append("g")
+        .attr("transform", "translate(" + 100 + "," + 450 + ")");
+
+    var xaxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .tickValues(dd)
+      .tickFormat(function(d) { return date_format(d) })
+
+      // .tickFormat()
+      // .tickSize(0)
+      //.tickPadding(12)
+
+    var gXaxis = svg.append("g")
+        .attr("class", "x axis slider")
+        .attr("transform", "translate(0," + 10 + ")")
+        .call(xaxis)
+      .select(".domain")
+      .select( function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+        .attr("class", "halo");
+
+    var slider = svg.append("g")
+        .attr("class", "slider")
+        .call(brush);
+
+    slider.selectAll(".extent,.resize")
+        .remove();
+
+    slider.select(".background")
+        .attr("height", height);
+
+    var handle = slider.append("circle")
+        .attr("class", "handle")
+        .attr("transform", "translate(0," + 10 + ")")
+        .attr("r", 9);
+
+    slider
+        .call(brush.event)
+      .transition() // gratuitous intro!
+        .duration(750)
+        .call(brush.extent([70, 70]))
+        .call(brush.event);
+
+    function brushed() {
+        var value = brush.extent()[0];
+
+        if (d3.event.sourceEvent) { // not a programmatic event
+          value = x.invert(d3.mouse(this)[0]);
+          brush.extent([value, value]);
+        }
+
+        handle.attr("cx", x(value));
+
+    }
+
+    function brushend() {
+        //svg.classed("selecting", !d3.event.target.empty());
+        var value = brush.extent()[0];
+
+        //console.log(value, x(value));
+        onEndCallback(x(value));
+
+    }
+
+    return {
+      "x": x,
+      "axis" : xaxis,
+      "axisG" :gXaxis,
+      "slider": slider
+    }
+
+};
 
 /* SVG Dropdown */
 
@@ -1413,7 +1596,6 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
 
       });
 
-
     var select_text = select_selected.append("text")
         .attr("id", "select_text")
         .attr("class", "dd_option_selected")
@@ -1428,7 +1610,7 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
 
     var svg_options = svg.append("g")
         .attr("id", id)
-        .attr("display", "none")
+        .style("display", "none")
         .on("mouseover",function(){
             console.log("mouse over");
         })
@@ -1436,17 +1618,19 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
             console.log("mouse out");
         })
 
-    for (var x = 1; x <= options_count; x++) {
+    var count = 1
 
-        var select_key = options_obj[x - 1][kv_key],
-            select_val = options_obj[x - 1][kv_val];
+    for (; count <= options_count; count++) {
+
+        var select_key = options_obj[count - 1][kv_key],
+            select_val = options_obj[count - 1][kv_val];
 
         // pop up or pop down
         var select_option = svg_options.append("g")
             .attr("data-attr-key", select_key)
             .attr("data-attr-val", select_val)
             .attr("class", "gdd_option")
-            .attr("transform", "translate(" + 0 + ",-" + x * dd_height + ")");
+            .attr("transform", "translate(" + 0 + ",-" + count * dd_height + ")");
 
         var textContainer = select_option.append("rect")
             .attr("class", "dd_option")
@@ -1484,10 +1668,6 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
             .attr("y", 8)
             .attr("x", 10)
             .attr("dy", ".75em")
-            .text(options_obj[x - 1][kv_val]);
+            .text(options_obj[count - 1][kv_val]);
     }
-};
-
-var click_callback = function (a, b, c) {
-    console.log(a, b, c)
 };
