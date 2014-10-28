@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Comparer OOI (GPC OOI)
- * Revised 10/14/2014
+ * Revised 10/27/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Comparer",
         "url" : "",
 
-        "version" : "0.0.1",
+        "version" : "0.0.3",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -33,7 +33,8 @@
               {
                 "name" : "d3",
                 "url" : "http://d3js.org/d3.v3.min.js",
-                "global_reference" : "d3"
+                "global_reference" : "d3",
+                "attributes":{"charset":"utf-8"}
               },
 
               {
@@ -68,7 +69,8 @@
                 {
                   "name" : "d3",
                   "url" : "http://d3js.org/d3.v3.min.js",
-                  "global_reference" : "d3"
+                  "global_reference" : "d3",
+                  "attributes":{"charset":"utf-8"}
                 },
                 {
                   "resource_type" : "tool",
@@ -93,7 +95,7 @@
 
         "configuration" : {
           "dataset_id" : "CE05MOAS-ce_312-20140420T2200",
-          "profile_id" : "105",
+          "profile_id" : "125",
           "var1" : "salinity",
           "var2" : "temperature",
           "date_start": "2014-05-02",
@@ -134,12 +136,12 @@
             },
             "salinity" : {
               "column" : "salinity (1e-3)",
-              "units" : "",
+              "units" : "1e-3",
               "title" : "Salinity" // Sea Water Practical Salinity
             },
             "temperature" : {
               "column" : "temperature (Celsius)",
-              "units" : "Degrees celsius",
+              "units" : "&#176; C",
               "title" : "Sea Water Temperature"
             },
             "conductivity" : {
@@ -154,7 +156,7 @@
             },
             "chlorophyll_a" : {
               "column" : "chlorophyll_a (ug L-1)",
-              "units" : "",
+              "units" : "ug L-1",
               "title" : "Chlorophyll A" // Chlorophyll a Concentration
             },
             "oxygen_concentration" : {
@@ -176,7 +178,6 @@
 
             //"parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
             "parameters" : ["temperature", "salinity", "density", "conductivity"]
-
 
         },
         "mapping": {
@@ -223,82 +224,197 @@
        "DATA" : {}
     };
 
+    tool.callback_download_track = function(){
+
+
+    };
+
+    tool.callback_download_profile = function(){
+
+
+    };
+
+    tool.callback_slider_update = function(){
+
+
+    }
+
     tool.Glider_Profile_Comparer_OOI = function( _target ){
 
       var c=this.configuration;
+
       // set up data objects and data requests
-      tool.DATA.init();
+      tool.DATA.init_services();
 
-      // update data
-
-      // define controls
-      tool.UI.init();
+      // show data download status.. "Preparing Tool Data"
+      // download track data..
+      // -> on complete, download profile data
+      // -> on complete, update charts
 
       // create controls
       tool.UI.setup();
 
-      // update charts
-      tool.update_charts(this.configuration.dataset_id, this.configuration.profile_id);
-
-      tool.update_profile_collection(
+      //update profile track
+      tool.update_track_profiles(
         c.dataset_id,
         c.profile_id,
         c.date_start,
         c.date_end
       );
 
-
-      // set up UI
-      // event UI
-
       EduVis.tool.load_complete(this);
 
     };
 
 
-    // called by update_profile_collection on request callback
+    tool.UI.slider = function(profile_extent){
 
-    tool.update_slider = function(){
+      var c = tool.configuration,
+        _target = c.dom_target,
+        profile_selected = c.profile_id;
 
-      // create new slider
+      d3.select("#" + _target + "_profile_slider").remove();
 
-      console.log("UPDATE SLIDER????? 265")
+      var tick_interpolate = d3.interpolate(profile_extent[0], profile_extent[1]);
 
+      var dd = [0, 1].map(function (a) {
+          return tick_interpolate(a);
+      });
+
+      var width = 380,
+          height = 50;
+
+      var x = d3.scale.linear()
+          .range([0, width])
+          .domain(profile_extent)
+          .clamp(true);
+
+      var brush = d3.svg.brush()
+          .x(x)
+          .extent([profile_selected, profile_selected])
+          .on("brush", brushed)
+          .on("brushend", brushend);
+
+      var svg = d3.select("#" + "svg_container").append("g")
+          .attr("id", _target + "_profile_slider")
+          .attr("transform", "translate(" + 100 + "," + 440 + ")");
+
+      var xaxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom")
+          .tickValues(dd)
+
+      var gXaxis = svg.append("g")
+          .attr("class", "x axis slider")
+          .attr("transform", "translate(0," + 20 + ")")
+          .call(xaxis);
+
+      var slider = svg.append("g")
+          .attr("class", "slider")
+          .call(brush);
+
+      slider.select(".background")
+          .attr("height", height);
+
+      slider.selectAll(".extent,.resize")
+          .remove();
+
+      var handle_container = slider.append("g")
+          .attr("class", "profile_data")
+          .append("text")
+          .attr("x",200)
+          .attr("y",40)
+          .attr("text-anchor", "middle")
+          .text("");
+
+      var handle = slider.append("path")
+          .attr("class", "handle")
+          .attr("stroke", "red")
+          .attr("stroke-width", "2")
+          .attr("fill","none")
+          .attr("transform", "translate(-10,0)")
+          .attr("d","M1,1L21,1L21,14L11,21L1,14Z");
+
+          //.attr("d","M1,1h21l21,14v21l1,14Z");
+          //.attr("d","M1,1L21,1L21,14L11,21L1,14Z");
+
+
+
+      slider
+          .call(brush.extent([profile_selected, profile_selected]))
+          .call(brush.event);
+
+      function brushed() {
+          var value = brush.extent()[0];
+
+          if (d3.event.sourceEvent) { // not a programmatic event
+            value = x.invert(d3.mouse(this)[0]);
+            brush.extent([value, value]);
+          }
+
+          var profile_data = tool.get_track_profile_info(Math.floor(value));
+
+          handle
+            .attr("transform", "translate(" + (x(value) - 10) + ",0)");
+
+          handle_container
+            .text("Profile: " + profile_data.profile_id + " - " + profile_data.time);
+
+          //var profile_data = tool.get_track_profile_info(Math.floor(value));
+
+      }
+
+      function brushend() {
+
+          var value = brush.extent()[0];
+
+          //console.log("SLIDER UPDATE ->", value, x(value),Math.floor(x(value)));
+
+          // update chart when slider is changed
+          tool.update_charts(Math.floor(value));
+      }
     };
 
-    tool.update_profile_collection = function(dataset_id, profile_id, date_start, date_end){
+    tool.update_track_profiles = function(dataset_id, profile_id, date_start, date_end){
 
-      console.log("DOWNLOAD Track Data", tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end,undefined ,".csv"));
+      console.log("DOWNLOAD Track Data", tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end,undefined ,".csvp"));
 
       // profile_id,time,latitude,longitude
       // ,UTC,degrees_north,degrees_east
 
-      d3.csv(tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end, undefined ,".csv"), function(d,i) {
+      d3.csv(tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end, undefined ,".csvp"), function(d,i) {
         return {
 
           ind : i,
-          profile_id: d.profile_id,
-          time: d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse(d.time),
-          lat: d.latitude,
-          lon: d.longitude
+          profile_id: +d.profile_id,
+          time: d3.time.format.utc("%Y-%m-%dT%H:%M:%SZ").parse(d["time (UTC)"]),
+          lat: +d["latitude (degrees_north)"],
+          lon: +d["longitude (degrees_east)"]
 
         };
       }, function(error, rows) {
 
-        tool.DATA.profile_collection = rows;
+          // set profile_collection data object
+          tool.DATA.profile_collection = rows;
 
-        // console.log("rows");
-        // console.log(rows);
-        tool.update_slider();
+          // set min and max profiles for slider move display
+          var profile_extent = d3.extent(rows,function(d){return d.profile_id;});
+
+          // update slider with new dataset
+          tool.UI.slider(profile_extent);
 
       });
 
-      // update slider
-
     };
 
-    tool.update_charts = function(dataset_id, profile_id){
+    tool.update_charts = function(profile_id){
 
+      var c = tool.configuration,
+          dataset_id = c.dataset_id;
+
+      console.log("UPDATE CHARTS:", dataset_id, profile_id);
+
+      // download profile for dataset_id and profile_id
       d3.csv( tool.DATA.erddap_endpoints.profile(dataset_id, profile_id), function(error,data){
 
         if(error){console.log(error);}
@@ -333,12 +449,19 @@
           d[column_selected2] = +d[column_selected2];
         });
 
+        // get the X extent
+        chart1.extent_x = d3.extent(data, (function(d) { return d[column_selected1]; }));
 
-        chart1.x.domain(d3.extent(data, (function(d) { return d[column_selected1]; })));
+        //update the x domain for chart1
+        chart1.x.domain(chart1.extent_x);
 
         // update the y domain to use the range of the returned data.
         chart1.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
 
+        // set the new tick values
+        chart1.axisX.tickValues(tool.axisTicks(chart1.extent_x));
+
+        // update the x and y axis for chart1
         chart1.select(".x.axis").call(chart1.axisX);
         chart1.select(".y.axis").call(chart1.axisY);
 
@@ -350,13 +473,20 @@
           .ease("linear")
           .attr("d", chart1.line);
 
-        // chart1.call(chart1.axisX);
 
-        chart2.x.domain(d3.extent(data, (function(d) { return d[column_selected2]; })));
+        // get the X extent
+        chart2.extent_x = d3.extent(data, (function(d) { return d[column_selected2]; }));
+
+        // update the x domain for chart2
+        chart2.x.domain(chart2.extent_x);
 
         // update the y domain to use the range of the returned data.
         chart2.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
 
+        // set the new tick values
+        chart2.axisX.tickValues(tool.axisTicks(chart2.extent_x));
+
+        // update the x axis for chart 2
         chart2.select(".x.axis").call(chart2.axisX);
 
         // update chart line
@@ -367,15 +497,23 @@
           .ease("linear")
           .attr("d", chart2.line);
 
+        // update the domain for chart3
         chart3.x.domain(d3.extent(data, (function(d) { return d[column_selected1]; })));
 
         // update the y domain to use the range of the returned data.
         chart3.y.domain(d3.extent(data, (function(d) { return d[column_selected2]; })));
 
+        // set the new tick values
+        chart3.axisX.tickValues(tool.axisTicks(chart1.extent_x));
+
+        // set the new tick values
+        chart3.axisY.tickValues(tool.axisTicks(chart2.extent_x));
+
+        // update the x and y axis for chart3
         chart3.select(".x.axis").call(chart3.axisX);
         chart3.select(".y.axis").call(chart3.axisY);
 
-        // update chart line
+        // update path for chart3
         chart3.select("path.line")
           .data([data])
           .transition()
@@ -383,40 +521,21 @@
           .ease("linear")
           .attr("d", chart3.line);
 
+        // update dataset object
         tool.DATA.dataset = data;
 
       });
 
-
-      //
-      //   // clean depth and selected column values
-      //   data.forEach(function(d) {
-      //     //d[column_date] = g.parseDate(d[column_date]);
-      //     d[column_depth] = +d[column_depth];
-      //     d[column_selected] = +d[column_selected];
-      //   });
-      //
-      //   // update x and y domains depth and the selected
-      //   g.x.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
-      //
-      //   // update the y domain to use the range of the returned data.
-      //   g.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
-      //
-      //   // update chart line
-      //   g.svg.selectAll("path.line")
-      //     .data([data])
-      //     .transition()
-      //     .duration(1000)
-      //     .ease("linear")
-      //     .attr("d", g.line);
-      //
-      //   // update chart title with profile id and date
       //   profile_date = data[0]["time (UTC)"];
 
     };
 
+/*
 
-    tool.select_update = function(chart_id, id, variable){
+  Variable selection updates..
+
+*/
+    tool.UI.select_update = function(chart_id, id, variable){
 
       console.log(1, id,variable);
 
@@ -437,22 +556,23 @@
 
         config["var"+chart_id] = variable;
 
+      // only need to update the newly selected variable.. other variables have been cleaned on download
       data.forEach(function(d) {
-        //d[column_date] = g.parseDate(d[column_date]);
-        d[column_depth] = +d[column_depth];
+        //d[column_depth] = +d[column_depth];
         d[column_selected] = +d[column_selected];
-      //  console.log("SELECTED", d[column_selected]);
       });
 
       console.log("SELECTED", column_selected);
 
-      chart.x.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
+      chart.extent_x = d3.extent(data, (function(d) { return d[column_selected]; }));
+      // update the x domain of the selected chart.. either chart1 or chart2
+      chart.x.domain(chart.extent_x);
+
+      // set the new tick values
+      chart.axisX.tickValues(tool.axisTicks(chart.extent_x));
 
       // update the y domain to use the range of the returned data.
       chart.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
-
-      //chart.select(".x.axis").call(chart.axisX);
-      //chart.select(".y.axis").call(chart.axisY);
 
       // update chart line
       chart.select("path.line")
@@ -462,16 +582,36 @@
         .ease("linear")
         .attr("d", chart.line);
 
+      // update the x axis for the given chart
+      //chart.axis_x.call(chart.axisX);
       chart.axis_x.call(chart.axisX);
 
+      // if it is chart1, chart 3 x domain needs to be updated, otherwise it is the y domain
       if(chart_id == 1){
-        chart3.x.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
+        chart3.extent_x = d3.extent(data, (function(d) { return d[column_selected]; }));
+        chart3.x.domain(chart3.extent_x);
+        // set the new tick values
+        chart3.axisX.tickValues(tool.axisTicks(chart3.extent_x));
         chart3.axis_x.call(chart3.axisX);
         chart3.labelX.text(column_selected_title);
       }
       else{
-        chart3.y.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
-        chart3.axis_y.call(chart3.axisY)
+        var chart3_extent_y = d3.extent(data, (function(d) { return d[column_selected]; }));
+        chart3.y.domain(chart3_extent_y);
+
+        chart3.axisY.tickValues(tool.axisTicks(chart3_extent_y));
+        chart3.axis_y
+          .call(chart3.axisY)
+
+          // .selectAll("text")
+          //   .style("text-anchor", "end")
+          //   //.attr("dx", "-.8em")
+          //   //.attr("dy", ".15em")
+          //   .attr("transform", function(d) {
+          //       return "rotate(45)";
+          //     });
+
+
         chart3.labelY.text(column_selected_title);
       }
 
@@ -482,324 +622,37 @@
         .ease("linear")
         .attr("d", chart3.line);
 
-
     };
 
-    tool.UI.setup = function(){
+    // called by update_profile_collection on request callback
+    tool.get_track_profile_info = function(profile_id){
+      var d = tool.DATA.profile_collection,
+          x = 0,
+          len = d.length;
 
-      var ui = tool.UI.attrs,
-          c = ui.chart,
-          w = c.width,
-          h = c.height,
-          m = ui.margin,
-          sh = c.height,
-          sw = 2*w + m.left,
-          _target = tool.dom_target;
-
-      var erddap_ref = tool.settings.erddap_parameter_metadata,
-          column_depth = erddap_ref.depth.column,
-          config = tool.configuration,
-          column1 = erddap_ref[config.var1],
-          column2 = erddap_ref[config.var2],
-
-          column_selected1 = column1.column,
-          column_selected2 = column2.column,
-
-          column_selected_title1 = column1.title,
-          column_selected_title2 = column2.title;
-
-      var ui_container = d3.select("#vistool")
-        .append("div")
-        .attr("id", "vis_container")
-        .style({
-          "width":"834px",
-          "margin":"0",
-          "height":"500px",
-          "border":"2px solid #333333"
-        });
-
-      var svg = ui_container.append("svg")
-        .attr("id", "svg_container")
-        .attr("width", 830)
-        .attr("height", 500)
-        // .style("font-size","11px")
-        // .style("font-family","Tahoma, Geneva, sans-serif");
-
-      var charts = svg.append("g")
-        .attr("transform", "translate(60,60)")
-        .attr("width", 210)
-        .attr("height", 320);
-
-    /*
-
-    Chart 1:
-
-    */
-
-      // Chart1: container
-      var chart1 = charts.append("g")
-        .attr("transform", "translate(20,0)")
-        .attr("width", 210)
-        .attr("height", 320);
-
-      // Chart1: scales
-      chart1.x = d3.scale.linear().range([0, 210]);
-      chart1.y = d3.scale.linear().range([0, 320]);
-
-      // Chart1: axis defs x and y
-      chart1.axisX = d3.svg.axis().scale(chart1.x).orient("bottom");//.tickSize(5,0,0);
-      chart1.axisY = d3.svg.axis().scale(chart1.y).orient("left");//.tickSize(0,0,0);
-
-      // Chart1: x axis placement and call
-      chart1.axis_x = chart1.append("g")
-        .attr("id", _target+"_chart1_axisX")
-        .attr("class", "x axis x1")
-        .attr("transform", "translate(0," + 320 + ")")
-        .call(chart1.axisX);
-
-      // Chart1: y axis placement and call
-      chart1.axis_y = chart1.append("g")
-        .attr("id", _target+"_chart1_axisY")
-        .attr("class", "y axis y1")
-        //.attr("transform", "translate(0," + h + ")")
-        .call(chart1.axisY);
-
-      chart1.append("path")
-        .attr("class", "line")
-        .attr("d", chart1.line)
-        .style("fill","none")
-        .style("stroke","#999999")
-        .style("stroke-width","2px");
-
-      chart1.line = d3.svg.line()
-        .interpolate("monotone")
-        .x(function(d) { return chart1.x(d[erddap_ref[config.var1].column]); })
-        //.x(function(d) { return chart1.x(d[column_selected1]); })
-        .y(function(d) { return chart1.y(d[column_depth]); });
-
-      console.log("ERDDAPPPP", column_selected1);
-
-
-  /*
-
-  Chart 2:
-
-  */
-
-      // Chart2: container
-      var chart2 = charts.append("g")
-        .attr("transform", "translate(240,0)")
-        .attr("width", 210)
-        .attr("height", 320);
-
-      // Chart2: scales
-      chart2.x = d3.scale.linear().range([0, 210]);
-      chart2.y = d3.scale.linear().range([0, 320]);
-
-      // Chart2: x axis definitions
-      chart2.axisX = d3.svg.axis().scale(chart2.x).orient("bottom");//.tickSize(5,0,0);
-      //chart2.axisY = d3.svg.axis().scale(chart2.y).orient("left");//.tickSize(0,0,0);
-
-      // Chart2: x axis placement and call
-      chart2.axis_x = chart2.append("g")
-        .attr("id", _target+"_chart2_axisX")
-        .attr("class", "x axis x2")
-        .attr("transform", "translate(0," + 320 + ")")
-        .call(chart2.axisX);
-
-      chart2.append("path")
-        .attr("class", "line")
-        .attr("d", chart2.line)
-        .style("fill","none")
-        .style("stroke","#999999")
-        .style("stroke-width","2px");
-
-      chart2.line = d3.svg.line()
-        .interpolate("monotone")
-        .x(function(d) { return chart2.x(d[erddap_ref[config.var2].column]); })
-        .y(function(d) { return chart2.y(d[column_depth]); });
-
-/*
-
-  chart3 Chart:
-
-*/
-
-      var chart3 = charts.append("g")
-        .attr("transform", "translate(510,80)")
-        .attr("width", 240)
-        .attr("height", 240);
-        // .style({
-        //   "fill" : "#111111",
-        //   "stroke" :"#999999",
-        //   "stroke-width":"1px"
-        // })
-
-        chart3.x = d3.scale.linear().range([0, 240]);
-        chart3.y = d3.scale.linear().range([0, 240]);
-
-        chart3.axisX = d3.svg.axis().scale(chart3.x).orient("bottom");//.tickSize(5,0,0);
-        chart3.axisY = d3.svg.axis().scale(chart3.y).orient("left");//.tickSize(0,0,0);
-
-        chart3.axis_x = chart3.append("g")
-          .attr("id", _target+"_chart3_axisX")
-          .attr("class", "x axis chart3")
-          .attr("transform", "translate(0," + 240 + ")")
-          .call(chart3.axisX);
-
-        chart3.axis_y = chart3.append("g")
-          .attr("id", _target+"_chart3_axisY")
-          .attr("class", "y axis chart3")
-          .call(chart3.axisY);
-
-        chart3.append("path")
-          .attr("class", "line")
-          .attr("d", chart3.line)
-          .style("fill","none")
-          .style("stroke","#999999")
-          .style("stroke-width","2px");
-
-        chart3.line = d3.svg.line()
-          .interpolate("monotone")
-          .x(function(d) { return chart3.x(d[erddap_ref[config.var1].column]); })
-          .y(function(d) { return chart3.y(d[erddap_ref[config.var2].column]); });
-
-/*
-
-  labels
-
-*/
-      var labels = svg.append("g");
-
-      chart1.labelY = labels.append("text")
-        .attr("id", _target + "chart1_labelY")
-        .attr("transform", "translate(0,220) rotate(270)")
-        .attr("x",0)
-        .attr("y",40)
-        .attr("text-anchor", "middle")
-        .text("Depth (m)");
-
-      // chart1.labelX = labels.append("text")
-      //   .attr("id", _target + "chart1_labelX")
-      //   .attr("transform", "translate(185,420)")
-      //   .attr("x",0)
-      //   .attr("y",0)
-      //   .attr("text-anchor", "middle")
-      //   .text("var1");
-      //
-      // chart2.labelX = labels.append("text")
-      //   .attr("id", _target + "chart2_labelX")
-      //   .attr("transform", "translate(405,420)")
-      //   .attr("x",0)
-      //   .attr("y",0)
-      //   .attr("text-anchor", "middle")
-      //   .text("var2");
-
-      chart3.labelX = labels.append("text")
-        .attr("id", _target + "chart3_labelX")
-        .attr("transform", "translate(690,420)")
-        .attr("x",0)
-        .attr("y",0)
-        .attr("text-anchor", "middle")
-        .text(column_selected_title1);
-
-      chart3.labelY = labels.append("text")
-        .attr("id", _target + "chart1_labelY")
-        .attr("transform", "translate(540,220) rotate(270)")
-        .attr("x",0)
-        .attr("y",0)
-        .attr("text-anchor", "middle")
-        .text(column_selected_title2);
-
-/*
-
-  Selectors
-
-*/
-
-      var x=0,len = erddap_ref.parameters.length;
-
-      var select_vars = [];
       for(x;x<len;x++){
-
-        select_vars.push(
-          {
-            "key": erddap_ref.parameters[x],
-            "value": erddap_ref[erddap_ref.parameters[x]].title
+          if(d[x].profile_id == +profile_id){
+            return d[x];
           }
-        );
       }
-
-    // svg select box for chart 1
-
-      svg_select(
-        select_vars,
-            erddap_ref[config.var1].title, {
-            "key": "key",
-            "value": "value"
-        },
-        "svg_container",
-        function(id,variable){
-
-          tool.select_update(1, id,variable);
-
-        },
-        120,400,
-        "select_var1");
-
-    // svg select box for chart 2
-      svg_select(
-
-        select_vars,
-        erddap_ref[config.var2].title,
-        {
-            "key": "key",
-            "value": "value"
-        },
-        "svg_container",
-
-        function(id,variable){
-
-          tool.select_update(2, id,variable);
-
-        },
-
-        320,400,
-        "select_var2");
-
-
-  /*
-
-      Slider
-
-  */
-
-      tool.UI.slider = svg_slider("svg_container",config.date_start, config.date_end, function(profile_id){
-
-          tool.update_charts(tool.configuration.dataset_id, profile_id);
-
-      });
-
-      console.log("SLICKER", "df");
-
-      // var slider = tool.UI.slider;
-      // slider.x.domain([10,300]);
-      // slider.call(tool.UI.slider.axisG);
-
-      // set UI references for later data updates
-
-      tool.UI.chart1 = chart1;
-      tool.UI.chart2 = chart2;
-      tool.UI.chart3 = chart3;
-
-
     };
 
-    tool.DATA.init = function(){
+    tool.axisTicks = function(extent){
 
-    /*
-        ERDDAP Tabledap requests
-    */
+      console.log("AXIS TICKS! ",extent);
+
+      var tick_interpolate = d3.interpolate(extent[0],extent[1]);
+      var dd = [0.1, 0.3, 0.5, 0.7, 0.9].map(function (a) {
+          return tick_interpolate(a);
+      });
+      return dd;
+    };
+
+    tool.DATA.init_services = function(){
+
+
+          // ERDDAP Tabledap requests
+
 
       var errdap_tabledap = "http://erddap.marine.rutgers.edu/erddap/tabledap/",
 
@@ -846,565 +699,455 @@
 
       };
 
-
       tool.DATA.erddap_endpoints = {
           glider_track : _glider_track,
           profile : _profile
       };
 
+    };
 
-      /*
-          ERDDAP init datasets
-      */
+    tool.UI.mousemove1 = function(){
 
-      console.log("tool.Data INITIALIZED", tool.DATA);
+      console.log("mouse moved on 1");
+
+      var c = tool.configuration,
+          erddap_ref = tool.settings.erddap_parameter_metadata,
+          ref1 = erddap_ref[c.var1],
+          ref2 = erddap_ref[c.var2],
+          col_x1 = ref1.column,
+          col_x2 = ref2.column,
+          col_y = erddap_ref.depth.column,
+          data = tool.DATA.dataset,
+          chart1 = tool.UI.chart1,
+          chart2 = tool.UI.chart2,
+          chart3 = tool.UI.chart3,
+
+          units1 = ref1.units,
+          units2 = ref2.units,
+
+          bisect_y = d3.bisector(function(d) { return d[col_y]; }).left,
+          y0 = chart1.y.invert(d3.mouse(this)[1]),
+          i = bisect_y(data, y0, 1),
+          d0 = data[i - 1],
+          d1 = data[i],
+          d = y0 - d0[col_y] > d1[col_y] - y0 ? d1 : d0,
+
+          c1_dx = d[col_x1],
+          c1_dy = d[col_y],
+          c1_x = chart1.x(c1_dx),
+          c1_y = chart1.y(c1_dy),
+          c1_mid_x = ((chart1.extent_x[1] + chart1.extent_x[0]) / 2)>c1_dx ? {"text-anchor":"start", "x":"10"} : {"text-anchor":"end","x":"-10" },
+
+          c2_dx = d[col_x2],
+          c2_dy = d[col_y],
+          c2_x = chart2.x(c2_dx),
+          c2_y = chart2.y(c2_dy),
+          c2_mid_x = ((chart2.extent_x[1] + chart2.extent_x[0]) / 2)>c2_dx ? {"text-anchor":"start", "x":"10"} : {"text-anchor":"end","x":"-10" },
+
+          c3_x = chart3.x(c1_dx),
+          c3_y = chart3.y(c2_dx);
+
+          chart1.tooltip.attr("transform", "translate(" + c1_x + "," + c1_y + ")")
+            .select("text")
+            .html(c1_dx + " " + units1)
+            .attr(c1_mid_x);
+
+          chart2.tooltip.attr("transform", "translate(" + c2_x + "," + c2_y + ")")
+            .select("text")
+            .html(c2_dx + " " + units2)
+            .attr(c2_mid_x);
+
+          chart3.tooltip.attr("transform", "translate(" + c3_x + "," + c3_y + ")")
+            .select("text")
+            .text(c1_dx + " - " + c2_dx)
+            .attr(c1_mid_x);
 
     };
 
-    tool.UI.init = function (){
+    tool.UI.setup = function(){
 
-      // add to #vistool div
-      var v = {
-        "width" : 820,
-        "height" : 500
-      };
-
-      var m = {top: 20, right: 20, bottom: 20, left: 20};
-
-      var c = {
-        "width" : 280 - m.left - m.right,
-        "height" : 450 - m.top - m.bottom
-      };
-
-      tool.UI.attrs = {
-
-        visualization: v,
-        chart : c,
-        margin : m
-      };
-
-    };
-
-    tool.ui_setup = function(){
-
-      // parameters
-
-      // 0 profile_id (1)
-      // 1 time (UTC)
-      // 2 latitude (degrees_north) -- na
-      // 3 longitude (degrees_east)
-      // 4 depth (m)
-      // 5 salinity (1)
-      // 6 temperature (Celsius)
-      // 7 conductivity (S m-1)
-      // 8 density (kg m-3)
-
-      // setup UI
-      $("<div />")
-        .css({
-          "width":"840px",
-          "margin":"0",
-          "height":"500px"
-        })
-        .append(
-//
-          $("<div />")
-            .attr("id", "map-container")
-            .css({
-
-
-              "float":"left",
-              "height":"450px",
-              "width":"320px"
-
-
-            })
-            .append(
-
-              $("<div />")
-                .attr("id", "gpe-map-title")
-                .html(tool.configuration.dataset_id + " Profile Locations")
-            )
-            .append(
-
-              $("<div />")
-                .attr("id", "gpe-map")
-                .height(320)
-                .width(320)
-            )
-            .append(
-              $("<div />")
-                .attr("id", "gpe-map-tools")
-                .append(
-                  $("<div />")
-                    .css({"margin-top":"12px","width":"320px"})
-                    .append(
-                      $("<span />")
-                        .css({
-                            "float":"left",
-                            "width":"80px",
-                            "font-size": "12px",
-                            "text-align":"center",
-                            "cursor": "pointer"
-                          })
-                        .html( '<a style="margin:0 auto;" class="ui-icon ui-icon-arrowthick-1-w"></a>')
-                        .on("click", function(){
-                         var slider = $("#"+ _target + "-profile-slider"),
-                            val = slider.slider("option","value");
-
-                          if ( val != slider.slider("option","min")){
-                              slider.slider("value", +val - 1 );
-                          }
-                        })
-                        .append(
-                          $("<span />")
-                            .attr("id", _target + "-profile-slider-left")
-                            .html("")
-                        )
-
-                    )
-                    .append(
-                      // append slider control
-                      $("<div />")
-                        .css({
-                          "float":"left",
-                          "width": "230px"
-                        })
-                        .attr("id", _target + "-profile-slider")
-                    )
-                    .append(
-                      $("<span />")
-                        .css({
-                          "float":"right",
-                          "width":"80px",
-                          "font-size": "12px",
-                          "text-align":"center",
-                          "cursor": "pointer"
-                        })
-                        .html( '<i style="margin:0 auto;" class="ui-icon ui-icon-arrowthick-1-e"></i>')
-                        .on("click", function(){
-
-                          var slider = $("#"+ _target + "-profile-slider"),
-                            val = slider.slider("option","value");
-
-                          if ( val != slider.slider("option","max")){
-                              slider.slider("value", +val + 1 );
-                          }
-                        })
-                        .append(
-                          $("<span />")
-                            .attr("id", _target + "-profile-slider-right")
-                            .html("")
-                        )
-                    )
-                )
-            )
-        )
-        .append(
-
-          $("<div />")
-            .attr("id", _target + "-chart")
-            .css({
-              "height":"450px",
-              "width":"420px",
-              "float":"right"
-            })
-            .append(
-              $("<div />")
-                .attr("id", _target + "-viz-container")
-            )
-            .append(
-              $("<div />")
-                .attr("id", _target + "-viz-controls")
-                .css({"text-align":"center"})
-                .append(
-                    $("<select />")
-                      .attr("id", _target + "-control-parameter-dropdown")
-                )
-                .append(
-                    $("<select />")
-                      .attr("id", _target + "-control-parameter-dropdown2")
-                )
-            )
-            //.html("visualization")
-        )
-        .appendTo("#"+_target);
-
-      // initialize the visualization
-      tool.visualization_setup();
-
-      tool.init_graph(1);
-
-      // initialize the map
-      // tool.map_setup();
-
-      // hack to invalidate the map bounds.
-      $('.nav-tabs a[href="#ev-instance-preview"]')
-        .on("click", function (e) {
-          //e.preventDefault();
-          //$(this).tab('show');
-          setTimeout(function() {
-            tool.leaflet_map.map.invalidateSize();
-            tool.leaflet_map.map.fitBounds(tool.leaflet_map.layer_locations.getBounds());
-         }, 10);
-
-        });
-
-      EduVis.tool.load_complete(this);
-
-    };
-
-    tool.visualization_setup = function(){
-
-      var g = tool.graph = {},
-        _target = tool.dom_target;
+      var ui = tool.UI.attrs,
+          m = {top: 20, right: 20, bottom: 20, left: 20},
+          w = 280 - m.left - m.right,
+          h = 450 - m.top - m.bottom,
+          _target = tool.dom_target;
 
       var erddap_ref = tool.settings.erddap_parameter_metadata,
           column_depth = erddap_ref.depth.column,
           config = tool.configuration,
-          column = erddap_ref[config.parameter],
-          column_selected = column.column,
-          column_selected_title = column.title;
+          column1 = erddap_ref[config.var1],
+          column2 = erddap_ref[config.var2],
 
-      g.margin = {top: 40, right: 10, bottom: 40, left: 46};
-      g.width = 320 - g.margin.left - g.margin.right;
-      g.height = 450 - g.margin.top - g.margin.bottom;
+          column_selected1 = column1.column,
+          column_selected2 = column2.column,
 
-      //g.parseDate = d3.time.format.iso.parse;
+          column_selected_title1 = column1.title,
+          column_selected_title2 = column2.title;
 
-      g.x = d3.scale.linear().range([0, g.width]);
-      g.y = d3.scale.linear().range([0, g.height]);
-
-      g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10);//.tickSize(5,0,0);
-      g.yAxis = d3.svg.axis().scale(g.y).orient("left");//.tickSize(0,0,0);
-
-      g.svg = d3.select("#"+_target + "-viz-container").append("svg")
-        .attr("id",_target+"_svggraph")
-        .attr("width", g.width + g.margin.left + g.margin.right)
-        .attr("height", g.height + g.margin.top + g.margin.bottom)
-        .style("font-size","11px")
-        .style("font-family","Tahoma, Geneva, sans-serif");
-
-      g.svg.append("defs").append("clipPath")
-          .attr("id", _target+"_clip")
-        .append("rect")
-          .attr("width", g.width)
-          .attr("height", g.height);
-
-      g.chart = g.svg.append("g")
-          .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
-
-      g.chart2 = g.svg.append("g")
-        .attr("transform", "translate(" + "0" + "," + g.margin.top + ")");
-
-      g.chart.append("g")
-        .attr("id", _target+"_xAxis")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + g.height + ")")
+      var ui_container = d3.select("#vistool")
+        .append("div")
+        .attr("id", "vis_container")
         .style({
-          "fill" : "none",
-          "stroke" :"#666666"
-          //,"stroke-width":"1px"
-        })
-        .call(g.xAxis);
+          "width":"834px",
+          "margin":"0",
+          "height":"500px",
+          "border":"2px solid #333333"
+        });
 
-      g.chart.append("g")
-        .attr("id", _target+"_yAxis")
-        .attr("class", "y axis")
-        .style({
-          "fill" : "none",
-          "stroke" :"#666666",
-          "stroke-width":"1px"
-        })
-        .call(g.yAxis);
+      var svg = ui_container.append("svg")
+        .attr("id", "svg_container")
+        .attr("width", 830)
+        .attr("height", 500)
+        // .style("font-size","11px")
+        // .style("font-family","Tahoma, Geneva, sans-serif");
 
-      g.chart.append("path")
+      var charts = svg.append("g")
+        .attr("transform", "translate(60,60)")
+        .attr("width", 210)
+        .attr("height", 320);
+
+      //
+      //Chart 1:
+      //
+
+      // Chart1: container
+      var chart1 = charts.append("g")
+        .attr("transform", "translate(20,0)")
+        .attr("width", 210)
+        .attr("height", 320);
+
+      // Chart1: scales
+      chart1.x = d3.scale.linear().range([0, 210]);
+      chart1.y = d3.scale.linear().range([0, 320]);
+
+      // Chart1: axis defs x and y
+      chart1.axisX = d3.svg.axis()
+        .scale(chart1.x)
+        .orient("bottom")//.tickSize(5,0,0);
+
+      chart1.axisY = d3.svg.axis()
+        .scale(chart1.y)
+        .orient("left");//.tickSize(0,0,0);
+
+      // Chart1: x axis placement and call
+      chart1.axis_x = chart1.append("g")
+        .attr("id", _target+"_chart1_axisX")
+        .attr("class", "x axis x1")
+        .attr("transform", "translate(0," + 320 + ")")
+        .call(chart1.axisX);
+
+      // Chart1: y axis placement and call
+      chart1.axis_y = chart1.append("g")
+        .attr("id", _target+"_chart1_axisY")
+        .attr("class", "y axis y1")
+        //.attr("transform", "translate(0," + h + ")")
+        .call(chart1.axisY);
+
+      chart1.append("path")
         .attr("class", "line")
-        .attr("d", g.line)
+        .attr("d", chart1.line)
         .style("fill","none")
         .style("stroke","#999999")
         .style("stroke-width","2px");
 
-      g.chart2.append("path")
-        .attr("class", "line")
-        .attr("d", g.line2)
-        .style("fill","none")
-        .style("stroke","#6699CC")
-        .style("stroke-width","2px");
+      chart1.line = d3.svg.line()
+        .interpolate("monotone")
+        .x(function(d) { return chart1.x(d[erddap_ref[config.var1].column]); })
+        //.x(function(d) { return chart1.x(d[column_selected1]); })
+        .y(function(d) { return chart1.y(d[column_depth]); });
 
-
-      g.mouse_focus = g.chart.append("g")
-        .attr("class", "focus")
+      chart1.tooltip = chart1.append("g")
+        .attr("class", "tooltip1")
+        //.attr("transform", "translate(20,0)")
         .style("display", "none");
 
-      g.mouse_focus.append("circle")
-          .attr("r", 4.5);
+      chart1.tooltip.append("circle")
+            .attr("r", 4.5);
 
-      g.mouse_focus.append("text")
-          .attr("x", 9)
-          .attr("dy", ".35em");
+      chart1.tooltip.append("text")
+            .attr("x", 9)
+            .attr("dy", ".35em");
 
-      g.mousemover = g.chart.append("rect")
+      chart1.append("rect")
         .attr("class", "overlay")
-        .attr("width", g.width)
-        .attr("height", g.height)
-        .style("fill", "none")
-        .style("pointer-events", "all")
-        .on("mouseover", function() { g.mouse_focus.style("display", null); })
-        .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
+        .attr("fill","none")
+        .attr("pointer-events", "all")
+        .attr("width", 210)
+        .attr("height", 320)
+        .on("mouseover", function() {
+          chart1.tooltip.style("display", null);
+          chart2.tooltip.style("display", null);
+          chart3.tooltip.style("display", null);
+        })
+        .on("mouseout", function() {
+          chart1.tooltip.style("display", "none");
+          chart2.tooltip.style("display", "none");
+          chart3.tooltip.style("display", "none");
+          })
+        .on("mousemove", tool.UI.mousemove1);
 
-      g.line = d3.svg.line()
+
+      console.log("ERDDAPPPP", column_selected1);
+
+      //
+      //Chart 2:
+      //
+
+      // Chart2: container
+      var chart2 = charts.append("g")
+        .attr("transform", "translate(240,0)")
+        .attr("width", 210)
+        .attr("height", 320);
+
+      // Chart2: scales
+      chart2.x = d3.scale.linear().range([0, 210]);
+      chart2.y = d3.scale.linear().range([0, 320]);
+
+      // Chart2: x axis definitions
+      chart2.axisX = d3.svg.axis().scale(chart2.x).orient("bottom");//.tickSize(5,0,0);
+
+
+      // Chart2: x axis placement and call
+      chart2.axis_x = chart2.append("g")
+        .attr("id", _target+"_chart2_axisX")
+        .attr("class", "x axis x2")
+        .attr("transform", "translate(0," + 320 + ")")
+        .call(chart2.axisX);
+
+      chart2.append("path")
+        .attr("class", "line")
+        .attr("d", chart2.line)
+        .style("fill","none")
+        .style("stroke","#999999")
+        .style("stroke-width","2px");
+
+      chart2.line = d3.svg.line()
         .interpolate("monotone")
-        .x(function(d) { return g.x(d[erddap_ref[config.var1].column]); })
-        .y(function(d) { return g.y(d[column_depth]); });
+        .x(function(d) { return chart2.x(d[erddap_ref[config.var2].column]); })
+        .y(function(d) { return chart2.y(d[column_depth]); });
 
-      g.line2 = d3.svg.line()
-        .interpolate("monotone")
-        .x(function(d) { return g.x(d[erddap_ref[config.var2].column]); })
-        .y(function(d) { return g.y(d[column_depth]); });
+        chart2.tooltip = chart2.append("g")
+          .attr("class", "tooltip2")
+          //.attr("transform", "translate(210,0)")
+          .style("display", "none");
 
-      g.title = g.svg.append("text")
-        .attr("class", "gtitle")
-        .attr("text-anchor", "left")
-        .style("font-size", "16px")
-        .attr("y", 0)
-        .attr("dy", ".75em")
-        .attr("transform", "translate(" + (g.margin.left + 20) + "," + (0) + ") ")
-        .text(tool.configuration.dataset_id);
-        //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
+        chart2.tooltip.append("circle")
+              .attr("r", 4.5);
 
-      g.subtitle = g.svg.append("text")
-        .attr("class", "gsubtitle")
-        .attr("text-anchor", "left")
-        .style("font-size", "11px")
-        .attr("y", 0)
-        .attr("dy", ".75em")
-        .attr("transform", "translate(" + (g.margin.left + 20) + "," + (18) + ") ")
-        .text(
-          column_selected_title + " Profile: "+ config.profile_id
-        );
+        chart2.tooltip.append("text")
+              .attr("x", 9)
+              .attr("dy", ".35em");
 
-      // g.stats = g.svg.append("text")
-      //   .attr("id", _target+"_stats1")
-      //   .attr("class", "glabel")
-      //   .attr("text-anchor", "middle")
-      //   .style("font-size", "11px")
-      //   .attr("dy", "-6px")
-      //   .attr("transform", "translate(" + (g.width/4+g.margin.left) + "," + (34) + ") ")
-      //   .text( "Statistics");
+        chart2.append("rect")
+          .attr("class", "overlay")
+          .attr("fill","none")
+          .attr("pointer-events", "all")
+          .attr("width", 210)
+          .attr("height", 320)
+          .on("mouseover", function() {
+            chart1.tooltip.style("display", null);
+            chart2.tooltip.style("display", null);
+            chart3.tooltip.style("display", null);
+          })
+          .on("mouseout", function() {
+            chart1.tooltip.style("display", "none");
+            chart2.tooltip.style("display", "none");
+            chart3.tooltip.style("display", "none");
+            })
+          .on("mousemove", tool.UI.mousemove1);
 
-      // g.legend = g.svg.append("path")
-      //   .attr({
-      //     "stroke": tool.configuration.line_color1,
-      //     "stroke-width":"3",
-      //     "fill":"none",
-      //     "d":"M6.5,13L13,13L19.5,21.6L26,4.3L32.5,4.3"
-      //   })
-      //   .attr("transform", "translate(" + (g.margin.left) + "," + (0) + ") ")
+      //
+      //  Chart3 Chart:
+      //
 
-      g.ylabel = g.svg.append("text")
-        .attr("id", _target+"_ylabel1")
-        .attr("class", "glabel")
+      var chart3 = charts.append("g")
+        //.attr("transform", "translate(510,80)")
+        .attr("transform", "translate(510,320)")
+        .attr("width", 240)
+        .attr("height", 240);
+        // .style({
+        //   "fill" : "#111111",
+        //   "stroke" :"#999999",
+        //   "stroke-width":"1px"
+        // })
+
+        chart3.x = d3.scale.linear().range([0, 240]);
+        chart3.y = d3.scale.linear().range([0, -240]);
+
+        chart3.axisX = d3.svg.axis()
+          .scale(chart3.x)
+          .orient("bottom");//.tickSize(5,0,0);
+
+        chart3.axisY = d3.svg.axis()
+          .scale(chart3.y)
+          .innerTickSize(2)
+          .tickPadding(1)
+          .orient("left");//.tickSize(0,0,0);
+
+        chart3.axis_x = chart3.append("g")
+          .attr("id", _target+"_chart3_axisX")
+          .attr("class", "x axis chart3")
+          //.attr("transform", "translate(0," + 240 + ")")
+          .call(chart3.axisX);
+
+        chart3.axis_y = chart3.append("g")
+          .attr("id", _target+"_chart3_axisY")
+          .attr("class", "y axis chart3")
+          .call(chart3.axisY)
+
+        chart3.append("path")
+          .attr("class", "line")
+          .attr("d", chart3.line)
+          .style("fill","none")
+          .style("stroke","#999999")
+          .style("stroke-width","2px");
+
+        chart3.line = d3.svg.line()
+          .interpolate("monotone")
+          .x(function(d) { return chart3.x(d[erddap_ref[config.var1].column]); })
+          .y(function(d) { return chart3.y(d[erddap_ref[config.var2].column]); });
+
+
+          chart3.tooltip = chart3.append("g")
+            .attr("class", "tooltip3")
+            .style("display", "none");
+
+          chart3.tooltip.append("circle")
+                .attr("r", 4.5);
+
+          chart3.tooltip.append("text")
+                .attr("x", 9)
+                .attr("dy", ".35em");
+
+          chart3.append("rect")
+            .attr("class", "overlay")
+            .attr("fill","none")
+            .attr("pointer-events", "all")
+            .attr("width", 210)
+            .attr("height", 320)
+            .on("mouseover", function() {
+              //chart1.tooltip.style("display", null);
+              //chart2.tooltip.style("display", null);
+            })
+            .on("mouseout", function() {
+              //chart1.tooltip.style("display", "none");
+              //chart2.tooltip.style("display", "none");
+              })
+            .on("mousemove", tool.UI.mousemove1);
+
+
+      //
+      //  labels
+      //
+
+      var labels = svg.append("g");
+
+      chart1.labelY = labels.append("text")
+        .attr("id", _target + "chart1_labelY")
+        .attr("transform", "translate(0,220) rotate(270)")
+        .attr("x",0)
+        .attr("y",40)
         .attr("text-anchor", "middle")
-        .style("font-size", "12px")
-        //.style("fill", "#999")
-        .attr("y", 0)
-        .attr("dy", "1em")
-        .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
         .text("Depth (m)");
 
-      g.xlabel = g.svg.append("text")
-        .attr("id", _target+"_xlabel")
-        .attr("class", "glabel")
+      // chart1.labelX = labels.append("text")
+      //   .attr("id", _target + "chart1_labelX")
+      //   .attr("transform", "translate(185,420)")
+      //   .attr("x",0)
+      //   .attr("y",0)
+      //   .attr("text-anchor", "middle")
+      //   .text("var1");
+      //
+      // chart2.labelX = labels.append("text")
+      //   .attr("id", _target + "chart2_labelX")
+      //   .attr("transform", "translate(405,420)")
+      //   .attr("x",0)
+      //   .attr("y",0)
+      //   .attr("text-anchor", "middle")
+      //   .text("var2");
+
+      chart3.labelX = labels.append("text")
+        .attr("id", _target + "chart3_labelX")
+        .attr("transform", "translate(690,420)")
+        .attr("x",0)
+        .attr("y",0)
         .attr("text-anchor", "middle")
-        .style("font-size", "12px")
-        .attr("dy", "-6px")
-        .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
-        .text( column_selected);
+        .text(column_selected_title1);
 
-      // initialize visualization controls
+      chart3.labelY = labels.append("text")
+        .attr("id", _target + "chart1_labelY")
+        .attr("transform", "translate(532,260) rotate(270)")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("text-anchor", "middle")
+        .text(column_selected_title2);
 
-      // create reference to dropdown
-      var parameter_dropdown = $("#"+ _target + "-control-parameter-dropdown"),
-          parameter_dropdown2 = $("#"+ _target + "-control-parameter-dropdown2");
+    // chart1 title
+    // chart2 title
+    // chart3 title
 
-      // add parameters to dropdowns
-      $.each(erddap_ref.parameters, function (index, parameter_option) {
+    //
+    //  Selectors
+    //
 
-        parameter_dropdown
-          .append(
-            $('<option></option>')
-              .val(parameter_option)
-              .html(
-                erddap_ref[parameter_option].title
-              )
-          );
+      var x=0,len = erddap_ref.parameters.length;
 
-        parameter_dropdown2
-          .append(
-            $('<option></option>')
-              .val(parameter_option)
-              .html(
-                erddap_ref[parameter_option].title
-              )
-          );
-      });
+      var select_vars = [];
+      for(x;x<len;x++){
 
-      // set initial value of dropdown and set change event to update chart
-      parameter_dropdown
-        .val( tool.configuration.parameter )
-        .on("change", function(a){
-
-          tool.configuration.parameter = $(this).val();
-          tool.graph_update(tool.configuration.profile_id);
-
-        });
-
-      parameter_dropdown2
-        .val( tool.configuration.parameter2 )
-        .on("change", function(a){
-
-          tool.configuration.parameter2 = $(this).val();
-          tool.graph_update(tool.configuration.profile_id2);
-
-        });
-
-    };
-
-    tool.erddap_request_profile = function(dataset_id, profile_id, columns_selected){
-      var tabledap_url = "http://erddap.marine.rutgers.edu/erddap/tabledap/",
-      dataset_url = dataset_id + ".csvp?",
-      //columns_default = ["time","depth", "salinity", "temperature", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter_650nm"],
-      columns_default = ["time","depth", "salinity", "temperature", "conductivity"],
-      columns = typeof columns_selected === "object" ? columns_selected : columns_default,
-      query = "&profile_id=" + profile_id + "&" + columns.join("!=NaN&") + "!=NaN&orderBy(%22depth%22)";
-
-//http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2100.csv?profile_id,time,latitude,longitude
-      console.log("QUERY FOR CSV: ", query)
-// SALINITY: http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2100.htmlTable?time,latitude,longitude,profile_id,salinity&salinity!=NaN
-//http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_319-20140420T2100.csvp?profile_id,time,depth,salinity,temperature,conductivity
-// &profile_id=1&time!=NaN&depth!=NaN&salinity!=NaN&temperature!=NaN&conductivity!=NaN!=NaN&orderBy(%22depth%22)
-      return tabledap_url + dataset_url + "profile_id," +columns.join(",") + query;
-    };
-
-    tool.erddap_dataset_query = function(params_obj){
-
-      var dataset_url = "http://erddap.marine.rutgers.edu/erddap/search/advanced.html?",
-        query_params = {
-          "cdm_data_type" : "trajectoryprofile",
-          "variableName":"",
-          "maxLat":"",
-          "minLon":"",
-          "maxLon":"",
-          "minLat":"",
-          "minTime":"",
-          "maxTime":""
-        };
-
-
-      $.extend(true, query_params, params_obj);
-
-      $.each(query_params,function(p,v){
-        if(v !== ""){
-          base_url += p + "=" + v + "&";
-        }
-      });
-
-      return dataset_url;
-
-    };
-
-    tool.graph_update = function(pid, lat, lng){
-
-      var g = tool.graph,
-      profile_id = typeof pid === "undefined" ? tool.configuration.profile_id : pid,
-      dataset_id = tool.configuration.dataset_id;
-
-      d3.csv( tool.erddap_request_profile(dataset_id, profile_id), function(error,data){
-
-        console.log("error", error, data);
-
-        //console.log(JSON.stringify(data));
-
-        // var erddap_meta = tool.settings.erddap_parameter_metadata,
-        //     //column_date = erddap_meta.time.column,
-        //     column_depth = erddap_meta.depth.column,
-        //     column_selected = erddap_meta[tool.configuration.parameter].column,
-        //     column_selected_title = erddap_meta[tool.configuration.parameter].column,
-
-        var erddap_ref = tool.settings.erddap_parameter_metadata,
-            column_depth = erddap_ref.depth.column,
-            config = tool.configuration,
-            column = erddap_ref[config.var1],
-            column_selected = column.column,
-            column_selected_title = column.title,
-            column_time = erddap_ref.time.column,
-            bisectData = d3.bisector(function(d) { return d[column_depth]; }).left,
-            profile_date;
-
-        // clean depth and selected column values
-        data.forEach(function(d) {
-          //d[column_date] = g.parseDate(d[column_date]);
-          d[column_depth] = +d[column_depth];
-          d[column_selected] = +d[column_selected];
-        });
-
-        // update x and y domains depth and the selected
-        g.x.domain(d3.extent(data, (function(d) { return d[column_selected]; })));
-
-        // update the y domain to use the range of the returned data.
-        g.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
-
-        // update chart line
-        g.svg.selectAll("path.line")
-          .data([data])
-          .transition()
-          .duration(1000)
-          .ease("linear")
-          .attr("d", g.line);
-
-        // update chart title with profile id and date
-        profile_date = data[0]["time (UTC)"].slice(0,10);
-
-        g.title.text(
-          tool.configuration.dataset_id + " - " + profile_date
+        select_vars.push(
+          {
+            "key": erddap_ref.parameters[x],
+            "value": erddap_ref[erddap_ref.parameters[x]].title
+          }
         );
 
-        g.subtitle.text(
-          column_selected_title + " Profile: "+ pid
-        );
-        //+ " Lat: " + lat + " Long:" + lng
+      };
 
-        g.xlabel.text(
-          column_selected_title +
-          (erddap_ref[config.parameter].units !== "" ? " (" + erddap_ref[config.parameter].units + ")" : "")
-        );
+      // svg select box for chart 1
 
-        // // update x and y axis
-        d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
-        d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
+      svg_select(
+        select_vars,
+            erddap_ref[config.var1].title, {
+            "key": "key",
+            "value": "value"
+        },
+        "svg_container",
+        function(id,variable){
 
-        //mouse move
-        g.mousemover.on("mousemove", function(){
+          tool.UI.select_update(1, id,variable);
 
-        var chartMiddle = g.width / 2,
-            mouseY = d3.mouse(this)[1],
-            y0 = g.y.invert(mouseY),
-            i = bisectData(data, y0, 1),
-            d0 = data[i - 1],
-            d1 = data[i],
-            d = y0 - d0[column_depth] > d1[column_depth] - y0 ? d1 : d0,
-            chartMidPoint = (g.x.domain()[1] + g.x.domain()[0])/2,
-            xPosition = d[column_selected] > chartMidPoint ? -100 : 0;
+        },
+        120,400,
+        "select_var1"
+      );
 
-        g.mouse_focus.attr("transform", "translate(" + g.x(d[column_selected]) + "," + g.y(d[column_depth]) + ")");
+      // svg select box for chart 2
+      svg_select(
 
-        g.mouse_focus.select("text").text(d3.round(d[column_depth], 1) + " m - " + d3.round(d[column_selected], 2))
-          .attr("transform", "translate(" + xPosition + "," + 0 + ")")
+        select_vars,
+        erddap_ref[config.var2].title,
+        {
+            "key": "key",
+            "value": "value"
+        },
+        "svg_container",
 
-        });
+        function(id,variable){
 
-      });
+          tool.UI.select_update(2, id,variable);
+
+        },
+
+        320,400,
+        "select_var2"
+      );
+
+      // set UI references for later data updates
+
+      tool.UI.chart1 = chart1;
+      tool.UI.chart2 = chart2;
+      tool.UI.chart3 = chart3;
 
     };
 
@@ -1427,121 +1170,6 @@
 
 }(EduVis));
 
-
-
-
-
-/* SVG Slider */
-
-  var svg_slider = function(dom_element, time_start, time_end, onEndCallback){
-
-    var svg_slider = {};
-
-    var date_format = d3.time.format("%Y-%m-%d"),
-        iso_format = d3.time.format.iso.parse;
-
-    // var dd = [0, 0.25, 0.5, 0.75, 1].map(function (a) {
-    //     return iso_format(tick_interpolate(a));
-    // });
-
-    var start = iso_format(time_start);
-    var end = iso_format(time_end);
-
-    var tick_interpolate = d3.interpolate(start, end);
-    var dd = [0, 1].map(function (a) {
-        return iso_format(tick_interpolate(a));
-    });
-
-    var margin = {top: 0, right: 0, bottom: 0, left: 0},
-        width = 400 - margin.left - margin.right,
-        height = 300 - margin.bottom - margin.top;
-
-    //console.log(tool.DATA.profile_collection);
-    var x = d3.time.scale()
-        .range([0, width])
-        .domain([start,end])
-        //.domain([0, data.length])
-        .clamp(true);
-
-    var brush = d3.svg.brush()
-        .x(x)
-        .extent([0, 0])
-        .on("brush", brushed)
-        .on("brushend", brushend);
-
-
-    var svg = d3.select("#"+dom_element).append("g")
-        .attr("transform", "translate(" + 100 + "," + 450 + ")");
-
-    var xaxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom")
-      .tickValues(dd)
-      .tickFormat(function(d) { return date_format(d) })
-
-      // .tickFormat()
-      // .tickSize(0)
-      //.tickPadding(12)
-
-    var gXaxis = svg.append("g")
-        .attr("class", "x axis slider")
-        .attr("transform", "translate(0," + 10 + ")")
-        .call(xaxis)
-      .select(".domain")
-      .select( function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-        .attr("class", "halo");
-
-    var slider = svg.append("g")
-        .attr("class", "slider")
-        .call(brush);
-
-    slider.selectAll(".extent,.resize")
-        .remove();
-
-    slider.select(".background")
-        .attr("height", height);
-
-    var handle = slider.append("circle")
-        .attr("class", "handle")
-        .attr("transform", "translate(0," + 10 + ")")
-        .attr("r", 9);
-
-    slider
-        .call(brush.event)
-      .transition() // gratuitous intro!
-        .duration(750)
-        .call(brush.extent([70, 70]))
-        .call(brush.event);
-
-    function brushed() {
-        var value = brush.extent()[0];
-
-        if (d3.event.sourceEvent) { // not a programmatic event
-          value = x.invert(d3.mouse(this)[0]);
-          brush.extent([value, value]);
-        }
-
-        handle.attr("cx", x(value));
-
-    }
-
-    function brushend() {
-        //svg.classed("selecting", !d3.event.target.empty());
-        var value = brush.extent()[0];
-
-        //console.log(value, x(value));
-        onEndCallback(x(value));
-
-    }
-
-    return {
-      "x": x,
-      "axis" : xaxis,
-      "axisG" :gXaxis,
-      "slider": slider
-    }
-
-};
 
 /* SVG Dropdown */
 
@@ -1592,7 +1220,7 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
 
           svg_options.style("display", "block");
 
-          console.log(dd_height, options_count);
+          //console.log(dd_height, options_count);
 
       });
 
@@ -1612,10 +1240,10 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
         .attr("id", id)
         .style("display", "none")
         .on("mouseover",function(){
-            console.log("mouse over");
+            //console.log("mouse over");
         })
         .on("mouseout",function(){
-            console.log("mouse out");
+            //console.log("mouse out");
         })
 
     var count = 1
@@ -1643,21 +1271,21 @@ var svg_select = function (options_obj, option_selected, key_value_obj, dom_elem
 
         })
             .on("mouseout", function (a, b, c) {
-            d3.select(this).style("fill", "#6699CC");
+              d3.select(this).style("fill", "#6699CC");
 
         })
             .on("click", function () {
 
-            var parentNode = d3.select(this.parentNode),
-                tKey = parentNode.attr("data-attr-key"),
-                tVal = parentNode.attr("data-attr-val");
+              var parentNode = d3.select(this.parentNode),
+                  tKey = parentNode.attr("data-attr-key"),
+                  tVal = parentNode.attr("data-attr-val");
 
-            select_text
-                .text(tVal);
+              select_text
+                  .text(tVal);
 
-            svg_options.style("display", "none");
+              svg_options.style("display", "none");
 
-            on_change_callback(id,tKey);
+              on_change_callback(id,tKey);
 
         });
 
