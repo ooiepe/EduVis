@@ -262,12 +262,19 @@
         c.date_end
       );
 
+      d3.select("body")
+        .on("keydown", function(press) {
+
+          console.log("keypress")
+
+        })
+
       EduVis.tool.load_complete(this);
 
     };
 
 
-    tool.UI.slider = function(profile_extent){
+    tool.UI.slider = function(profile_extent, date_extent){
 
       var c = tool.configuration,
         _target = c.dom_target,
@@ -275,11 +282,14 @@
 
       d3.select("#" + _target + "_profile_slider").remove();
 
-      var tick_interpolate = d3.interpolate(profile_extent[0], profile_extent[1]);
+      var date_format_utc = d3.time.format("%Y-%m-%d %H:%M");
 
-      var dd = [0, 1].map(function (a) {
-          return tick_interpolate(a);
-      });
+      // var tick_interpolate = d3.interpolate(profile_extent[0], profile_extent[1]);
+      //
+      // var dd = [0, 1].map(function (a) {
+      //     return tick_interpolate(a);
+      // });
+      //console.log("dd",dd);
 
       var width = 380,
           height = 50;
@@ -302,24 +312,26 @@
       var xaxis = d3.svg.axis()
           .scale(x)
           .orient("bottom")
-          .tickValues(dd)
+          .tickValues([profile_extent[0], profile_extent[1]])
 
       var gXaxis = svg.append("g")
           .attr("class", "x axis slider")
           .attr("transform", "translate(0," + 20 + ")")
           .call(xaxis);
 
-      var slider = svg.append("g")
+      var slider = svg.append("g");
+
+      var slider_svg = slider.append("g")
           .attr("class", "slider")
           .call(brush);
 
-      slider.select(".background")
+      slider_svg.select(".background")
           .attr("height", height);
 
-      slider.selectAll(".extent,.resize")
+      slider_svg.selectAll(".extent,.resize")
           .remove();
 
-      var handle_container = slider.append("g")
+      var handle_container = slider_svg.append("g")
           .attr("class", "profile_data")
           .append("text")
           .attr("x",200)
@@ -327,7 +339,7 @@
           .attr("text-anchor", "middle")
           .text("");
 
-      var handle = slider.append("path")
+      var handle = slider_svg.append("path")
           .attr("class", "handle")
           .attr("stroke", "red")
           .attr("stroke-width", "2")
@@ -338,11 +350,70 @@
           //.attr("d","M1,1h21l21,14v21l1,14Z");
           //.attr("d","M1,1L21,1L21,14L11,21L1,14Z");
 
-
-
-      slider
+      slider_svg
           .call(brush.extent([profile_selected, profile_selected]))
           .call(brush.event);
+
+      var btn_ProfilePrev = slider.append("g")
+            .append("path")
+            .attr("stroke", "red")
+              .attr("stroke-width", "2")
+              .attr("fill","red")
+              .attr("transform", "translate(-36,10)")
+              .attr("d","M8 12L16 2 22 2 22 22 16 22Z")
+              .on("click",left_clicked);
+
+
+      var btn_ProfileNext = slider.append("g")
+            .append("path")
+              .attr("stroke", "red")
+              .attr("stroke-width", "2")
+              .attr("fill","red")
+              .attr("transform", "translate(396,10)")
+              .attr("d","M2 2L8 2 16 12 8 22 2 22Z")
+              .on("click",right_clicked);
+
+      tool.UI.slider_svg = slider_svg;
+
+      function left_clicked(){
+
+        var profile = tool.configuration.profile_id,
+            profile_data = tool.get_track_profile_info(profile-1);
+
+        if(typeof profile_data !== "undefined"){
+
+          tool.configuration.profile_id--;
+
+          handle
+            .attr("transform", "translate(" + (x(profile_data.profile_id) - 10) + ",0)");
+
+          handle_container
+            .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
+
+          tool.update_charts(profile_data.profile_id);
+        }
+
+      }
+
+      function right_clicked(){
+
+        var profile = tool.configuration.profile_id,
+            profile_data = tool.get_track_profile_info(profile+1);
+
+        if(typeof profile_data !== "undefined"){
+
+          tool.configuration.profile_id++;
+
+          handle
+            .attr("transform", "translate(" + (x(profile_data.profile_id) - 10) + ",0)");
+
+          handle_container
+            .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
+
+          tool.update_charts(profile_data.profile_id);
+
+        }
+      }
 
       function brushed() {
           var value = brush.extent()[0];
@@ -358,9 +429,7 @@
             .attr("transform", "translate(" + (x(value) - 10) + ",0)");
 
           handle_container
-            .text("Profile: " + profile_data.profile_id + " - " + profile_data.time);
-
-          //var profile_data = tool.get_track_profile_info(Math.floor(value));
+            .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
 
       }
 
@@ -372,6 +441,8 @@
 
           // update chart when slider is changed
           tool.update_charts(Math.floor(value));
+
+          tool.configuration.profile_id = Math.floor(value);//profile_data.profile_id;
       }
     };
 
@@ -398,10 +469,11 @@
           tool.DATA.profile_collection = rows;
 
           // set min and max profiles for slider move display
-          var profile_extent = d3.extent(rows,function(d){return d.profile_id;});
+          var profile_extent = d3.extent(rows,function(d){return d.profile_id;}),
+              date_extent = d3.extent(rows,function(d){return d.time;});
 
           // update slider with new dataset
-          tool.UI.slider(profile_extent);
+          tool.UI.slider(profile_extent, date_extent);
 
       });
 
@@ -440,7 +512,7 @@
             bisectData = d3.bisector(function(d) { return d[column_depth]; }).left,
             profile_date;
 
-        console.log("Data downloaded", data);
+        //console.log("Data downloaded", data);
 
         data.forEach(function(d) {
           //d[column_date] = g.parseDate(d[column_date]);
@@ -469,8 +541,8 @@
         chart1.select("path.line")
           .data([data])
           .transition()
-          .duration(1000)
-          .ease("linear")
+          // .duration(1000)
+          // .ease("linear")
           .attr("d", chart1.line);
 
 
@@ -493,8 +565,8 @@
         chart2.select("path.line")
           .data([data])
           .transition()
-          .duration(1000)
-          .ease("linear")
+          // .duration(1000)
+          // .ease("linear")
           .attr("d", chart2.line);
 
         // update the domain for chart3
@@ -517,8 +589,8 @@
         chart3.select("path.line")
           .data([data])
           .transition()
-          .duration(1000)
-          .ease("linear")
+          // .duration(1000)
+          // .ease("linear")
           .attr("d", chart3.line);
 
         // update dataset object
@@ -578,8 +650,8 @@
       chart.select("path.line")
         .data([data])
         .transition()
-        .duration(1000)
-        .ease("linear")
+        //.duration(1000)
+        //.ease("linear")
         .attr("d", chart.line);
 
       // update the x axis for the given chart
@@ -618,8 +690,8 @@
       chart3.select("path.line")
         .data([data])
         .transition()
-        .duration(1000)
-        .ease("linear")
+        //.duration(1000)
+        //.ease("linear")
         .attr("d", chart3.line);
 
     };
@@ -638,8 +710,6 @@
     };
 
     tool.axisTicks = function(extent){
-
-      console.log("AXIS TICKS! ",extent);
 
       var tick_interpolate = d3.interpolate(extent[0],extent[1]);
       var dd = [0.1, 0.3, 0.5, 0.7, 0.9].map(function (a) {
@@ -708,6 +778,8 @@
 
     tool.UI.mousemove1 = function(){
 
+      try{
+
       console.log("mouse moved on 1");
 
       var c = tool.configuration,
@@ -749,18 +821,27 @@
 
           chart1.tooltip.attr("transform", "translate(" + c1_x + "," + c1_y + ")")
             .select("text")
+            .text(c1_dx)
             .html(c1_dx + " " + units1)
             .attr(c1_mid_x);
 
           chart2.tooltip.attr("transform", "translate(" + c2_x + "," + c2_y + ")")
             .select("text")
+            .text(c2_dx + " ")
             .html(c2_dx + " " + units2)
             .attr(c2_mid_x);
 
           chart3.tooltip.attr("transform", "translate(" + c3_x + "," + c3_y + ")")
             .select("text")
             .text(c1_dx + " - " + c2_dx)
+            .html(c1_dx + " - " + c2_dx)
             .attr(c1_mid_x);
+
+          }
+          catch(err){
+            console.log("ERROR: ", err, err.message);
+          }
+
 
     };
 
@@ -906,7 +987,6 @@
       // Chart2: x axis definitions
       chart2.axisX = d3.svg.axis().scale(chart2.x).orient("bottom");//.tickSize(5,0,0);
 
-
       // Chart2: x axis placement and call
       chart2.axis_x = chart2.append("g")
         .attr("id", _target+"_chart2_axisX")
@@ -1035,7 +1115,6 @@
               })
             .on("mousemove", tool.UI.mousemove1);
 
-
       //
       //  labels
       //
@@ -1081,6 +1160,38 @@
         .attr("y",0)
         .attr("text-anchor", "middle")
         .text(column_selected_title2);
+
+      chart3.labelTitle = labels.append("text")
+        .attr("id", _target + "chart3_labelTitle")
+        .attr("transform", "translate(570,110)")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("text-anchor", "start")
+        .text("");
+
+      chart3.labelTitleRight = labels.append("text")
+        .attr("id", _target + "chart3_labelTitle")
+        .attr("transform", "translate(810,110)")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("text-anchor", "end")
+        .text("");
+
+      chart3.labelSubTitle = labels.append("text")
+        .attr("id", _target + "chart3_labelTitle")
+        .attr("transform", "translate(570,130)")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("text-anchor", "start")
+        .text("");
+
+      chart3.labelSubTitleRight = labels.append("text")
+        .attr("id", _target + "chart3_labelTitle")
+        .attr("transform", "translate(810,130)")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("text-anchor", "end")
+        .text("");
 
     // chart1 title
     // chart2 title
