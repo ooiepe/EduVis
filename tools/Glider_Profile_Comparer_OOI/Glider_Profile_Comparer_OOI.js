@@ -94,10 +94,14 @@
         },
 
         "configuration" : {
+
           "dataset_id" : "CE05MOAS-ce_312-20140420T2200",
+          "glider_name" : "CE05MOAS",
           "profile_id" : "125",
+
           "var1" : "salinity",
           "var2" : "temperature",
+
           "date_start": "2014-05-02",
           "date_end": "2014-06-10"
 
@@ -262,12 +266,18 @@
         c.date_end
       );
 
-      d3.select("body")
-        .on("keydown", function(press) {
-
-          console.log("keypress")
-
-        })
+      // d3.select("body")
+      //   .on("keydown", function() {
+      //
+      //     var evt = d3.event(this);
+      //
+      //     console.log("keypress",evt);
+      //
+      //     // left or right press
+      //     //
+      //
+      //
+      //   })
 
       EduVis.tool.load_complete(this);
 
@@ -390,7 +400,11 @@
           handle_container
             .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
 
-          tool.update_charts(profile_data.profile_id);
+          tool.update_charts(profile_data);
+
+          // update labels;
+
+
         }
 
       }
@@ -410,7 +424,7 @@
           handle_container
             .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
 
-          tool.update_charts(profile_data.profile_id);
+          tool.update_charts(profile_data);
 
         }
       }
@@ -438,11 +452,15 @@
           var value = brush.extent()[0];
 
           //console.log("SLIDER UPDATE ->", value, x(value),Math.floor(x(value)));
+          var profile_data = tool.get_track_profile_info(Math.floor(value));
+
+          //update configuration profile id
+          tool.configuration.profile_id = profile_data.profile_id;
 
           // update chart when slider is changed
-          tool.update_charts(Math.floor(value));
+          tool.update_charts(profile_data);
 
-          tool.configuration.profile_id = Math.floor(value);//profile_data.profile_id;
+
       }
     };
 
@@ -479,10 +497,11 @@
 
     };
 
-    tool.update_charts = function(profile_id){
+    tool.update_charts = function(profile_data){
 
       var c = tool.configuration,
-          dataset_id = c.dataset_id;
+          dataset_id = c.dataset_id,
+          profile_id = profile_data.profile_id;
 
       console.log("UPDATE CHARTS:", dataset_id, profile_id);
 
@@ -510,7 +529,9 @@
 
             column_time = erddap_ref.time.column,
             bisectData = d3.bisector(function(d) { return d[column_depth]; }).left,
-            profile_date;
+            profile_date,
+
+            date_format_utc = d3.time.format("%Y-%m-%d %H:%M");
 
         //console.log("Data downloaded", data);
 
@@ -544,7 +565,6 @@
           // .duration(1000)
           // .ease("linear")
           .attr("d", chart1.line);
-
 
         // get the X extent
         chart2.extent_x = d3.extent(data, (function(d) { return d[column_selected2]; }));
@@ -593,6 +613,18 @@
           // .ease("linear")
           .attr("d", chart3.line);
 
+
+        chart3.labelName.text(c.dataset_id);
+        // update chart labels
+
+        chart3.labelTitleRight.text(date_format_utc(profile_data.time));
+        //chart3.labelTitleRight.text(column_selected_title1 + "-" + column_selected_title2);
+
+        chart3.labelTitle.text("Profile ID: " + profile_id);
+
+        //chart3.labelSubTitleRight.text(profile_data.time);
+
+        chart3.labelSubTitle.text("Lat: " + d3.round(profile_data.lat,3) + " Long: " + d3.round(profile_data.lon,3))
         // update dataset object
         tool.DATA.dataset = data;
 
@@ -1161,6 +1193,14 @@
         .attr("text-anchor", "middle")
         .text(column_selected_title2);
 
+      chart3.labelName = labels.append("text")
+        .attr("id", _target + "chart3_labelName")
+        .attr("transform", "translate(570,90)")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("text-anchor", "start")
+        .text("");
+
       chart3.labelTitle = labels.append("text")
         .attr("id", _target + "chart3_labelTitle")
         .attr("transform", "translate(570,110)")
@@ -1170,7 +1210,7 @@
         .text("");
 
       chart3.labelTitleRight = labels.append("text")
-        .attr("id", _target + "chart3_labelTitle")
+        .attr("id", _target + "chart3_labelTitleRight")
         .attr("transform", "translate(810,110)")
         .attr("x",0)
         .attr("y",0)
@@ -1178,7 +1218,7 @@
         .text("");
 
       chart3.labelSubTitle = labels.append("text")
-        .attr("id", _target + "chart3_labelTitle")
+        .attr("id", _target + "chart3_labelSubTitle")
         .attr("transform", "translate(570,130)")
         .attr("x",0)
         .attr("y",0)
@@ -1186,7 +1226,7 @@
         .text("");
 
       chart3.labelSubTitleRight = labels.append("text")
-        .attr("id", _target + "chart3_labelTitle")
+        .attr("id", _target + "chart3_labelSubTitleRight")
         .attr("transform", "translate(810,130)")
         .attr("x",0)
         .attr("y",0)
