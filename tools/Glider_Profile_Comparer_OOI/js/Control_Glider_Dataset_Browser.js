@@ -2,7 +2,7 @@
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
 
-Revised 10/8/2014
+Revised 10/30/2014
 Written by Michael Mills, Rutgers University
 
 */
@@ -14,7 +14,7 @@ Written by Michael Mills, Rutgers University
   var parent_tool,
     control = {
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.1.1",
+    "version" : "0.1.2",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -519,8 +519,8 @@ Written by Michael Mills, Rutgers University
                     parent_tool.configuration.date_end = $("#config-date_end-input").val();
                     parent_tool.configuration.dataset_id = $("#config-dataset_id-select").val();
 
-                    // update map
-                    parent_tool.map_update();
+                    // call the apply callback
+                    parent_tool.config_callback();
 
                   })
               )

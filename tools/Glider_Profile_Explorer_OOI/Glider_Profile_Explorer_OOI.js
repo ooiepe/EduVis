@@ -93,10 +93,10 @@
 
         "configuration" : {
           "dataset_id" : "CE05MOAS-ce_319-20140420T2200",
-          "profile_id" : "157",
+          "profile_id" : "1",
           "parameter" : "temperature",
           "date_start": "2014-04-24",
-          "date_end": "2014-05-19"
+          "date_end": "2014-04-26"
         },
 
         "data" : {},
@@ -144,6 +144,7 @@
         "locations_query" : function(){
 
             //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.geoJson?profile_id,time,latitude,longitude
+            //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.geoJson?profile_id,time,latitude,longitude&time%3E=2014-06-10&time%3C=2014-06-10
             return "http://erddap.marine.rutgers.edu/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
          }
        }
@@ -616,7 +617,7 @@
 
     tool.map_setup = function(){
 
-      /*
+        /*
           Leaflet Map
         */
 
@@ -651,6 +652,12 @@
 
         //!* chart_update
         //!* slider_update
+
+    };
+
+    tool.config_callback = function(){
+
+      tool.map_update();
 
     };
 
@@ -811,12 +818,6 @@
         console.log("error", error, data);
 
         //console.log(JSON.stringify(data));
-
-        // var erddap_meta = tool.settings.erddap_parameter_metadata,
-        //     //column_date = erddap_meta.time.column,
-        //     column_depth = erddap_meta.depth.column,
-        //     column_selected = erddap_meta[tool.configuration.parameter].column,
-        //     column_selected_title = erddap_meta[tool.configuration.parameter].column,
 
         var erddap_ref = tool.settings.erddap_parameter_metadata,
             column_depth = erddap_ref.depth.column,

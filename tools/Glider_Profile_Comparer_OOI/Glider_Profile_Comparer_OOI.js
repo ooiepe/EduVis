@@ -93,7 +93,9 @@
 
         },
 
-        "configuration" : {
+
+
+        "c_orig" : {
 
           "dataset_id" : "CE05MOAS-ce_312-20140420T2200",
           "glider_name" : "CE05MOAS",
@@ -105,6 +107,15 @@
           "date_start": "2014-05-02",
           "date_end": "2014-06-10"
 
+        },
+        "configuration" : {
+          "dataset_id": "CP05MOAS-cp_388-20141006T2010",
+          "glider_name": "CE05MOAS",
+          "profile_id": 42,
+          "var1": "salinity",
+          "var2": "temperature",
+          "date_start": "2014-10-11",
+          "date_end": "2014-10-13"
         },
 
         "data" : {},
@@ -403,8 +414,6 @@
           tool.update_charts(profile_data);
 
           // update labels;
-
-
         }
 
       }
@@ -630,7 +639,9 @@
 
       });
 
-      //   profile_date = data[0]["time (UTC)"];
+      //  profile_date = data[0]["time (UTC)"];
+
+
 
     };
 
@@ -783,8 +794,8 @@
           // use user-defined variables array or local array
           var vars_track = typeof (variables) === "undefined" ? errdap_track_vars : variables,
               return_data_type = typeof (return_type) === "undefined" ? ".geoJson" : return_type,
-              query = "&time%3E=" + date_start +
-                      "&time%3C=" + date_end;
+              query = "&time%3E=" + date_start + "T00:00:00Z"+
+                      "&time%3C=" + date_end + "T23:59:59Z";
 
           // build request url
           return errdap_tabledap + dataset_id + return_data_type + "?" + vars_track.join(",") + query;
@@ -874,6 +885,23 @@
             console.log("ERROR: ", err, err.message);
           }
 
+
+    };
+
+    tool.config_callback = function(){
+
+      console.log("apply click");
+      var c = tool.configuration;
+
+      // update track profiles
+      // data and charts are updated in subsequent callback
+
+      tool.update_track_profiles(
+        c.dataset_id,
+        c.profile_id,
+        c.date_start,
+        c.date_end
+      );
 
     };
 
