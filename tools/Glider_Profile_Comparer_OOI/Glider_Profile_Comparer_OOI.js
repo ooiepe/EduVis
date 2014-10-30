@@ -363,7 +363,7 @@
       var handle = slider_svg.append("path")
           .attr("class", "handle")
           .attr("stroke", "red")
-          .attr("stroke-width", "2")
+          .attr("stroke-width", "1")
           .attr("fill","none")
           .attr("transform", "translate(-10,0)")
           .attr("d","M1,1L21,1L21,14L11,21L1,14Z");
@@ -378,7 +378,7 @@
       var btn_ProfilePrev = slider.append("g")
             .append("path")
             .attr("stroke", "red")
-              .attr("stroke-width", "2")
+              .attr("stroke-width", "1")
               .attr("fill","red")
               .attr("transform", "translate(-36,10)")
               .attr("d","M8 12L16 2 22 2 22 22 16 22Z")
@@ -388,7 +388,7 @@
       var btn_ProfileNext = slider.append("g")
             .append("path")
               .attr("stroke", "red")
-              .attr("stroke-width", "2")
+              .attr("stroke-width", "1")
               .attr("fill","red")
               .attr("transform", "translate(396,10)")
               .attr("d","M2 2L8 2 16 12 8 22 2 22Z")
@@ -564,15 +564,15 @@
         chart1.axisX.tickValues(tool.axisTicks(chart1.extent_x));
 
         // update the x and y axis for chart1
-        chart1.select(".x.axis").call(chart1.axisX);
-        chart1.select(".y.axis").call(chart1.axisY);
+        chart1.select(".x.axis").transition().ease("linear").call(chart1.axisX);
+        chart1.select(".y.axis").transition().ease("linear").call(chart1.axisY);
 
         // update chart line
         chart1.select("path.line")
           .data([data])
           .transition()
-          // .duration(1000)
-          // .ease("linear")
+          //.duration(500)
+          .ease("linear")
           .attr("d", chart1.line);
 
         // get the X extent
@@ -588,14 +588,15 @@
         chart2.axisX.tickValues(tool.axisTicks(chart2.extent_x));
 
         // update the x axis for chart 2
-        chart2.select(".x.axis").call(chart2.axisX);
+        chart2.select(".x.axis").transition().ease("linear").call(chart2.axisX);
+        chart2.select(".y.axis").transition().ease("linear").call(chart2.axisY);
 
         // update chart line
         chart2.select("path.line")
           .data([data])
           .transition()
-          // .duration(1000)
-          // .ease("linear")
+          //.duration(500)
+          .ease("linear")
           .attr("d", chart2.line);
 
         // update the domain for chart3
@@ -611,29 +612,31 @@
         chart3.axisY.tickValues(tool.axisTicks(chart2.extent_x));
 
         // update the x and y axis for chart3
-        chart3.select(".x.axis").call(chart3.axisX);
-        chart3.select(".y.axis").call(chart3.axisY);
+        chart3.select(".x.axis").transition().ease("linear").call(chart3.axisX);
+        chart3.select(".y.axis").transition().ease("linear").call(chart3.axisY);
 
         // update path for chart3
         chart3.select("path.line")
           .data([data])
           .transition()
-          // .duration(1000)
-          // .ease("linear")
+          //.duration(500)
+          .ease("linear")
           .attr("d", chart3.line);
 
 
         chart3.labelName.text(c.dataset_id);
         // update chart labels
 
-        chart3.labelTitleRight.text(date_format_utc(profile_data.time));
+        chart3.labelTitleRight.text("Profile # " + profile_id);
         //chart3.labelTitleRight.text(column_selected_title1 + "-" + column_selected_title2);
 
-        chart3.labelTitle.text("Profile ID: " + profile_id);
+        chart3.labelTitle.text(date_format_utc(profile_data.time));
 
         //chart3.labelSubTitleRight.text(profile_data.time);
 
-        chart3.labelSubTitle.text("Lat: " + d3.round(profile_data.lat,3) + " Long: " + d3.round(profile_data.lon,3))
+        chart3.labelSubTitle
+          .text("Location: " + d3.round(profile_data.lat,3) + " N " + d3.round(profile_data.lon,3)+" W")
+          .html("Location: " + d3.round(profile_data.lat,3) + "&deg; N " + d3.round(profile_data.lon,3)+"&deg;W")
         // update dataset object
         tool.DATA.dataset = data;
 
@@ -693,13 +696,15 @@
       chart.select("path.line")
         .data([data])
         .transition()
-        //.duration(1000)
+        //.duration(500)
         //.ease("linear")
         .attr("d", chart.line);
 
       // update the x axis for the given chart
       //chart.axis_x.call(chart.axisX);
-      chart.axis_x.call(chart.axisX);
+      chart.axis_x.transition()
+        //.ease("linear")
+        .call(chart.axisX);
 
       // if it is chart1, chart 3 x domain needs to be updated, otherwise it is the y domain
       if(chart_id == 1){
@@ -707,7 +712,9 @@
         chart3.x.domain(chart3.extent_x);
         // set the new tick values
         chart3.axisX.tickValues(tool.axisTicks(chart3.extent_x));
-        chart3.axis_x.call(chart3.axisX);
+        chart3.axis_x.transition()
+          //.ease("linear")
+          .call(chart3.axisX);
         chart3.labelX.text(column_selected_title);
       }
       else{
@@ -716,6 +723,8 @@
 
         chart3.axisY.tickValues(tool.axisTicks(chart3_extent_y));
         chart3.axis_y
+          .transition()
+          //.ease("linear")
           .call(chart3.axisY)
 
           // .selectAll("text")
@@ -726,14 +735,13 @@
           //       return "rotate(45)";
           //     });
 
-
         chart3.labelY.text(column_selected_title);
       }
 
       chart3.select("path.line")
         .data([data])
         .transition()
-        //.duration(1000)
+        //.duration(500)
         //.ease("linear")
         .attr("d", chart3.line);
 
@@ -860,24 +868,26 @@
           c2_mid_x = ((chart2.extent_x[1] + chart2.extent_x[0]) / 2)>c2_dx ? {"text-anchor":"start", "x":"10"} : {"text-anchor":"end","x":"-10" },
 
           c3_x = chart3.x(c1_dx),
-          c3_y = chart3.y(c2_dx);
+          c3_y = chart3.y(c2_dx),
+
+          formatNum = d3.format(".2f");
 
           chart1.tooltip.attr("transform", "translate(" + c1_x + "," + c1_y + ")")
             .select("text")
-            .text(c1_dx)
-            .html(c1_dx + " " + units1)
+            .text(formatNum(c1_dx), c1_dx)
+            .html(formatNum(c1_dx) + " " + units1)
             .attr(c1_mid_x);
 
           chart2.tooltip.attr("transform", "translate(" + c2_x + "," + c2_y + ")")
             .select("text")
-            .text(c2_dx + " ")
-            .html(c2_dx + " " + units2)
+            .text(formatNum(c2_dx) + " ")
+            .html(formatNum(c2_dx) + " " + units2)
             .attr(c2_mid_x);
 
           chart3.tooltip.attr("transform", "translate(" + c3_x + "," + c3_y + ")")
             .select("text")
-            .text(c1_dx + " - " + c2_dx)
-            .html(c1_dx + " - " + c2_dx)
+            .text(formatNum(c1_dx) + " - " + formatNum(c2_dx))
+            .html(formatNum(c1_dx) + " - " + formatNum(c2_dx))
             .attr(c1_mid_x);
 
           }
@@ -992,7 +1002,7 @@
         .style("stroke-width","2px");
 
       chart1.line = d3.svg.line()
-        .interpolate("monotone")
+        .interpolate("linear")
         .x(function(d) { return chart1.x(d[erddap_ref[config.var1].column]); })
         //.x(function(d) { return chart1.x(d[column_selected1]); })
         .y(function(d) { return chart1.y(d[column_depth]); });
@@ -1047,12 +1057,27 @@
       // Chart2: x axis definitions
       chart2.axisX = d3.svg.axis().scale(chart2.x).orient("bottom");//.tickSize(5,0,0);
 
+      chart2.axisY = d3.svg.axis()
+        .scale(chart2.y)
+        .orient("left")
+        .tickFormat("")
+        .tickSize(3,3);//.tickSize(0,0,0);
+
       // Chart2: x axis placement and call
       chart2.axis_x = chart2.append("g")
         .attr("id", _target+"_chart2_axisX")
         .attr("class", "x axis x2")
         .attr("transform", "translate(0," + 320 + ")")
         .call(chart2.axisX);
+
+
+      // Chart1: y axis placement and call
+      chart2.axis_y = chart2.append("g")
+        .attr("id", _target+"_chart2_axisY")
+        .attr("class", "y axis y2")
+        //.attr("transform", "translate(0," + h + ")")
+        .call(chart2.axisY);
+
 
       chart2.append("path")
         .attr("class", "line")
@@ -1062,7 +1087,7 @@
         .style("stroke-width","2px");
 
       chart2.line = d3.svg.line()
-        .interpolate("monotone")
+        .interpolate("linear")
         .x(function(d) { return chart2.x(d[erddap_ref[config.var2].column]); })
         .y(function(d) { return chart2.y(d[column_depth]); });
 
@@ -1143,7 +1168,7 @@
           .style("stroke-width","2px");
 
         chart3.line = d3.svg.line()
-          .interpolate("monotone")
+          .interpolate("linear")
           .x(function(d) { return chart3.x(d[erddap_ref[config.var1].column]); })
           .y(function(d) { return chart3.y(d[erddap_ref[config.var2].column]); });
 
@@ -1163,6 +1188,7 @@
             .attr("class", "overlay")
             .attr("fill","none")
             .attr("pointer-events", "all")
+
             .attr("width", 210)
             .attr("height", 320)
             .on("mouseover", function() {
@@ -1223,16 +1249,18 @@
 
       chart3.labelName = labels.append("text")
         .attr("id", _target + "chart3_labelName")
-        .attr("transform", "translate(570,90)")
-        .attr("x",0)
+        .attr("transform", "translate(692,90)")
+        .attr("x","0")
         .attr("y",0)
-        .attr("text-anchor", "start")
+        .attr("text-anchor", "middle")
+        .attr("font-size","14px")
+        .attr("font-weight","bold")
         .text("");
 
       chart3.labelTitle = labels.append("text")
         .attr("id", _target + "chart3_labelTitle")
         .attr("transform", "translate(570,110)")
-        .attr("x",0)
+        .attr("x",10)
         .attr("y",0)
         .attr("text-anchor", "start")
         .text("");
@@ -1240,7 +1268,7 @@
       chart3.labelTitleRight = labels.append("text")
         .attr("id", _target + "chart3_labelTitleRight")
         .attr("transform", "translate(810,110)")
-        .attr("x",0)
+        .attr("x",-20)
         .attr("y",0)
         .attr("text-anchor", "end")
         .text("");
@@ -1248,7 +1276,7 @@
       chart3.labelSubTitle = labels.append("text")
         .attr("id", _target + "chart3_labelSubTitle")
         .attr("transform", "translate(570,130)")
-        .attr("x",0)
+        .attr("x",10)
         .attr("y",0)
         .attr("text-anchor", "start")
         .text("");
@@ -1297,7 +1325,7 @@
           tool.UI.select_update(1, id,variable);
 
         },
-        120,400,
+        120,410,
         "select_var1"
       );
 
@@ -1318,7 +1346,7 @@
 
         },
 
-        320,400,
+        320,410,
         "select_var2"
       );
 
@@ -1347,134 +1375,145 @@
     // extend base object with tool..
     EduVis.tool.tools[tool.name] = tool;
 
-}(EduVis));
+    /* SVG Dropdown */
 
+    var svg_select = function (options_obj, option_selected, key_value_obj, dom_element, on_change_callback, x, y, id) {
 
-/* SVG Dropdown */
+        // todo.. add sorting
+        // set data-attr-text and data-attr-value for select_box g element
 
-var svg_select = function (options_obj, option_selected, key_value_obj, dom_element, on_change_callback, x, y, id) {
+        // known issues
+        // svg parent element hight will cut off svg.. is there overflow outside the parent svg element?
+        //
 
-    // todo.. add sorting
-    // set data-attr-text and data-attr-value for select_box g element
+        var ui_settings = {
+            "select_box": {
+                "height": 24,
+                    "width": 160
+            }
+        };
 
-    // known issues
-    // svg parent element hight will cut off svg.. is there overflow outside the parent svg element?
-    //
+        var kv_key = key_value_obj.key,
+            kv_val = key_value_obj.value;
 
-    var ui_settings = {
-        "select_box": {
-            "height": 28,
-                "width": 200
-        }
-    };
+        var dd_height = 24,
+            dd_width = 160;
 
-    var kv_key = key_value_obj.key,
-        kv_val = key_value_obj.value;
+        var selected_var = option_selected,
+            options_count = options_obj.length;
 
-    var dd_height = 28,
-        dd_width = 150;
+        var svg = d3.select("#"+dom_element).append("g")
+            //.attr("id", "svg_svg")
+            .attr("width", dd_width)
+            .attr("height", dd_height * (options_count + 1))
+            .attr("transform", "translate("+ x + "," + y +")")
+            .style("font-size", "11px")
+            .style("font-family", "Tahoma, Geneva, sans-serif");
 
-    var selected_var = option_selected,
-        options_count = options_obj.length;
+        var select_selected = svg.append("g")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")");
 
-    var svg = d3.select("#"+dom_element).append("g")
-        //.attr("id", "svg_svg")
-        .attr("width", dd_width)
-        .attr("height", dd_height * (options_count + 1))
-        .attr("transform", "translate("+ x + "," + y +")")
-        .style("font-size", "11px")
-        .style("font-family", "Tahoma, Geneva, sans-serif");
+        select_selected.append("path")
+            .attr("stroke", "red")
+            .attr("stroke-width", "1")
+            .attr("fill","none")
+            .attr("transform", "translate(140,2)")
+            .attr("d","M2 8L8 2 14 8z M2 12L8 18 14 12z");
 
-    var select_selected = svg.append("g")
-        .attr("transform", "translate(" + 0 + "," + 0 + ")");
-
-    var svg_select = select_selected.append("rect")
-        .style("fill", "#CCCCCC")
-        .style("pointer-events", "all")
-        .attr("width", dd_width)
-        .attr("height", dd_height)
-
-        .on("click", function () {
-        //svg_options.transition().style("height", );
-
-          svg_options.style("display", "block");
-
-          //console.log(dd_height, options_count);
-
-      });
-
-    var select_text = select_selected.append("text")
-        .attr("id", "select_text")
-        .attr("class", "dd_option_selected")
-        .attr("pointer-events", "none")
-        .attr("text-anchor", "left")
-        .style("font-size", "12px")
-        .attr("y", 10)
-        .attr("x", 10)
-        .attr("dy", ".75em")
-        .attr("data-attr-val", selected_var)
-        .text(selected_var);
-
-    var svg_options = svg.append("g")
-        .attr("id", id)
-        .style("display", "none")
-        .on("mouseover",function(){
-            //console.log("mouse over");
-        })
-        .on("mouseout",function(){
-            //console.log("mouse out");
-        })
-
-    var count = 1
-
-    for (; count <= options_count; count++) {
-
-        var select_key = options_obj[count - 1][kv_key],
-            select_val = options_obj[count - 1][kv_val];
-
-        // pop up or pop down
-        var select_option = svg_options.append("g")
-            .attr("data-attr-key", select_key)
-            .attr("data-attr-val", select_val)
-            .attr("class", "gdd_option")
-            .attr("transform", "translate(" + 0 + ",-" + count * dd_height + ")");
-
-        var textContainer = select_option.append("rect")
-            .attr("class", "dd_option")
-            .style("fill", "#6699CC")
-            .style("pointer-events", "all")
+        var svg_select = select_selected.append("rect")
+            .attr("fill", "none")
+            .attr("stroke", "red")
+            .attr("stroke-width", 1)
+            .attr("rx", "10")
+            .attr("ry", "10")
             .attr("width", dd_width)
             .attr("height", dd_height)
-            .on("mouseover", function () {
-            d3.select(this).style("fill", "#666666");
 
-        })
-            .on("mouseout", function (a, b, c) {
-              d3.select(this).style("fill", "#6699CC");
+            .style("pointer-events", "all")
 
-        })
             .on("click", function () {
+            //svg_options.transition().style("height", );
 
-              var parentNode = d3.select(this.parentNode),
-                  tKey = parentNode.attr("data-attr-key"),
-                  tVal = parentNode.attr("data-attr-val");
+              svg_options.style("display", "block");
 
-              select_text
-                  .text(tVal);
+              //console.log(dd_height, options_count);
 
-              svg_options.style("display", "none");
+          });
 
-              on_change_callback(id,tKey);
-
-        });
-
-        var option = select_option.append("text")
-            .attr("class", "dd_option")
-            .style("pointer-events", "none")
+        var select_text = select_selected.append("text")
+            .attr("id", "select_text")
+            .attr("class", "dd_option_selected")
+            .attr("pointer-events", "none")
+            .attr("text-anchor", "left")
             .style("font-size", "12px")
             .attr("y", 8)
             .attr("x", 10)
             .attr("dy", ".75em")
-            .text(options_obj[count - 1][kv_val]);
-    }
-};
+            .attr("data-attr-val", selected_var)
+            .text(selected_var);
+
+        var svg_options = svg.append("g")
+            .attr("id", id)
+            .style("display", "none")
+            .on("mouseover",function(){
+                //console.log("mouse over");
+            })
+            .on("mouseout",function(){
+                //console.log("mouse out");
+            })
+
+        var count = 1
+
+        for (; count <= options_count; count++) {
+
+            var select_key = options_obj[count - 1][kv_key],
+                select_val = options_obj[count - 1][kv_val];
+
+            // pop up or pop down
+            var select_option = svg_options.append("g")
+                .attr("data-attr-key", select_key)
+                .attr("data-attr-val", select_val)
+                .attr("class", "gdd_option")
+                .attr("transform", "translate(" + 0 + ",-" + count * dd_height + ")");
+
+            var textContainer = select_option.append("rect")
+                .attr("class", "dd_option")
+                .style("fill", "#6699CC")
+                .style("pointer-events", "all")
+                .attr("width", dd_width)
+                .attr("height", dd_height)
+                .on("mouseover", function () {
+                d3.select(this).style("fill", "#666666");
+
+            })
+                .on("mouseout", function (a, b, c) {
+                  d3.select(this).style("fill", "#6699CC");
+
+            })
+                .on("click", function () {
+
+                  var parentNode = d3.select(this.parentNode),
+                      tKey = parentNode.attr("data-attr-key"),
+                      tVal = parentNode.attr("data-attr-val");
+
+                  select_text
+                      .text(tVal);
+
+                  svg_options.style("display", "none");
+
+                  on_change_callback(id,tKey);
+
+            });
+
+            var option = select_option.append("text")
+                .attr("class", "dd_option")
+                .style("pointer-events", "none")
+                .style("font-size", "12px")
+                .attr("y", 8)
+                .attr("x", 10)
+                .attr("dy", ".75em")
+                .text(options_obj[count - 1][kv_val]);
+        }
+    };
+
+}(EduVis));
