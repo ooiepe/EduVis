@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Comparer OOI (GPC OOI)
- * Revised 10/27/2014
+ * Revised 10/31/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Comparer",
         "url" : "",
 
-        "version" : "0.0.3",
+        "version" : "0.0.4",
         "authors" : [
             {
                 "name" : "Michael Mills",
@@ -334,6 +334,7 @@
           .scale(x)
           .orient("bottom")
           .tickValues([profile_extent[0], profile_extent[1]])
+          .tickFormat(d3.format("f"))
 
       var gXaxis = svg.append("g")
           .attr("class", "x axis slider")
@@ -448,11 +449,15 @@
 
           var profile_data = tool.get_track_profile_info(Math.floor(value));
 
-          handle
-            .attr("transform", "translate(" + (x(value) - 10) + ",0)");
+          if(typeof profile_data !== "undefined"){
 
-          handle_container
-            .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
+            handle
+              .attr("transform", "translate(" + (x(value) - 10) + ",0)");
+
+            handle_container
+              .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
+
+          }
 
       }
 
@@ -463,13 +468,17 @@
           //console.log("SLIDER UPDATE ->", value, x(value),Math.floor(x(value)));
           var profile_data = tool.get_track_profile_info(Math.floor(value));
 
-          //update configuration profile id
-          tool.configuration.profile_id = profile_data.profile_id;
+          console.log("!!!! PROFILE DATA --> ", Math.floor(value), profile_data);
 
-          // update chart when slider is changed
-          tool.update_charts(profile_data);
+          if(typeof profile_data !== "undefined"){
 
 
+            //update configuration profile id
+            tool.configuration.profile_id = profile_data.profile_id;
+
+            // update chart when slider is changed
+            tool.update_charts(profile_data);
+          }
       }
     };
 
@@ -507,6 +516,8 @@
     };
 
     tool.update_charts = function(profile_data){
+
+      console.log("!!!!PROFILE DATA", profile_data);
 
       var c = tool.configuration,
           dataset_id = c.dataset_id,

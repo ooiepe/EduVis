@@ -2,7 +2,7 @@
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
 
-Revised 10/30/2014
+Revised 10/31/2014
 Written by Michael Mills, Rutgers University
 
 */
@@ -14,7 +14,7 @@ Written by Michael Mills, Rutgers University
   var parent_tool,
     control = {
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.1.2",
+    "version" : "0.1.3",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -48,7 +48,8 @@ Written by Michael Mills, Rutgers University
     },
         width = 500 - margin.left - margin.right,
         height = 50 - margin.top - margin.bottom,
-        date_format = d3.time.format("%Y-%m-%d");
+        date_format = d3.time.format("%Y-%m-%d"),
+        date_range_format = d3.time.format("%Y-%m-%d-%H-%M-%S");
 
     var iso_format = d3.time.format.iso.parse,
 
@@ -58,6 +59,9 @@ Written by Michael Mills, Rutgers University
     var range_date_start = range_start || date_start,
         range_date_end = range_end || date_end;
 
+
+        console.log("RANGEs!! ->", range_date_start, range_date_end);
+
     var x = d3.time.scale.utc()
         .range([0, width])
         .domain([start, end]);
@@ -65,7 +69,8 @@ Written by Michael Mills, Rutgers University
     // set the extent to the selected range within the full range
     var brush = d3.svg.brush()
         .x(x)
-        .extent([date_format.parse(range_date_start), date_format.parse(range_date_end)])
+        //.extent([date_format.parse(range_date_start), date_format.parse(range_date_end)])
+        .extent([date_range_format.parse(range_date_start + "-00-01-01"), date_range_format.parse(range_date_end+"-23-59-59")])
         .on("brushstart", brushstart)
         .on("brush", brushmove)
         .on("brushend", brushend);
