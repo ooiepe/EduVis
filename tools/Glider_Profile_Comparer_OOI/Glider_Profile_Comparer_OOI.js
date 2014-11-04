@@ -93,21 +93,6 @@
 
         },
 
-
-
-        "c_orig" : {
-
-          "dataset_id" : "CE05MOAS-ce_312-20140420T2200",
-          "glider_name" : "CE05MOAS",
-          "profile_id" : "125",
-
-          "var1" : "salinity",
-          "var2" : "temperature",
-
-          "date_start": "2014-05-02",
-          "date_end": "2014-06-10"
-
-        },
         "configuration" : {
           "dataset_id": "CP05MOAS-cp_388-20141006T2010",
           "glider_name": "CE05MOAS",
@@ -312,7 +297,7 @@
       // });
       //console.log("dd",dd);
 
-      var width = 380,
+      var width = 370,
           height = 50;
 
       var x = d3.scale.linear()
@@ -338,13 +323,14 @@
 
       var gXaxis = svg.append("g")
           .attr("class", "x axis slider")
-          .attr("transform", "translate(0," + 20 + ")")
+          .attr("transform", "translate(10," + 20 + ")")
           .call(xaxis);
 
       var slider = svg.append("g");
 
       var slider_svg = slider.append("g")
           .attr("class", "slider")
+          .attr("transform", "translate(10,0)")
           .call(brush);
 
       slider_svg.select(".background")
@@ -358,15 +344,16 @@
           .append("text")
           .attr("x",200)
           .attr("y",40)
+          .attr("pointer-events","none")
           .attr("text-anchor", "middle")
           .text("");
 
       var handle = slider_svg.append("path")
           .attr("class", "handle")
-          .attr("stroke", "red")
+          .attr("stroke", "grey")
           .attr("stroke-width", "1")
           .attr("fill","none")
-          .attr("transform", "translate(-10,0)")
+          .attr("transform", "translate(10,0)")
           .attr("d","M1,1L21,1L21,14L11,21L1,14Z");
 
           //.attr("d","M1,1h21l21,14v21l1,14Z");
@@ -378,19 +365,19 @@
 
       var btn_ProfilePrev = slider.append("g")
             .append("path")
-            .attr("stroke", "red")
+            .attr("stroke", "grey")
               .attr("stroke-width", "1")
-              .attr("fill","red")
-              .attr("transform", "translate(-36,10)")
+              .attr("fill","grey")
+              .attr("transform", "translate(-26,10)")
               .attr("d","M8 12L16 2 22 2 22 22 16 22Z")
               .on("click",left_clicked);
 
 
       var btn_ProfileNext = slider.append("g")
             .append("path")
-              .attr("stroke", "red")
+              .attr("stroke", "grey")
               .attr("stroke-width", "1")
-              .attr("fill","red")
+              .attr("fill","grey")
               .attr("transform", "translate(396,10)")
               .attr("d","M2 2L8 2 16 12 8 22 2 22Z")
               .on("click",right_clicked);
@@ -472,7 +459,6 @@
 
           if(typeof profile_data !== "undefined"){
 
-
             //update configuration profile id
             tool.configuration.profile_id = profile_data.profile_id;
 
@@ -506,8 +492,14 @@
 
           // set min and max profiles for slider move display
           var profile_extent = d3.extent(rows,function(d){return d.profile_id;}),
-              date_extent = d3.extent(rows,function(d){return d.time;});
+              date_extent = d3.extent(rows,function(d){return d.time;}),
+              profile_id = tool.configuration.profile_id;
 
+          // update configuration profile ID if profile doesn't fall within the range of profiles
+          if(profile_id < profile_extent[0] || profile_id > profile_extent[1]){
+            tool.configuration.profile_id = profile_extent[0];
+          }
+          
           // update slider with new dataset
           tool.UI.slider(profile_extent, date_extent);
 
@@ -516,8 +508,6 @@
     };
 
     tool.update_charts = function(profile_data){
-
-      console.log("!!!!PROFILE DATA", profile_data);
 
       var c = tool.configuration,
           dataset_id = c.dataset_id,
@@ -1089,7 +1079,6 @@
         //.attr("transform", "translate(0," + h + ")")
         .call(chart2.axisY);
 
-
       chart2.append("path")
         .attr("class", "line")
         .attr("d", chart2.line)
@@ -1102,35 +1091,35 @@
         .x(function(d) { return chart2.x(d[erddap_ref[config.var2].column]); })
         .y(function(d) { return chart2.y(d[column_depth]); });
 
-        chart2.tooltip = chart2.append("g")
-          .attr("class", "tooltip2")
-          //.attr("transform", "translate(210,0)")
-          .style("display", "none");
+      chart2.tooltip = chart2.append("g")
+        .attr("class", "tooltip2")
+        //.attr("transform", "translate(210,0)")
+        .style("display", "none");
 
-        chart2.tooltip.append("circle")
-              .attr("r", 4.5);
+      chart2.tooltip.append("circle")
+            .attr("r", 4.5);
 
-        chart2.tooltip.append("text")
-              .attr("x", 9)
-              .attr("dy", ".35em");
+      chart2.tooltip.append("text")
+            .attr("x", 9)
+            .attr("dy", ".35em");
 
-        chart2.append("rect")
-          .attr("class", "overlay")
-          .attr("fill","none")
-          .attr("pointer-events", "all")
-          .attr("width", 210)
-          .attr("height", 320)
-          .on("mouseover", function() {
-            chart1.tooltip.style("display", null);
-            chart2.tooltip.style("display", null);
-            chart3.tooltip.style("display", null);
+      chart2.append("rect")
+        .attr("class", "overlay")
+        .attr("fill","none")
+        .attr("pointer-events", "all")
+        .attr("width", 210)
+        .attr("height", 320)
+        .on("mouseover", function() {
+          chart1.tooltip.style("display", null);
+          chart2.tooltip.style("display", null);
+          chart3.tooltip.style("display", null);
+        })
+        .on("mouseout", function() {
+          chart1.tooltip.style("display", "none");
+          chart2.tooltip.style("display", "none");
+          chart3.tooltip.style("display", "none");
           })
-          .on("mouseout", function() {
-            chart1.tooltip.style("display", "none");
-            chart2.tooltip.style("display", "none");
-            chart3.tooltip.style("display", "none");
-            })
-          .on("mousemove", tool.UI.mousemove1);
+        .on("mousemove", tool.UI.mousemove1);
 
       //
       //  Chart3 Chart:
@@ -1260,7 +1249,7 @@
 
       chart3.labelName = labels.append("text")
         .attr("id", _target + "chart3_labelName")
-        .attr("transform", "translate(692,90)")
+        .attr("transform", "translate(692,70)")
         .attr("x","0")
         .attr("y",0)
         .attr("text-anchor", "middle")
@@ -1270,7 +1259,7 @@
 
       chart3.labelTitle = labels.append("text")
         .attr("id", _target + "chart3_labelTitle")
-        .attr("transform", "translate(570,110)")
+        .attr("transform", "translate(570,100)")
         .attr("x",10)
         .attr("y",0)
         .attr("text-anchor", "start")
@@ -1278,15 +1267,15 @@
 
       chart3.labelTitleRight = labels.append("text")
         .attr("id", _target + "chart3_labelTitleRight")
-        .attr("transform", "translate(810,110)")
-        .attr("x",-20)
+        .attr("transform", "translate(810,100)")
+        .attr("x",-10)
         .attr("y",0)
         .attr("text-anchor", "end")
         .text("");
 
       chart3.labelSubTitle = labels.append("text")
         .attr("id", _target + "chart3_labelSubTitle")
-        .attr("transform", "translate(570,130)")
+        .attr("transform", "translate(570,120)")
         .attr("x",10)
         .attr("y",0)
         .attr("text-anchor", "start")
@@ -1294,7 +1283,7 @@
 
       chart3.labelSubTitleRight = labels.append("text")
         .attr("id", _target + "chart3_labelSubTitleRight")
-        .attr("transform", "translate(810,130)")
+        .attr("transform", "translate(810,120)")
         .attr("x",0)
         .attr("y",0)
         .attr("text-anchor", "end")
@@ -1336,7 +1325,7 @@
           tool.UI.select_update(1, id,variable);
 
         },
-        120,410,
+        100,410,
         "select_var1"
       );
 
@@ -1360,6 +1349,55 @@
         320,410,
         "select_var2"
       );
+
+      // swap button
+
+      var swap_charts = charts.append("g")
+        //.attr("transform", "translate(510,80)")
+        .attr("transform", "translate(220,346)")
+        .attr("width", 40)
+        .attr("height", 40)
+        .attr("stroke","gray")
+        .attr("stroke-width",2)
+        .attr("fill", "none")
+        .append("path")
+        .attr("d","M10 20Q20 36 30 20M10 26 10 20 16 21M30 26 30 20 24 21")
+        .on({
+          "mousemove" : function(){
+
+            d3.select(this)
+              .attr("stroke","grey")
+              .attr("stroke-width",3);
+          },
+          'mouseout':function(){
+
+            d3.select(this)
+              .attr("stroke","gray")
+              .attr("stroke-width",2);
+
+          },
+          'click':function(){
+
+            var c = tool.configuration,
+                profile = tool.configuration.profile_id,
+                profile_data = tool.get_track_profile_info(profile),
+                v1 = c.var1,
+                v2 = c.var2,
+                erddap_ref = tool.settings.erddap_parameter_metadata;
+
+            c.var2 = v1;
+            c.var1 = v2;
+
+            // update using select button change
+            tool.UI.select_update(1, "select_var1", v2);
+            tool.UI.select_update(2, "select_var2", v1);
+
+            d3.select("#select_text_select_var1").text(erddap_ref[v2].title);
+            d3.select("#select_text_select_var2").text(erddap_ref[v1].title);
+
+          }
+        });
+
 
       // set UI references for later data updates
 
@@ -1391,16 +1429,11 @@
     var svg_select = function (options_obj, option_selected, key_value_obj, dom_element, on_change_callback, x, y, id) {
 
         // todo.. add sorting
-        // set data-attr-text and data-attr-value for select_box g element
-
-        // known issues
-        // svg parent element hight will cut off svg.. is there overflow outside the parent svg element?
-        //
 
         var ui_settings = {
             "select_box": {
                 "height": 24,
-                    "width": 160
+                    "width": 180
             }
         };
 
@@ -1408,7 +1441,7 @@
             kv_val = key_value_obj.value;
 
         var dd_height = 24,
-            dd_width = 160;
+            dd_width = 180;
 
         var selected_var = option_selected,
             options_count = options_obj.length;
@@ -1425,15 +1458,15 @@
             .attr("transform", "translate(" + 0 + "," + 0 + ")");
 
         select_selected.append("path")
-            .attr("stroke", "red")
+            .attr("stroke", "grey")
             .attr("stroke-width", "1")
             .attr("fill","none")
-            .attr("transform", "translate(140,2)")
+            .attr("transform", "translate(160,2)")
             .attr("d","M2 8L8 2 14 8z M2 12L8 18 14 12z");
 
         var svg_select = select_selected.append("rect")
             .attr("fill", "none")
-            .attr("stroke", "red")
+            .attr("stroke", "grey")
             .attr("stroke-width", 1)
             .attr("rx", "10")
             .attr("ry", "10")
@@ -1452,7 +1485,7 @@
           });
 
         var select_text = select_selected.append("text")
-            .attr("id", "select_text")
+            .attr("id", "select_text_" + id)
             .attr("class", "dd_option_selected")
             .attr("pointer-events", "none")
             .attr("text-anchor", "left")
@@ -1488,20 +1521,23 @@
                 .attr("transform", "translate(" + 0 + ",-" + count * dd_height + ")");
 
             var textContainer = select_option.append("rect")
-                .attr("class", "dd_option")
-                .style("fill", "#6699CC")
-                .style("pointer-events", "all")
-                .attr("width", dd_width)
-                .attr("height", dd_height)
-                .on("mouseover", function () {
-                d3.select(this).style("fill", "#666666");
+              .attr("class", "dd_option")
+              //.attr("stroke","grey")
+              //.attr("stroke-width",1)
+              .attr("fill", "#ffffff")
+              .attr("pointer-events", "all")
+              .attr("width", dd_width)
+              .attr("height", dd_height)
+              .on({
+                "mouseover": function () {
+                    d3.select(this).style("fill", "#f8f8f8");
 
-            })
-                .on("mouseout", function (a, b, c) {
-                  d3.select(this).style("fill", "#6699CC");
+                },
+                "mouseout": function (a, b, c) {
+                  d3.select(this).style("fill", "#ffffff");
 
-            })
-                .on("click", function () {
+                },
+                "click": function () {
 
                   var parentNode = d3.select(this.parentNode),
                       tKey = parentNode.attr("data-attr-key"),
@@ -1514,7 +1550,8 @@
 
                   on_change_callback(id,tKey);
 
-            });
+                }
+              });
 
             var option = select_option.append("text")
                 .attr("class", "dd_option")
@@ -1525,6 +1562,17 @@
                 .attr("dy", ".75em")
                 .text(options_obj[count - 1][kv_val]);
         }
+
+        svg_options.append("rect")
+          .attr("transform", "translate(0," + -(count-1) *dd_height + ")")
+            .attr("class", "dd_option")
+            .attr("stroke","grey")
+            .attr("stroke-width",1)
+            .attr("fill", "none")
+            .attr("pointer-events", "none")
+            .attr("width", dd_width)
+            .attr("height", dd_height*(count-1))
+
     };
 
 }(EduVis));

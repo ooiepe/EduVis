@@ -3,7 +3,7 @@
  * OOI EPE - Data Browser Control
  * for use with Time Series Tools - STS, STSM, DTS
  *
- * Revised 10/9/2014
+ * Revised 11/4/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
     control = {
 
     "name":"Data_Browser_Control",
-    "version" : "0.2.5",
+    "version" : "0.2.6",
     "description" : "This controls allows the user to select Time Series Datasets via a map and search criteria interface. The search is supported by EPE Data Services.",
     "authors" : [
       {
@@ -70,6 +70,15 @@
         opacity: 1,
         fillOpacity: 0.8
     }
+
+  };
+
+  control.web_services = {
+
+    // Data - http://epedata.oceanobservatories.org/parameters
+    // Dev  - http://epedev.oceanobservatories.org/timeseries/parameters"
+    // another one - "http://epe.marine.rutgers.edu/epedata/"
+    "data_url" : "http://epe.marine.rutgers.edu/epedata/"
 
   };
 
@@ -305,9 +314,7 @@
               "id":"db-selection-search"
           })
           .append(
-            $("<div/>", {
-                "id":"db-select-networks"
-            })
+            $("<div/>")
             .html(
               $("<h5>&nbsp;</h5>")
                 .css({"border-bottom":"1px solid #CCCCCC"})
@@ -489,9 +496,7 @@
 //
 // PARAMETERS
 //
-      // Data - http://epedata.oceanobservatories.org/parameters
-      // Dev  - http://epedev.oceanobservatories.org/timeseries/parameters"
-      $.getJSON( "http://epedata.oceanobservatories.org/parameters", function( data ) {
+      $.getJSON( control.web_services.data_url + "parameters", function( data ) {
 
         control.parameters = data.parameters;
 
@@ -543,9 +548,7 @@
 // // networks
 // //
 
-        // DEV  - "http://epedev.oceanobservatories.org/timeseries/networks"
-        // DATA - "http://epedata.oceanobservatories.org/networks"
-        $.getJSON( "http://epedata.oceanobservatories.org/networks", function( data ) {
+        $.getJSON( control.web_services.data_url + "networks", function( data ) {
 
         control.networks = data.networks;
 
@@ -712,9 +715,7 @@
             control.map.removeLayer(control.layer_station_markers);
         }
 
-        // DEV  - http://epedev.oceanobservatories.org/timeseries/
-        // DATA - http://epedata.oceanobservatories.org/
-        var search_stations_query = "http://epedata.oceanobservatories.org/" + control.stationSearch();
+        var search_stations_query = control.web_services.data_url + control.stationSearch();
 
         $.getJSON( search_stations_query, function(geodata){
 
@@ -957,9 +958,8 @@
             // coordinates -- + "(" + station.geometry.coordinates[0] + ", " + station.geometry.coordinates[1] + ")"
             // request station from data-services
 
-            // DEV  - "http://epedev.oceanobservatories.org/timeseries/stations/"
-            // DATA - "http://epedata.oceanobservatories.org/stations/
-            $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
+            //$.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
+            $.getJSON( control.web_services.data_url + "stations/" + network + "/" + station, function( data ) {
                 // get reference to drop down
                 // if exists, check for presence of current network/station
 
@@ -1312,7 +1312,7 @@
 
                         evt_station_remove_click.stopImmediatePropagation();
 
-                        tool.configuration.data_cart.splice(index,1);
+                        tool.configuration.data_cart.splice(index);
 
                         $(".cart-param-tools").remove();
 
@@ -1425,9 +1425,8 @@
           //console.log("station already present")
       }
       else{
-        // http://epedev.oceanobservatories.org/timeseries/
-        // http://epedata.oceanobservatories.org/stations/
-        $.getJSON( "http://epedata.oceanobservatories.org/stations/" + network + "/" + station, function( data ) {
+
+        $.getJSON( control.web_services.data_url + "stations/" + network + "/" + station, function( data ) {
 
           //console.log("**** station data **** ", data);
 
