@@ -149,64 +149,69 @@
                 "air_temperature":{}
               }
             }
-          ]
+          ],
+          "datepicker_ui" : "off"
         },
-
+        "settings":{},
         "data" : {},
         // "target_div" : "Hello_World",
         "tools" : {},
         "graph" : {},
         "param_units" : {}
-    };
+      };
 
-    tool.controls = {
-
-      "layer_station_markers" : {},
-      "timerSearchProgress" : {},
-      "timerSearchQueue" : {},
-      "stationMarkerOptions" : {
-
-        "NDBC" : {
-            radius: 6,
-            fillColor: "#ff0000",
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-        },
-        "CO-OPS" : {
-            radius: 6,
-            fillColor: "#ffff00",
-            color: "#000",
-            weight: 1,
-            opacity: 1,
-            fillOpacity: 0.8
-        }
-      },
-
-      "styleStationHighlight" : {
-          weight: 5,
-          color: '#666',
-          dashArray: '',
-          fillOpacity: 0.6
-      },
-
-      "styleStationClicked" : {
-          weight: 8,
-          color: '#ff0000',
-          dashArray: '',
-          fillOpacity: 0.7
-      },
-
-      "styleStationReset" : {
-          radius: 6,
-          color: "#000",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 0.8
-      }
-
-    };
+    //     "controls" : {
+    //
+    //       "layer_station_markers" : {},
+    //       "timerSearchProgress" : {},
+    //       "timerSearchQueue" : {},
+    //       "stationMarkerOptions" : {
+    //
+    //         "NDBC" : {
+    //             radius: 6,
+    //             fillColor: "#ff0000",
+    //             color: "#000",
+    //             weight: 1,
+    //             opacity: 1,
+    //             fillOpacity: 0.8
+    //         },
+    //         "CO-OPS" : {
+    //             radius: 6,
+    //             fillColor: "#ffff00",
+    //             color: "#000",
+    //             weight: 1,
+    //             opacity: 1,
+    //             fillOpacity: 0.8
+    //         }
+    //       },
+    //
+    //       "styleStationHighlight" : {
+    //           weight: 5,
+    //           color: '#666',
+    //           dashArray: '',
+    //           fillOpacity: 0.6
+    //       },
+    //
+    //       "styleStationClicked" : {
+    //           weight: 8,
+    //           color: '#ff0000',
+    //           dashArray: '',
+    //           fillOpacity: 0.7
+    //       },
+    //
+    //       "styleStationReset" : {
+    //           radius: 6,
+    //           color: "#000",
+    //           weight: 1,
+    //           opacity: 1,
+    //           fillOpacity: 0.8
+    //       },
+    //
+    //       "ui-datepicker-toggle" : {
+    //
+    //       }
+    //     }
+    // };
 
     /**
      * Initial setup of visualization tool
@@ -260,6 +265,7 @@
       g.focus.append("path")
         //.datum(data)
         .attr("class", "line")
+        .attr('clip-path', 'url(#'+ _target+"_clip" +')')
         .attr("d", g.line1)
         .style("fill","none")
         .style("stroke","#a33333")
@@ -328,9 +334,200 @@
         .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
         .text( "Statistics");
 
+      tool.ui_init(_target);
+
+    //  tool.select_createDropdowns(_target);
+    //  tool.select_updateStations();
+    //  tool.select_updateParameters();
+
+    };
+
+    tool.ui_init = function(_target){
+
+      // add tool control container
+      tool.ui_controls = $("<div/>")
+        .attr({
+          "id": _target + "_ui_tool_controls"
+        })
+        .css({
+          "text-align" : "center"
+          //,
+          //"height" : "50px"
+        })
+        .append(
+
+          $("<div/>")
+            .attr({
+              "id" : _target+"_tool-status"
+            })
+        )
+
+      // add controls container
+      $("#"+_target).append(tool.ui_controls);
+
+      // add dropdown controls
       tool.select_createDropdowns(_target);
+
+      // update station and paremeters based on configuration
       tool.select_updateStations();
       tool.select_updateParameters();
+
+      // add datepicker elements
+      tool.configuration.datepicker_ui = "on";
+
+      if(tool.configuration.datepicker_ui == "on"){
+
+        var start_date = tool.configuration.start_date,
+            end_date = tool.configuration.end_date;
+        //save tool start and end dates
+        tool.settings.date_start_default = start_date;
+        tool.settings.date_end_default = end_date;
+
+        tool.ui_datePicker(_target);
+      }
+
+    }
+
+
+
+    tool.ui_datePicker = function(_target){
+
+
+      $("#"+ _target + "_ui_tool_controls")
+        .append(
+
+          $("<div />")
+            .attr({"id":"ui_tool_date_toggle"})
+            .append(
+              "Start Date: &nbsp;"
+            )
+            .append(
+
+              $("<input />")
+              .attr({
+                "id": "tool-date-start",
+                "name":"tool-date-start",
+                "type": "text"
+              })
+              .addClass('datepicker input-small')
+              .datepicker({
+                "dateFormat": "yy-mm-dd",
+                "changeMonth": true,
+                "changeYear": true,
+                "minDate":tool.configuration.start_date,
+                "maxDate":tool.configuration.end_date,
+                "onClose" : function(d,i){
+
+                  //console.log(d,i);
+                  tool.configuration.start_date = d;
+
+                  tool.draw();
+
+                  $("#tool-date-end").datepicker( "option", "minDate" , d);
+
+                  //tool.graph_update_dates( d, tool.configuration.end_date);
+                  //
+                  //
+                  // var g = tool.graph;
+                  //
+                  // g.x.domain([g.parseDateConfig(d),g.parseDateConfig(tool.configuration.end_date)])
+                  //
+                  // g.svg.selectAll("path.line")
+                  //   .transition()
+                  //   .duration(1000)
+                  //   .ease("linear")
+                  //   .attr("d", tool.graph.line1);
+                  //
+                  // console.log(" update graph with new start and end dates?");
+
+                },
+                "defaultDate": tool.configuration.start_date
+              })
+              .val(tool.configuration.start_date)
+            )
+            .append(
+              "&nbsp;&nbsp;&nbsp;End Date: &nbsp;"
+            )
+            .append(
+
+              $("<input />")
+              .attr({
+                "id": "tool-date-end",
+                "name":"tool-date-end",
+                "type": "text"
+              })
+              .addClass('datepicker input-small')
+              .datepicker({
+                "dateFormat": "yy-mm-dd",
+                "changeMonth": true,
+                "changeYear": true,
+                "minDate":tool.configuration.start_date,
+                "maxDate":tool.configuration.end_date,
+                "onClose" : function(d,i){
+
+                  //console.log(d,i);
+
+                  tool.configuration.end_date = d;
+                  tool.draw();
+
+                  $("#tool-date-start").datepicker( "option", "maxDate" , d);
+
+                  //tool.graph_update_dates( tool.configuration.start_date,d);
+                  // var g = tool.graph;
+                  //
+                  // g.x.domain([g.parseDateConfig(tool.configuration.start_date),g.parseDateConfig(d)])
+                  //
+                  // g.svg.selectAll("path.line")
+                  //   .transition()
+                  //   .duration(1000)
+                  //   .ease("linear")
+                  //   .attr("d", tool.graph.line1);
+                  //
+                  //
+                  // console.log(" update graph with new start and end dates?");
+
+                },
+                "defaultDate": tool.configuration.end_date
+              })
+              .val(tool.configuration.end_date)
+            )
+            .append("<br />")
+            .append(
+              $("<a>")
+                .addClass("btn")
+                .html("Reset Default")
+                .on("click",function(){
+
+                  var default_start = tool.settings.date_start_default,
+                      default_end = tool.settings.date_end_default;
+
+                  tool.configuration.start_date = default_start;
+                  tool.configuration.end_date = default_end;
+
+                  $("#tool-date-end")
+                    .val(default_end)
+                    .datepicker("option","minDate",default_start)
+                    .datepicker("option","maxDate",default_end)
+                    .datepicker("setDate",default_end);
+
+                  $("#tool-date-start")
+                    .val(default_start)
+                    .datepicker("option","minDate",default_start)
+                    .datepicker("option","maxDate",default_end)
+                    .datepicker("setDate",default_start);
+
+                  tool.draw();
+                })
+            )
+          )
+
+      // things needed.
+
+      // add startdate date picker
+
+      // add end date date picker
+
+      // add events to update the graph when dates change
 
     };
 
@@ -390,6 +587,14 @@
         tool.draw();
     };
 
+    // tool.graph_update_dates = function(date_start,date_end){
+    //
+    //     tool.configuration.start_date = date_start;
+    //     tool.configuration.end_ate = date_end;
+    //
+    //     tool.draw();
+    // }
+
     /**
      * Update graph and config when start date is changed
      * Not currently used?
@@ -433,8 +638,8 @@
         end = config.end_date;
       }
 
-      //"http://epedev.oceanobservatories.org/timeseries/stations/"
-      return 'http://epedata.oceanobservatories.org/timeseries?' +
+
+      return tool.web_services.data_url + "timeseries?" +
         'network=' + network +
         '&station=' + station +
         '&parameter=' + parameter +
@@ -564,17 +769,14 @@
      */
     tool.select_createDropdowns = function(_target){
 
-      var tool_controls = $("<div/>")
-        .css({
-          "text-align" : "center",
-          "height" : "50px"
-        })
+      $("#"+ _target + "_ui_tool_controls")
+
         .append(
           $("<div/>")
             .attr({
               "id": _target+"_tool-dropdowns"
             })
-            .append("Station: ")
+            .append("Station: &nbsp;")
             .append(
               $("<select></select>")
               .attr({
@@ -596,7 +798,7 @@
                 }
               })
             )
-            .append("&nbsp;&nbsp;&nbsp;Parameter: ")
+            .append("&nbsp;&nbsp;&nbsp;Parameter: &nbsp;")
             .append(
               $("<select></select>")
               .attr({
@@ -798,6 +1000,14 @@
 
     };
 
+    tool.web_services = {
+
+      //http://epedev.oceanobservatories.org/timeseries/stations/
+      //http://epedata.oceanobservatories.org/timeseries?
+
+      "data_url" : "http://epe.marine.rutgers.edu/epedata/"
+    };
+
     /**
      * Initialize tool
      * Called automatically by EduVis
@@ -817,6 +1027,26 @@
       tool.controls = {};
       tool.controls.Data_Browser_Control = EduVis.controls.Data_Browser_Control;
       tool.controls.Data_Browser_Control.init(tool);
+
+      tool.controls.ui_date_toggle = $("<div/>")
+        .append("Datepicker Toggle: &nbsp;")
+        .append(
+          $("<select></select>")
+            .attr({"id":"ui_control_date_toggle"})
+            .on("change",function(evt){
+
+              tool.configuration.datepicker_ui = evt.target.value;
+
+              //tool.controls.Data_Browser_Control.apply_button_update("modified");
+
+            })
+            .val(tool.configuration.datepicker_ui)
+            .append('<option value="on">On</option>')
+            .append('<option value="off">Off</option>')
+
+        );
+
+        tool.controls.ui_date_toggle.insertBefore("#db-selection-search");
 
     };
 

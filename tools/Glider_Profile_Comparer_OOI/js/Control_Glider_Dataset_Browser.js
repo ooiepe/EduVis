@@ -2,7 +2,7 @@
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
 
-Revised 10/31/2014
+Revised 11/25/2014
 Written by Michael Mills, Rutgers University
 
 */
@@ -14,7 +14,7 @@ Written by Michael Mills, Rutgers University
   var parent_tool,
     control = {
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.1.3",
+    "version" : "0.1.4",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -36,31 +36,34 @@ Written by Michael Mills, Rutgers University
     }
   };
 
-  control.config_dateRange_slider = function(date_start, date_end, range_start, range_end){
+  control.config_dateRange_slider = function(date_start, date_end, range_start, range_end, time_start, time_end){
 
     $("#ui-config-dateRange-slider").remove();
 
     var margin = {
-        top: 0,
-        right: 40,
-        bottom: 20,
-        left: 40
-    },
+          top: 0,
+          right: 40,
+          bottom: 20,
+          left: 40
+        },
         width = 500 - margin.left - margin.right,
-        height = 50 - margin.top - margin.bottom,
-        date_format = d3.time.format("%Y-%m-%d"),
-        date_range_format = d3.time.format("%Y-%m-%d-%H-%M-%S");
+        height = 50 - margin.top - margin.bottom;
 
-    var iso_format = d3.time.format.iso.parse,
+    var date_format_ymd = d3.time.format("%Y-%m-%d"),
+        date_range_format = d3.time.format("%Y-%m-%d-%H-%M-%S"),
 
-        start = date_format.parse(date_start),
-        end = date_format.parse(date_end);
+        iso_format = d3.time.format.iso.parse,
+
+        //start = date_format_ymd.parse(date_start),
+        //end = date_format_ymd.parse(date_end);
+
+        start = date_range_format.parse(date_start + "-00-01-01"),
+        end = date_range_format.parse(date_end + "-23-59-59");
 
     var range_date_start = range_start || date_start,
         range_date_end = range_end || date_end;
 
-
-        console.log("RANGEs!! ->", range_date_start, range_date_end);
+        console.log("RANGEs!! ->", start, end, range_date_start, range_date_end);
 
     var x = d3.time.scale.utc()
         .range([0, width])
@@ -69,7 +72,7 @@ Written by Michael Mills, Rutgers University
     // set the extent to the selected range within the full range
     var brush = d3.svg.brush()
         .x(x)
-        //.extent([date_format.parse(range_date_start), date_format.parse(range_date_end)])
+        //.extent([date_format_ymd.parse(range_date_start), date_format_ymd.parse(range_date_end)])
         .extent([date_range_format.parse(range_date_start + "-00-01-01"), date_range_format.parse(range_date_end+"-23-59-59")])
         .on("brushstart", brushstart)
         .on("brush", brushmove)
@@ -101,7 +104,7 @@ Written by Michael Mills, Rutgers University
           d3.svg.axis().scale(x)
             .orient("bottom")
             .tickValues(dd)
-            .tickFormat(date_format)
+            .tickFormat(date_format_ymd)
         );
 
     var brushg = svg.append("g")
@@ -125,8 +128,8 @@ Written by Michael Mills, Rutgers University
     function brushmove() {
         var s = brush.extent();
 
-        $("#config-date_start-input").val(date_format(s[0]));
-        $("#config-date_end-input").val(date_format(s[1]));
+        $("#config-date_start-input").val(date_format_ymd(s[0]));
+        $("#config-date_end-input").val(date_format_ymd(s[1]));
 
         // limit execution does not seem to have an effect
         L.Util.limitExecByInterval(
@@ -142,22 +145,24 @@ Written by Michael Mills, Rutgers University
 
   };
 
+/*
+
+*/
   control.poly_track_selected_update = function(start,end){
 
     // get full track from poly_track
     var track_geojson = control.config_controls.leaflet_map.track_full_geojson,
-        iso_format = d3.time.format.iso.parse,
-        date_format = d3.time.format("%Y-%m-%d").parse;
+        iso_format = d3.time.format.iso.parse;
 
     var poly_coords = [],
       config = control.parent_tool.configuration,
-      config_mapObj =  control.config_controls.leaflet_map;
+      config_mapObj = control.config_controls.leaflet_map;
 
     var track_updated = L.geoJson(track_geojson,{
 
       onEachFeature: function (location, location_feature) {
 
-        var date_compare = date_format(location.properties.time.substring(0,10));
+        var date_compare = iso_format(location.properties.time);
 
         if((date_compare >= start ) && (date_compare <= end)){
           poly_coords.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
@@ -175,20 +180,20 @@ Written by Michael Mills, Rutgers University
 
     var parent_tool = control.parent_tool,
         config = parent_tool.configuration,
-        settings = parent_tool.settings, // /?
+        settings = parent_tool.settings,
         iso_format = d3.time.format.iso.parse,
-        date_format = d3.time.format("%Y-%m-%d"),
+        date_format_ymd = d3.time.format("%Y-%m-%d"),
         slider = control.config_controls.slider;
 
-        control.iso_format = iso_format;
+    control.iso_format = iso_format;
 
-        slider.date_start = config.date_start;
-        slider.date_end = config.date_end;
+    slider.date_start = config.date_start;
+    slider.date_end = config.date_end;
 
-        slider.date_range_start = config.date_start;
-        slider.date_range_end = config.date_end;
+    slider.date_range_start = config.date_start;
+    slider.date_range_end = config.date_end;
 
-        var erddap_ref = settings.erddap_parameter_metadata,
+    var erddap_ds = settings.erddap.data_source,//.parameter_metadata,
 
         dropdown_deployment = $("<div />")
           .append(
@@ -219,7 +224,7 @@ Written by Michael Mills, Rutgers University
               .append("<option>...loading...</option>")
               .on("change", function(evt){
 
-                console.log("this ui_control_dataset_id change event", this);
+                //console.log("this ui_control_dataset_id change event", this);
 
                 var dataset_val = evt.target.value,
                     ds_obj,
@@ -251,10 +256,10 @@ Written by Michael Mills, Rutgers University
                 }
                 while(!is_dataset);
 
-                slider.date_start = date_format(date_start_ds);
-                slider.date_end = date_format(date_end_ds);
-                slider.date_range_start = date_format(date_start_ds);
-                slider.date_range_end = date_format(date_end_ds);
+                slider.date_start = date_format_ymd(date_start_ds);
+                slider.date_end = date_format_ymd(date_end_ds);
+                slider.date_range_start = date_format_ymd(date_start_ds);
+                slider.date_range_end = date_format_ymd(date_end_ds);
 
                 // now set the slider to the full range of the requested dataset
                 // if its the config dataset load the specific start and end dates
@@ -271,13 +276,13 @@ Written by Michael Mills, Rutgers University
 
                 // set the date picker start and end range restrictions
                 $("#config-date_start-input").datepicker("option", {
-                  "minDate":date_format(date_start_ds),
-                  "maxDate":date_format(date_end_ds)
+                  "minDate":date_format_ymd(date_start_ds),
+                  "maxDate":date_format_ymd(date_end_ds)
                 });
 
                 $("#config-date_end-input").datepicker("option", {
-                  "minDate":date_format(date_start_ds),
-                  "maxDate":date_format(date_end_ds)
+                  "minDate":date_format_ymd(date_start_ds),
+                  "maxDate":date_format_ymd(date_end_ds)
                 });
 
                 // zoom to the track bounds, southwest, northeast obtained from datasets query
@@ -299,43 +304,111 @@ Written by Michael Mills, Rutgers University
                   // save the track geojson for later reference - primarily the config slider
                   config_mapObj.track_full_geojson = geodata;
 
-                  var poly_coords = [], poly_coords_selected = [];
+                  // create arrays to hold the profile locations and selected profile locations
+                  var poly_coords = [],
+                      poly_coords_selected = [];
 
                   // remove geoJson point layer if its already on the map
                   if(typeof config_mapObj.track_full_L_geoJson !== "undefined"){
                     config_mapObj.map.removeLayer(config_mapObj.track_full_L_geoJson);
                   }
 
+                  /*
+                    Create Leaflet geoJson object for the points of the glider track
+                    -add click events for
+                  */
+
                   config_mapObj.track_full_L_geoJson = L.geoJson(geodata,{
 
                     onEachFeature: function (location, location_feature) {
 
-
                       location_feature.on({
+
+                        /*
+                          Track Mouse Hover Event
+                        */
+                        "mouseover": function(e){
+
+                          // todo- this can be another style setting in map settings to make it easy for future updates
+
+                          // set the opacity, fill, and radius
+                          this.setStyle({
+                            "fillOpacity":1,
+                            "opacity":1,
+                            "radius":6
+                          });
+
+                        },
+                        "mouseout": function(e){
+
+                          // reset the opacity, fill, and radius
+
+                          this.setStyle({
+                            "fillOpacity":1,
+                            "opacity":1,
+                            "radius":3
+                          });
+
+                        },
+
                         "click": function(e){
 
+                          // Build Content for the Profile Marker click event
+
+                          this.on({
+                            "mouseout":function(){
+
+                              this.setStyle({
+                                "fillOpacity":1,
+                                "opacity":1,
+                                "radius":3
+                              });
+
+                            }
+                          });
+
                           var start = iso_format($("#config-date_start-input").val()),
-                            end = iso_format($("#config-date_end-input").val()),
-                            profile_date = e.target.feature.properties.time.substring(0,10),
-                            profile_time = iso_format(profile_date),
-                            content, position;
+                              end = iso_format($("#config-date_end-input").val()),
 
-                            // set as start date
-                            if(profile_time <= start){
-                              content = '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>';
-                              //position="start";
-                            }
-                            else if(profile_time <= end){
+                              props = e.target.feature.properties,
 
-                              content = '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>' +
-                                        '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
-                                    //position = "both";
-                            }
-                            else{
-                              content = '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
-                            }
+                              profile_date = props.time.substring(0,10),
+                              profile_time = iso_format(props.time),
 
-                          // create popup and add it to the map
+                              latlng = this.getLatLng(),
+
+                              content = '<div style="margin:8px; min-width:240px">' +
+                                        '<div style="float:left;">' + props.time +"</div>" +
+                                        '<div style="text-align:right">Profile #: ' + props.profile_id +"</div>" +
+                                        "<div>Location: " + d3.round(latlng.lat,3) + " N " + d3.round(latlng.lng,3)+" W</div>"+
+                                        '</div><div style="padding:14px;">';
+
+
+                          // build button based on current selection and glider track date range
+
+                          // set as start date
+                          if(profile_time <= start){
+
+                            content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date
+                                    +'" class="btn">Set as <b>Start Date</b></a>';
+
+                          }
+                          else if(profile_time <= end){
+
+                            content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date
+                                    +'" class="btn">Set as <b>Start Date</b></a>' +
+                                      '<a id="track_profile_set_end" data-attr-date="'+ profile_date
+                                    +'" class="btn">Set as <b>End Date</b>.</a>';
+                          }
+                          else{
+
+                            content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date
+                                    +'" class="btn">Set as <b>End Date</b>.</a>';
+                          }
+
+                          content += "</div>";
+
+                          // create pop up and add it to the map
                           var popup = L.popup()
                             .setLatLng(e.target._latlng)
                             .setContent(content)
@@ -348,7 +421,10 @@ Written by Michael Mills, Rutgers University
                                 slider = control.config_controls.slider;
 
                               // update the start date
-                              date_start.val($(this).attr("data-attr-date"));
+                              date_start.val(
+                                // coming as a formated date?
+                                $(this).attr("data-attr-date")
+                              );
 
                               control.config_dateRange_slider(slider.date_start, slider.date_end, date_start.val(), date_end.val());
                           });
@@ -358,14 +434,17 @@ Written by Michael Mills, Rutgers University
                             var date_start = $("#config-date_start-input"),
                                 date_end = $("#config-date_end-input");
 
-                              date_end.val($(this).attr("data-attr-date"));
+                              date_end.val(
+                                $(this).attr("data-attr-date")
+                                //$(this).attr("data-attr-date")
+
+                              );
 
                               control.config_dateRange_slider(slider.date_start, slider.date_end, date_start.val(), date_end.val());
 
                           });
                         }
                       });
-
 
                       //location_feature.bindPopup(control.track_profile_click(iso_format(location.properties.time)));
 
@@ -377,11 +456,12 @@ Written by Michael Mills, Rutgers University
                         latlng,
                         {
                           radius: 3,
+                          //fillColor: "#ff0000",
                           fillColor: "#ff0000",
                           color: "#000",
                           weight: 1,
-                          opacity: 1,
-                          fillOpacity: 0.8
+                          opacity: 0,
+                          fillOpacity: 0
                         }
                       );
                     }
@@ -415,6 +495,32 @@ Written by Michael Mills, Rutgers University
 
                   // update the poly line full track
                   config_mapObj.poly_line_track.setLatLngs(poly_coords);
+
+                  // track mouse over and mouse out
+                  // config_mapObj.poly_line_track.on({
+                  //
+                  //   "mouseover" : function(){
+                  //
+                  //      config_mapObj.track_full_L_geoJson
+                  //     // set the opacity, fill, and radius
+                  //     .setStyle({
+                  //       "fillOpacity":1,
+                  //       "opacity":1,
+                  //       "radius":3
+                  //     });
+                  //   },
+                  //   "mouseout" : function(){
+                  //
+                  //      config_mapObj.track_full_L_geoJson
+                  //     // set the opacity, fill, and radius
+                  //     .setStyle({
+                  //       "fillOpacity":0,
+                  //       "opacity":0,
+                  //       "radius":6
+                  //     });
+                  //   }
+                  //
+                  // });
 
                   // update the poly line selection track
                   config_mapObj.poly_line_selected.setLatLngs(poly_coords_selected);
@@ -585,11 +691,56 @@ Written by Michael Mills, Rutgers University
             // remove all drop down selection options
             $("#config-dataset_id-select").children().remove();
 
-            // console.log(datasets);
+            // use lookup table to build structured dataset based on array / station source
             $.each(datasets, function(i,dset){
 
-               $("#config-dataset_id-select")
-                 .append('<option value="' + dset["datasetID"] +'">' + dset["datasetID"]+'</option>');
+              // grab dataset ID
+              // first two chars or two chars after.. compare lowercase in all instances
+
+              var d_id = dset.datasetID.substring(0,2).toLowerCase();
+
+              erddap_ds[d_id].datasets.push(dset);
+
+              // control.parenttool
+/*
+                datasetID: "CE05MOAS-ce_311-20141007T0028"
+                institution: "OOI"
+                maxLatitude: 44.95396812372304
+                maxLongitude: -124.12050911265995
+                maxTime: "2014-11-21T10:32:44Z"
+                minLatitude: 44.36658249006089
+                minLongitude: -125.12023382659741
+                minTime: "2014-10-07T00:43:48Z"
+*/
+            });
+
+            //  create grouped select station with structured object
+            $.each(erddap_ds, function (i, dataObj) {
+
+              // create opt group
+              var optGroup = $("<optgroup>")
+                .attr("label", dataObj.title);
+
+              // add datasets to opt group
+              $.each(dataObj.datasets, function (i,dset) {
+
+                var d = dset.datasetID,
+                    t0 = dset.minTime,
+                    t1 = dset.maxTime,
+                    d_id = d.substring( (1+d.indexOf("_") ),d.indexOf("_")+4),
+                    time_range = t0.substring(0,10) + " to " + t1.substring(0,10);
+
+                optGroup.append(
+
+                  $("<option>")
+                    .attr("value",d)
+                    .html(d_id + "  " + time_range)
+                );
+              });
+
+              // add opt group
+              $("#config-dataset_id-select")
+                 .append(optGroup);
             });
 
             // set the default seleted option for the dataset dropdown
@@ -605,25 +756,62 @@ Written by Michael Mills, Rutgers University
               })
             };
 
-            // add the ocean basemap to the map tool control
+            // define the ocean basemap layer and add it ot the map tool control
             control.config_controls.leaflet_map.oceanBasemap_layer = new L.TileLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",{
               maxZoom: 19,
               attribution: 'Tile Layer: &copy; Esri'
             }).addTo(control.config_controls.leaflet_map.map);
 
-            // add the blank poly line for the full track
+            // define the full track polyline and add it ot the map
             control.config_controls.leaflet_map.poly_line_track = L.polyline(
               [],
               {color: 'white'} // /todo: add transparancy
             )
             .addTo(control.config_controls.leaflet_map.map);
 
-            // add the empty poly line for the selected part of the track
+            // define the selected portion polyline and add it to the map
             control.config_controls.leaflet_map.poly_line_selected = L.polyline(
               [],
               {color: 'blue'} // /todo: add transparancy
             )
             .addTo(control.config_controls.leaflet_map.map);
+
+            // add event handlers to the map
+            control.config_controls.leaflet_map.map.on({
+
+              "zoomend":function(e){
+
+              /*
+                When zoom level changes set the style of the profile markers
+
+              */
+
+              if(this.getZoom() >= 10){
+
+                if(typeof control.config_controls.leaflet_map.track_full_L_geoJson !== "undefined"){
+
+                  // set the opacity, fill, and radius
+                  control.config_controls.leaflet_map.track_full_L_geoJson
+                   .setStyle({
+                     "fillOpacity":1,
+                     "opacity":1,
+                     "radius":3
+                   });
+                }
+              }
+              else{
+
+                if(typeof control.config_controls.leaflet_map.track_full_L_geoJson !== "undefined"){
+
+                  control.config_controls.leaflet_map.track_full_L_geoJson
+                    .setStyle({
+                      "fillOpacity":0,
+                      "opacity":0,
+                      "radius":3
+                    });
+                };
+              }
+            }});
 
             control.config_controls.ui_control_dataset_id.trigger("change");
 
