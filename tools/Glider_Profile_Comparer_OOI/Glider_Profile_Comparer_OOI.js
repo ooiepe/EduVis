@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Comparer OOI (GPC OOI)
- * Revised 12/1/2014
+ * Revised 12/3/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Comparer",
         "url" : "",
 
-        "version" : "0.0.7",
+        "version" : "0.0.8",
         "authors" : [
           {
             "name" : "Michael Mills",
@@ -96,18 +96,20 @@
         "configuration" : {
 
           "dataset_id" : "CP05MOAS-cp_388-20141006T2010",
-          "glider_name" : "CE05MOAS",
-          "profile_id" : 42, // we can no longer rely on profile ID.. times must be used
+          "glider_name" : "388",
+          "profile_id" : 286,
           "profile_time" : "2014-10-12T17:53:17Z",
 
           "var1" : "salinity",
           "var2" : "temperature",
 
-          "profile_time_start" : "2014-10-11T04:21:09Z",
-          "profile_time_end" : "2014-10-13T02:03:56Z",
+          "observatory" : "Global Papa",
 
-          "date_start" : "2014-10-11",
-          "date_end" : "2014-10-13"
+          //"profile_time_start" : "2014-10-11T04:21:09Z",
+          //"profile_time_end" : "2014-10-13T02:03:56Z",
+
+          "date_start" : "2014-11-24",
+          "date_end" : "2014-12-01"
         },
 
         "data" : {},
@@ -119,7 +121,7 @@
 
             "data_source" : {
 
-              // lookup info for available datasets.. add here to associate
+              // lookup info for available datasets.. add here to associate glider datasets with observatories
               "ce" : {
                 //"website" : "http://www.whoi.edu/ooi_cgsn/pioneer-array",
                 "title" : "Coastal Endurance",
@@ -132,7 +134,7 @@
                 "datasets" : [ ]
               },
               "gp" : {
-                //"website" : "http://www.whoi.edu/ooi_cgsn/coastal-scale-nodes",
+                //"website" : "",
                 "title" : "Global Papa",
                 "datasets" : [ ]
               },
@@ -155,12 +157,12 @@
               },
               "latitude" : {
                 "column" : "latitude (degrees_north)",
-                "units" : "degrees north",
+                "units" : "\u00B0N",
                 "title" : "Latitude"
               },
               "longitude" : {
                 "column" : "longitude (degrees_east)",
-                "units" : "degrees east",
+                "units" : "\u00B0E",
                 "title" : "Longitude"
               },
               "depth" : {
@@ -175,7 +177,7 @@
               },
               "temperature" : {
                 "column" : "temperature (Celsius)",
-                "units" : "&#176;C",
+                "units" : "\u00B0C",
                 "title" : "Sea Water Temperature"
               },
               "conductivity" : {
@@ -257,7 +259,7 @@
        "DATA" : {}
     };
 
-    tool.Glider_Profile_Comparer_OOI = function( _target ){
+    tool.Glider_Profile_Comparer_OOI = function (_target) {
 
       var c=this.configuration;
 
@@ -283,7 +285,7 @@
       EduVis.tool.load_complete(this);
     };
 
-    tool.UI.slider = function(profile_extent, date_extent){
+    tool.UI.slider = function (profile_extent, date_extent) {
 
       var c = tool.configuration,
         _target = c.dom_target,
@@ -308,6 +310,7 @@
           .on("brushend", brushend);
 
       var svg = d3.select("#" + "svg_container").append("g")
+          //.attr("fill", "#FFF")
           .attr("id", _target + "_profile_slider")
           .attr("transform", "translate(" + 100 + "," + 440 + ")");
 
@@ -402,7 +405,7 @@
         var profile = tool.configuration.profile_id,
             profile_data = tool.get_track_profile_info(profile-1);
 
-        if(typeof profile_data !== "undefined"){
+        if (typeof profile_data !== "undefined") {
 
           tool.configuration.profile_id--;
 
@@ -440,35 +443,32 @@
 
       function brushed () {
 
-        var value = brush.extent()[0];
+        var val = brush.extent()[0];
 
-        if (d3.event.sourceEvent) { // not a programmatic event
-          value = x.invert(d3.mouse(this)[0]);
-          brush.extent([value, value]);
+        if (d3.event.sourceEvent) {
+          val = x.invert(d3.mouse(this)[0]);
+          brush.extent([val, val]);
         }
 
-        var profile_data = tool.get_track_profile_info(Math.floor(value));
+        var profile_data = tool.get_track_profile_info(Math.floor(val));
 
-        if(typeof profile_data !== "undefined"){
+        if (typeof profile_data !== "undefined") {
 
           handle
-            .attr("transform", "translate(" + (x(value) - 10) + ",0)");
+            .attr("transform", "translate(" + (x(val) - 10) + ",0)");
 
           handle_container
             .text("Profile: " + profile_data.profile_id + " - " + date_format_utc(profile_data.time));
         }
-      };
+      }
 
       function brushend ( ) {
 
-        var value = brush.extent()[0];
+        var val = brush.extent()[0];
 
-        //console.log("SLIDER UPDATE ->", value, x(value),Math.floor(x(value)));
-        var profile_data = tool.get_track_profile_info(Math.floor(value));
+        var profile_data = tool.get_track_profile_info(Math.floor(val));
 
-        //console.log("!!!! PROFILE DATA --> ", Math.floor(value), profile_data);
-
-        if(typeof profile_data !== "undefined"){
+        if (typeof profile_data !== "undefined") {
 
           //update configuration profile id
           tool.configuration.profile_id = profile_data.profile_id;
@@ -476,17 +476,14 @@
           // update chart when slider is changed
           tool.update_charts(profile_data);
         }
-      };
+      }
     };
 
-    tool.update_track_profiles = function(dataset_id, profile_id, date_start, date_end){
+    tool.update_track_profiles = function (dataset_id, profile_id, date_start, date_end) {
 
       console.log("DOWNLOAD Track Data", tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end,undefined ,".csvp"));
 
-      // profile_id,time,latitude,longitude
-      // ,UTC,degrees_north,degrees_east
-
-      d3.csv(tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end, undefined ,".csvp"), function(d,i) {
+      d3.csv(tool.DATA.erddap_endpoints.glider_track(dataset_id, date_start, date_end, undefined ,".csvp"), function (d,i) {
         return {
 
           ind : i,
@@ -496,18 +493,18 @@
           lon: +d["longitude (degrees_east)"]
 
         };
-      }, function(error, rows) {
+      }, function (error, rows) {
 
           // set profile_collection data object
           tool.DATA.profile_collection = rows;
 
           // set min and max profiles for slider move display
-          var profile_extent = d3.extent(rows,function(d){return d.profile_id;}),
-              date_extent = d3.extent(rows,function(d){return d.time;}),
+          var profile_extent = d3.extent(rows,function (d) {return d.profile_id;}),
+              date_extent = d3.extent(rows,function (d) {return d.time;}),
               profile_id = tool.configuration.profile_id;
 
           // update configuration profile ID if profile doesn't fall within the range of profiles
-          if(profile_id < profile_extent[0] || profile_id > profile_extent[1]){
+          if (profile_id < profile_extent[0] || profile_id > profile_extent[1]) {
             tool.configuration.profile_id = profile_extent[0];
           }
 
@@ -516,7 +513,7 @@
       });
     };
 
-    tool.update_charts = function(profile_data){
+    tool.update_charts = function (profile_data) {
 
       var c = tool.configuration,
           dataset_id = c.dataset_id,
@@ -525,36 +522,36 @@
       console.log("UPDATE CHARTS:", dataset_id, profile_id);
 
       // download profile for dataset_id and profile_id
-      d3.csv( tool.DATA.erddap_endpoints.profile(dataset_id, profile_id), function(error,data){
+      d3.csv( tool.DATA.erddap_endpoints.profile(dataset_id, profile_id), function (error,data) {
 
-        if(error){console.log(error);}
+        if (error) {console.log(error);}
 
-        var erddap_ref = tool.settings.erddap.parameter_metadata,
-            column_depth = erddap_ref.depth.column,
+        var erddap_params = tool.settings.erddap.parameter_metadata,
+            column_depth = erddap_params.depth.column,
             config = tool.configuration,
 
             chart1 = tool.UI.chart1,
             chart2 = tool.UI.chart2,
             chart3 = tool.UI.chart3,
 
-            column1 = erddap_ref[config.var1],
-            column2 = erddap_ref[config.var2],
+            column1 = erddap_params[config.var1],
+            column2 = erddap_params[config.var2],
 
             column_selected1 = column1.column,
             column_selected2 = column2.column,
 
-            column_selected_title1 = column1.title + " ("+ column1.units +")",
-            column_selected_title2 = column2.title + " ("+ column2.units +")",
+            column_selected_title1 = column1.title + " ( "+ column1.units +" )",
+            column_selected_title2 = column2.title + " ( "+ column2.units +" )",
 
-            column_time = erddap_ref.time.column,
-            bisectData = d3.bisector(function(d) { return d[column_depth]; }).left,
+            column_time = erddap_params.time.column,
+            bisectData = d3.bisector(function (d) { return d[column_depth]; }).left,
             profile_date,
 
             date_format_utc = d3.time.format("%Y-%m-%d %H:%M");
 
         //console.log("Data downloaded", data);
 
-        data.forEach(function(d) {
+        data.forEach(function (d) {
           //d[column_date] = g.parseDate(d[column_date]);
           d[column_depth] = +d[column_depth];
           d[column_selected1] = +d[column_selected1];
@@ -562,13 +559,13 @@
         });
 
         // get the X extent
-        chart1.extent_x = d3.extent(data, (function(d) { return d[column_selected1]; }));
+        chart1.extent_x = d3.extent(data, (function (d) { return d[column_selected1]; }));
 
         //update the x domain for chart1
         chart1.x.domain(chart1.extent_x);
 
         // update the y domain to use the range of the returned data.
-        chart1.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
+        chart1.y.domain(d3.extent(data, (function (d) { return d[column_depth]; })));
 
         // set the new tick values
         chart1.axisX.tickValues(tool.axisTicks(chart1.extent_x));
@@ -586,13 +583,13 @@
           .attr("d", chart1.line);
 
         // get the X extent
-        chart2.extent_x = d3.extent(data, (function(d) { return d[column_selected2]; }));
+        chart2.extent_x = d3.extent(data, (function (d) { return d[column_selected2]; }));
 
         // update the x domain for chart2
         chart2.x.domain(chart2.extent_x);
 
         // update the y domain to use the range of the returned data.
-        chart2.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
+        chart2.y.domain(d3.extent(data, (function (d) { return d[column_depth]; })));
 
         // set the new tick values
         chart2.axisX.tickValues(tool.axisTicks(chart2.extent_x));
@@ -610,10 +607,10 @@
           .attr("d", chart2.line);
 
         // update the domain for chart3
-        chart3.x.domain(d3.extent(data, (function(d) { return d[column_selected1]; })));
+        chart3.x.domain(d3.extent(data, (function (d) { return d[column_selected1]; })));
 
         // update the y domain to use the range of the returned data.
-        chart3.y.domain(d3.extent(data, (function(d) { return d[column_selected2]; })));
+        chart3.y.domain(d3.extent(data, (function (d) { return d[column_selected2]; })));
 
         // set the new tick values
         chart3.axisX.tickValues(tool.axisTicks(chart1.extent_x));
@@ -625,15 +622,18 @@
         chart3.select(".x.axis").transition().ease("linear").call(chart3.axisX);
         chart3.select(".y.axis").transition().ease("linear").call(chart3.axisY);
 
+        // chart3 points
+
         // update path for chart3
         chart3.select("path.line")
           .data([data])
           .transition()
-          //.duration(500)
           .ease("linear")
           .attr("d", chart3.line);
 
-        chart3.labelName.text(c.dataset_id);
+        chart3.pointsUpdate(data);
+
+        chart3.labelName.text(c.observatory + " " + c.glider_name);
         // update chart labels
 
         chart3.labelTitleRight.text("Profile # " + profile_id);
@@ -643,8 +643,8 @@
         //chart3.labelSubTitleRight.text(profile_data.time);
 
         chart3.labelSubTitle
-          .text("Location: " + d3.round(profile_data.lat,3) + " N " + d3.round(profile_data.lon,3)+" W")
-          .html("Location: " + d3.round(profile_data.lat,3) + "&deg; N " + d3.round(profile_data.lon,3)+"&deg;W");
+          .text("Location: " + d3.round(profile_data.lat,3) + " \u00B0N " + d3.round(profile_data.lon,3) + " \u00B0E");
+
         // update dataset object
         tool.DATA.dataset = data;
 
@@ -658,34 +658,32 @@
 */
     tool.UI.select_update = function (chart_id, id, variable) {
 
-      console.log(1, id,variable);
-
-      var erddap_ref = tool.settings.erddap.parameter_metadata,
-          column_depth = erddap_ref.depth.column,
+      var erddap_params = tool.settings.erddap.parameter_metadata,
+          column_depth = erddap_params.depth.column,
 
           config = tool.configuration,
 
           chart = tool.UI["chart" + chart_id],
           chart3 = tool.UI.chart3,
 
-          column = erddap_ref[variable],
+          column = erddap_params[variable],
           column_selected = column.column,
-          column_selected_title = column.title + " (" + column.units + ")",
-          column_time = erddap_ref.time.column,
+          column_selected_title = column.title + " ( " + column.units + " )",
+          column_time = erddap_params.time.column,
 
           data = tool.DATA.dataset;
 
       config["var"+chart_id] = variable;
 
       // only need to update the newly selected variable.. other variables have been cleaned on download
-      data.forEach(function(d) {
+      data.forEach(function (d) {
         //d[column_depth] = +d[column_depth];
         d[column_selected] = +d[column_selected];
       });
 
       console.log("SELECTED", column_selected);
 
-      chart.extent_x = d3.extent(data, (function(d) { return d[column_selected]; }));
+      chart.extent_x = d3.extent(data, (function (d) { return d[column_selected]; }));
       // update the x domain of the selected chart.. either chart1 or chart2
       chart.x.domain(chart.extent_x);
 
@@ -693,7 +691,7 @@
       chart.axisX.tickValues(tool.axisTicks(chart.extent_x));
 
       // update the y domain to use the range of the returned data.
-      chart.y.domain(d3.extent(data, (function(d) { return d[column_depth]; })));
+      chart.y.domain(d3.extent(data, (function (d) { return d[column_depth]; })));
 
       // update chart line
       chart.select("path.line")
@@ -710,9 +708,9 @@
         .call(chart.axisX);
 
       // if it is chart1, chart 3 x domain needs to be updated, otherwise it is the y domain
-      if( chart_id == 1 ){
+      if ( chart_id == 1 ) {
 
-        chart3.extent_x = d3.extent(data, (function(d) { return d[column_selected]; }));
+        chart3.extent_x = d3.extent(data, (function (d) { return d[column_selected]; }));
 
         chart3.x.domain(chart3.extent_x);
         // set the new tick values
@@ -720,15 +718,24 @@
 
         chart3.axis_x.transition()
           //.ease("linear")
-          .call(chart3.axisX);
+          .call( chart.axisX );
 
         chart3.labelX
-          .text(column_selected_title)
-          .html(column_selected_title);
+          .text(column_selected_title);
+          //.html(column_selected_title);
+
+          //update points
+
+          chart3.pointsUpdate(data);
+          //  chart3.points
+          //  .data(data)
+          //  .transition()
+          //  .attr("cx", function(d) { return chart3.x(d[column_selected]); });
+
       }
       else{
 
-        var chart3_extent_y = d3.extent(data, (function(d) { return d[column_selected]; }));
+        var chart3_extent_y = d3.extent(data, (function (d) { return d[column_selected]; }));
         chart3.y.domain(chart3_extent_y);
 
         chart3.axisY.tickValues(tool.axisTicks(chart3_extent_y));
@@ -741,11 +748,21 @@
           //   .style("text-anchor", "end")
           //   //.attr("dx", "-.8em")
           //   //.attr("dy", ".15em")
-          //   .attr("transform", function(d) {
+          //   .attr("transform", function (d) {
           //       return "rotate(45)";
           //     });
 
         chart3.labelY.text(column_selected_title);
+
+        //update points
+
+        //chart3 points
+        //
+        // chart3.pointsUpdate(data);
+        //   .data(data)
+        //   .transition()
+        //   .attr("cy", function(d) { return chart3.y(d[column_selected]); });
+
       }
 
       chart3.select("path.line")
@@ -755,23 +772,25 @@
         //.ease("linear")
         .attr("d", chart3.line);
 
+      chart3.pointsUpdate(data);
+
     };
 
     // called by update_profile_collection on request callback
-    tool.get_track_profile_info = function(profile_id){
+    tool.get_track_profile_info = function (profile_id) {
 
       var d = tool.DATA.profile_collection,
           x = 0,
           len = d.length;
 
-      for(x;x<len;x++){
-          if(d[x].profile_id == +profile_id){
+      for (x;x<len;x++) {
+          if (d[x].profile_id == +profile_id) {
             return d[x];
           }
       }
     };
 
-    tool.axisTicks = function(extent){
+    tool.axisTicks = function (extent) {
 
       var tick_interpolate = d3.interpolate(extent[0],extent[1]);
       var dd = [0.1, 0.3, 0.5, 0.7, 0.9].map(function (a) {
@@ -780,7 +799,7 @@
       return dd;
     };
 
-    tool.DATA.init_services = function(){
+    tool.DATA.init_services = function () {
 
 
       // ERDDAP Tabledap requests
@@ -837,19 +856,19 @@
 
     };
 
-    tool.UI.mousemove1 = function(){
+    tool.UI.mousemove1 = function () {
 
       try{
 
         console.log("mouse moved on 1");
 
         var c = tool.configuration,
-            erddap_ref = tool.settings.erddap.parameter_metadata,
-            ref1 = erddap_ref[c.var1],
-            ref2 = erddap_ref[c.var2],
+            erddap_params = tool.settings.erddap.parameter_metadata,
+            ref1 = erddap_params[c.var1],
+            ref2 = erddap_params[c.var2],
             col_x1 = ref1.column,
             col_x2 = ref2.column,
-            col_y = erddap_ref.depth.column,
+            col_y = erddap_params.depth.column,
             data = tool.DATA.dataset,
             chart1 = tool.UI.chart1,
             chart2 = tool.UI.chart2,
@@ -858,7 +877,7 @@
             units1 = ref1.units,
             units2 = ref2.units,
 
-            bisect_y = d3.bisector(function(d) { return d[col_y]; }).left,
+            bisect_y = d3.bisector(function (d) { return d[col_y]; }).left,
             y0 = chart1.y.invert(d3.mouse(this)[1]),
             i = bisect_y(data, y0, 1),
             d0 = data[i - 1],
@@ -885,29 +904,27 @@
         chart1.tooltip.attr("transform", "translate(" + c1_x + "," + c1_y + ")")
           .select("text")
           .text(formatNum(c1_dx) + " " + units1)
-          .html(formatNum(c1_dx) + " " + units1)
           .attr(c1_mid_x);
 
         chart2.tooltip
           .attr("transform", "translate(" + c2_x + "," + c2_y + ")")
           .select("text")
           .text(formatNum(c2_dx) + " " + units2)
-          .html(formatNum(c2_dx) + " " + units2)
           .attr(c2_mid_x);
 
         chart3.tooltip.attr("transform", "translate(" + c3_x + "," + c3_y + ")")
           .select("text")
           .text(formatNum(c1_dx) + " - " + formatNum(c2_dx))
-          .html(formatNum(c1_dx) + " - " + formatNum(c2_dx))
+          //.html(formatNum(c1_dx) + " - " + formatNum(c2_dx))
           .attr(c1_mid_x);
 
       }
-      catch(err){
+      catch (err) {
         console.log("ERROR: ", err, err.message);
       }
     };
 
-    tool.config_callback = function(){
+    tool.config_callback = function () {
 
       //console.log("GPE Control.. apply click");
 
@@ -924,7 +941,7 @@
       );
     };
 
-    tool.UI.setup = function(){
+    tool.UI.setup = function () {
 
       var ui = tool.UI.attrs,
           m = {top: 20, right: 20, bottom: 20, left: 20},
@@ -932,17 +949,17 @@
           h = 450 - m.top - m.bottom,
           _target = tool.dom_target;
 
-      var erddap_ref = tool.settings.erddap.parameter_metadata,
-          column_depth = erddap_ref.depth.column,
+      var erddap_params = tool.settings.erddap.parameter_metadata,
+          column_depth = erddap_params.depth.column,
           config = tool.configuration,
-          column1 = erddap_ref[config.var1],
-          column2 = erddap_ref[config.var2],
+          column1 = erddap_params[config.var1],
+          column2 = erddap_params[config.var2],
 
           column_selected1 = column1.column,
           column_selected2 = column2.column,
 
-          column_selected_title1 = column1.title + " ("+ column1.units +")",
-          column_selected_title2 = column2.title + " ("+ column2.units +")";
+          column_selected_title1 = column1.title + " ( "+ column1.units +" )",
+          column_selected_title2 = column2.title + " ( "+ column2.units +" )";
 
       var ui_container = d3.select("#vistool")
         .append("div")
@@ -1045,9 +1062,9 @@
 
       chart1.line = d3.svg.line()
         .interpolate("linear")
-        .x(function(d) { return chart1.x(d[erddap_ref[config.var1].column]); })
-        //.x(function(d) { return chart1.x(d[column_selected1]); })
-        .y(function(d) { return chart1.y(d[column_depth]); });
+        .x(function (d) { return chart1.x(d[erddap_params[config.var1].column]); })
+        //.x(function (d) { return chart1.x(d[column_selected1]); })
+        .y(function (d) { return chart1.y(d[column_depth]); });
 
       chart1.tooltip = chart1.append("g")
         .attr("class", "tooltip1")
@@ -1067,12 +1084,12 @@
         .attr("pointer-events", "all")
         .attr("width", 210)
         .attr("height", 320)
-        .on("mouseover", function() {
+        .on("mouseover", function () {
           chart1.tooltip.style("display", null);
           chart2.tooltip.style("display", null);
           chart3.tooltip.style("display", null);
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
           chart1.tooltip.style("display", "none");
           chart2.tooltip.style("display", "none");
           chart3.tooltip.style("display", "none");
@@ -1142,8 +1159,8 @@
 
       chart2.line = d3.svg.line()
         .interpolate("linear")
-        .x(function(d) { return chart2.x(d[erddap_ref[config.var2].column]); })
-        .y(function(d) { return chart2.y(d[column_depth]); });
+        .x(function (d) { return chart2.x(d[erddap_params[config.var2].column]); })
+        .y(function (d) { return chart2.y(d[column_depth]); });
 
       chart2.tooltip = chart2.append("g")
         .attr("class", "tooltip2")
@@ -1163,12 +1180,12 @@
         .attr("pointer-events", "all")
         .attr("width", 210)
         .attr("height", 320)
-        .on("mouseover", function() {
+        .on("mouseover", function () {
           chart1.tooltip.style("display", null);
           chart2.tooltip.style("display", null);
           chart3.tooltip.style("display", null);
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
           chart1.tooltip.style("display", "none");
           chart2.tooltip.style("display", "none");
           chart3.tooltip.style("display", "none");
@@ -1238,8 +1255,44 @@
 
       chart3.line = d3.svg.line()
         .interpolate("linear")
-        .x(function(d) { return chart3.x(d[erddap_ref[config.var1].column]); })
-        .y(function(d) { return chart3.y(d[erddap_ref[config.var2].column]); });
+        .x(function (d) { return chart3.x(d[erddap_params[config.var1].column]); })
+        .y(function (d) { return chart3.y(d[erddap_params[config.var2].column]); });
+
+      //chart3 points
+
+      chart3.svgpoints = chart3.append("g")
+        .attr("id",_target+"_chart3_points");
+
+      chart3.pointsUpdate = function(data){
+
+        var points = chart3.svgpoints.selectAll("circle")
+          .data(data);
+
+        points
+          .transition()
+          .attr("cx", function(d) { return chart3.x(d[erddap_params[config.var1].column]); })
+          .attr("cy", function(d) { return chart3.y(d[erddap_params[config.var2].column]); });
+
+        points.enter().append("circle")
+          .attr("cx", function(d) { return chart3.x(d[erddap_params[config.var1].column]); })
+          .attr("cy", function(d) { return chart3.y(d[erddap_params[config.var2].column]); })
+          .attr("r", 3.5);
+
+        points.exit().remove();
+
+      };
+
+
+      // chart3.points
+      //   .enter().append("circle")
+      //   .attr("cx", function(d) { return chart3.x(d[erddap_params[config.var1].column]); })
+      //   .attr("cy", function(d) { return chart3.y(d[erddap_params[config.var2].column]); })
+      //   .attr("r", 3.5)
+      //   .style("fill", "#FFFFFF")
+      //   .style("stroke", "orange")
+      //   .style("stroke-width", 1);
+      //
+      // chart3.points.exit().remove();
 
       chart3.tooltip = chart3.append("g")
         .attr("class", "tooltip3")
@@ -1259,11 +1312,11 @@
 
         .attr("width", 210)
         .attr("height", 320)
-        .on("mouseover", function() {
+        .on("mouseover", function () {
           //chart1.tooltip.style("display", null);
           //chart2.tooltip.style("display", null);
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
           //chart1.tooltip.style("display", "none");
           //chart2.tooltip.style("display", "none");
           })
@@ -1305,8 +1358,8 @@
         .attr("x",0)
         .attr("y",0)
         .attr("text-anchor", "middle")
-        .text(column_selected_title1)
-        .html(column_selected_title1);
+        .text(column_selected_title1);
+        //.html(column_selected_title1);
 
       chart3.labelY = labels.append("text")
         .attr("id", _target + "chart1_labelY")
@@ -1314,8 +1367,8 @@
         .attr("x",0)
         .attr("y",0)
         .attr("text-anchor", "middle")
-        .text(column_selected_title2)
-        .html(column_selected_title2);
+        .text(column_selected_title2);
+        //.html(column_selected_title2);
 
       chart3.labelName = labels.append("text")
         .attr("id", _target + "chart3_labelName")
@@ -1359,23 +1412,19 @@
         .attr("text-anchor", "end")
         .text("");
 
-    // chart1 title
-    // chart2 title
-    // chart3 title
-
     //
-    //  Selectors
+    //  Dropdown Selectors
     //
 
-      var x=0,len = erddap_ref.parameters.length;
+      var x=0,len = erddap_params.parameters.length;
 
       var select_vars = [];
-      for(x;x<len;x++){
+      for (x;x<len;x++) {
 
         select_vars.push(
           {
-            "key": erddap_ref.parameters[x],
-            "value": erddap_ref[erddap_ref.parameters[x]].title
+            "key": erddap_params.parameters[x],
+            "value": erddap_params[erddap_params.parameters[x]].title
           }
         );
       }
@@ -1384,12 +1433,12 @@
 
       svg_select(
         select_vars,
-            erddap_ref[config.var1].title, {
+            erddap_params[config.var1].title, {
             "key": "key",
             "value": "value"
         },
         "svg_container",
-        function(id,variable){
+        function (id,variable) {
 
           tool.UI.select_update(1, id,variable);
 
@@ -1402,14 +1451,14 @@
       svg_select(
 
         select_vars,
-        erddap_ref[config.var2].title,
+        erddap_params[config.var2].title,
         {
             "key": "key",
             "value": "value"
         },
         "svg_container",
 
-        function(id,variable){
+        function (id,variable) {
 
           tool.UI.select_update(2, id,variable);
 
@@ -1434,26 +1483,26 @@
           fill : "#fff"
         })
         .on({
-          "mousemove" : function(){
+          "mousemove" : function () {
 
             swap_arrow
               .attr("stroke","grey")
               .attr("stroke-width",3);
           },
-          'mouseout':function(){
+          'mouseout' : function () {
 
             swap_arrow
               .attr("stroke","gray")
               .attr("stroke-width",2);
           },
-          'click':function(){
+          'click' : function () {
 
             var c = tool.configuration,
                 profile = tool.configuration.profile_id,
                 profile_data = tool.get_track_profile_info(profile),
                 v1 = c.var1,
                 v2 = c.var2,
-                erddap_ref = tool.settings.erddap.parameter_metadata;
+                erddap_params = tool.settings.erddap.parameter_metadata;
 
             c.var2 = v1;
             c.var1 = v2;
@@ -1462,8 +1511,8 @@
             tool.UI.select_update(1, "select_var1", v2);
             tool.UI.select_update(2, "select_var2", v1);
 
-            d3.select("#select_text_select_var1").text(erddap_ref[v2].title);
-            d3.select("#select_text_select_var2").text(erddap_ref[v1].title);
+            d3.select("#select_text_select_var1").text(erddap_params[v2].title);
+            d3.select("#select_text_select_var2").text(erddap_params[v1].title);
           }
         });
 
@@ -1483,12 +1532,12 @@
       tool.UI.chart3 = chart3;
     };
 
-    tool.init_tool = function() {
+    tool.init_tool = function () {
 
       this.Glider_Profile_Comparer_OOI(this.dom_target);
     };
 
-    tool.init_controls = function(target_div){
+    tool.init_controls = function (target_div) {
 
       tool.controls = {};
       tool.controls.Glider_Dataset_Browser_Control = EduVis.controls.Glider_Dataset_Browser_Control;
@@ -1572,16 +1621,16 @@
       var svg_options = svg.append("g")
           .attr("id", id)
           .style("display", "none")
-          .on("mouseover",function(){
+          .on("mouseover",function () {
               //console.log("mouse over");
           })
-          .on("mouseout",function(){
+          .on("mouseout",function () {
               //console.log("mouse out");
           });
 
-      var count = 1;
+      var count;
 
-      for (; count <= options_count; count++) {
+      for (count = 1; count <= options_count; ++count) {
 
           var select_key = options_obj[count - 1][kv_key],
               select_val = options_obj[count - 1][kv_val];
