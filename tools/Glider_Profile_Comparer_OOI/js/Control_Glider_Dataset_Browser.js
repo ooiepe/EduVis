@@ -2,7 +2,7 @@
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
 
-Revised 11/25/2014
+Revised 12/04/2014
 Written by Michael Mills, Rutgers University
 
 */
@@ -14,7 +14,7 @@ Written by Michael Mills, Rutgers University
   var parent_tool,
     control = {
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.1.4",
+    "version" : "0.1.5",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -31,12 +31,10 @@ Written by Michael Mills, Rutgers University
         "date_range_end" : null
       }
     },
-    "datasets":{
-
-    }
+    "datasets":{}
   };
 
-  control.config_dateRange_slider = function(date_start, date_end, range_start, range_end, time_start, time_end){
+  control.config_dateRange_slider = function (date_start, date_end, range_start, range_end, time_start, time_end) {
 
     $("#ui-config-dateRange-slider").remove();
 
@@ -97,58 +95,57 @@ Written by Michael Mills, Rutgers University
         return iso_format(tick_interpolate(a));
     });
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(
-          d3.svg.axis().scale(x)
-            .orient("bottom")
-            .tickValues(dd)
-            .tickFormat(date_format_ymd)
-        );
-
     var brushg = svg.append("g")
         .attr("class", "brush")
         .call(brush);
 
-    brushg.selectAll(".resize").append("path")
-      .attr("transform", "translate(0," + height / 2 + ")")
-      .attr("d", arc);
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(
+        d3.svg.axis().scale(x)
+        .orient("bottom")
+        .tickValues(dd)
+        .tickFormat(date_format_ymd)
+      );
 
-    brushg.selectAll("rect")
-      .attr("height", height);
+    brushg.selectAll (".resize").append ("path")
+      .attr ("transform", "translate(0," + height / 2 + ")")
+      .attr ("d", arc);
+
+    brushg.selectAll ("rect")
+      .attr ("height", height);
 
     brushstart();
     brushmove();
 
-    function brushstart() {
-        svg.classed("selecting", true);
-    }
-
-    function brushmove() {
-        var s = brush.extent();
-
-        $("#config-date_start-input").val(date_format_ymd(s[0]));
-        $("#config-date_end-input").val(date_format_ymd(s[1]));
-
-        // limit execution does not seem to have an effect
-        L.Util.limitExecByInterval(
-          control.poly_track_selected_update(s[0],s[1]),
-          1000, this);
-    }
-
-    function brushend() {
-        svg.classed("selecting", !d3.event.target.empty());
-    }
-
     control.config_controls.brush = brush;
+
+    function brushstart () {
+      svg.classed("selecting", true);
+    }
+
+    function brushmove () {
+
+      var s = brush.extent();
+
+      $("#config-date_start-input").val (date_format_ymd (s[0]));
+      $("#config-date_end-input").val (date_format_ymd (s[1]));
+
+      // limit execution does not seem to have an effect
+      L.Util.limitExecByInterval (control.poly_track_selected_update(s[0],s[1]), 1000, this);
+    }
+
+    function brushend () {
+      svg.classed ("selecting", !d3.event.target.empty());
+    }
 
   };
 
 /*
 
 */
-  control.poly_track_selected_update = function(start,end){
+  control.poly_track_selected_update = function (start,end) {
 
     // get full track from poly_track
     var track_geojson = control.config_controls.leaflet_map.track_full_geojson,
@@ -164,7 +161,7 @@ Written by Michael Mills, Rutgers University
 
         var date_compare = iso_format(location.properties.time);
 
-        if((date_compare >= start ) && (date_compare <= end)){
+        if ((date_compare >= start ) && (date_compare <= end)) {
           poly_coords.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
         }
       }
@@ -174,7 +171,7 @@ Written by Michael Mills, Rutgers University
 
   };
 
-  control.init = function(_parent_tool){
+  control.init = function (_parent_tool) {
 
     control.parent_tool = _parent_tool;
 
@@ -222,7 +219,7 @@ Written by Michael Mills, Rutgers University
             control.config_controls["ui_control_dataset_id"] = $("<select />")
               .attr("id","config-dataset_id-select")
               .append("<option>...loading...</option>")
-              .on("change", function(evt){
+              .on("change", function (evt) {
 
                 //console.log("this ui_control_dataset_id change event", this);
 
@@ -239,7 +236,7 @@ Written by Michael Mills, Rutgers University
 
                 // find dataset array and set start date and end date
                 do{
-                  if(glider_datasets[c].datasetID == dataset_val){
+                  if (glider_datasets[c].datasetID == dataset_val) {
 
                     ds_obj = glider_datasets[c];
 
@@ -263,7 +260,7 @@ Written by Michael Mills, Rutgers University
 
                 // now set the slider to the full range of the requested dataset
                 // if its the config dataset load the specific start and end dates
-                if(config.dataset_id == dataset_val){
+                if (config.dataset_id == dataset_val) {
 
                   slider.date_range_start = config.date_start;
                   slider.date_range_end = config.date_end;
@@ -295,7 +292,7 @@ Written by Michael Mills, Rutgers University
 
                 // query json object of dataset
                 $.getJSON( "http://erddap.marine.rutgers.edu/erddap/tabledap/" + dataset_val + ".geoJson?profile_id,time,latitude,longitude",
-                  function(geodata){
+                  function (geodata) {
 
                   console.log("track data returned...");
 
@@ -309,7 +306,7 @@ Written by Michael Mills, Rutgers University
                       poly_coords_selected = [];
 
                   // remove geoJson point layer if its already on the map
-                  if(typeof config_mapObj.track_full_L_geoJson !== "undefined"){
+                  if (typeof config_mapObj.track_full_L_geoJson !== "undefined") {
                     config_mapObj.map.removeLayer(config_mapObj.track_full_L_geoJson);
                   }
 
@@ -322,14 +319,44 @@ Written by Michael Mills, Rutgers University
 
                     onEachFeature: function (location, location_feature) {
 
+                      var featureMouseOut = function (feat) {
+
+                          console.log(feat.options);
+                          var f = feat.options;
+
+                          feat.setStyle({
+                            "fillOpacity":0,
+                            "opacity":0,
+                            "radius":0
+                          });
+
+                      };
+
+                      var featureMouseOutTimer;
+
                       location_feature.on({
 
-                        /*
-                          Track Mouse Hover Event
-                        */
-                        "mouseover": function(e){
+                        // Track Mouse Hover Event
+                        "mouseover": function (e) {
 
                           // todo- this can be another style setting in map settings to make it easy for future updates
+                          var opts = this.options,
+                              self = this;
+
+                          // Save current style to be reapplied after mouse out
+                          var currentStyle = {
+                            "fillOpacity": opts.fillOpacity,
+                            "opacity": opts.opacity,
+                            "radius": opts.radius
+                          };
+
+                          // Set mouse out even after mouse over occurs to maintain styles
+                          this.on({
+                            "mouseout" : function () {
+
+                              setTimeout(function () {self.setStyle(currentStyle) },1000);
+                            }
+                          });
 
                           // set the opacity, fill, and radius
                           this.setStyle({
@@ -337,35 +364,28 @@ Written by Michael Mills, Rutgers University
                             "opacity":1,
                             "radius":6
                           });
-
                         },
-                        "mouseout": function(e){
+                        "click": function (e) {
 
-                          // reset the opacity, fill, and radius
-
-                          this.setStyle({
-                            "fillOpacity":1,
-                            "opacity":1,
-                            "radius":3
-                          });
-
-                        },
-
-                        "click": function(e){
-
-                          // Build Content for the Profile Marker click event
-
-                          this.on({
-                            "mouseout":function(){
-
-                              this.setStyle({
-                                "fillOpacity":1,
-                                "opacity":1,
-                                "radius":3
-                              });
-
-                            }
-                          });
+                          // // Build Content for the Profile Marker click event
+                          // var opts = this.options,
+                          // self = this;
+                          //
+                          // // Save current style to be reapplied after mouse out
+                          //
+                          // var currentStyle = {
+                          //   "fillOpacity": opts.fillOpacity,
+                          //   "opacity": opts.opacity,
+                          //   "radius": opts.radius
+                          // };
+                          //
+                          // this.on({
+                          //   "mouseout" : function () {
+                          //
+                          //     setTimeout(function () {self.setStyle(currentStyle) },1000);
+                          //
+                          //   }
+                          // });
 
                           var start = iso_format($("#config-date_start-input").val()),
                               end = iso_format($("#config-date_end-input").val()),
@@ -383,27 +403,20 @@ Written by Michael Mills, Rutgers University
                                         "<div>Location: " + d3.round(latlng.lat,3) + " N " + d3.round(latlng.lng,3)+" W</div>"+
                                         '</div><div style="padding:14px;">';
 
-
                           // build button based on current selection and glider track date range
 
                           // set as start date
-                          if(profile_time <= start){
+                          if (profile_time <= start) {
 
-                            content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date
-                                    +'" class="btn">Set as <b>Start Date</b></a>';
-
+                            content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>';
                           }
-                          else if(profile_time <= end){
+                          else if (profile_time <= end) {
 
-                            content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date
-                                    +'" class="btn">Set as <b>Start Date</b></a>' +
-                                      '<a id="track_profile_set_end" data-attr-date="'+ profile_date
-                                    +'" class="btn">Set as <b>End Date</b>.</a>';
+                            content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>' + '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
                           }
                           else{
 
-                            content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date
-                                    +'" class="btn">Set as <b>End Date</b>.</a>';
+                            content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
                           }
 
                           content += "</div>";
@@ -414,7 +427,7 @@ Written by Michael Mills, Rutgers University
                             .setContent(content)
                             .openOn(config_mapObj.map);
 
-                          $("#track_profile_set_start").on("click",function(e){
+                          $("#track_profile_set_start").on("click",function (e) {
 
                             var date_start = $("#config-date_start-input"),
                                 date_end = $("#config-date_end-input"),
@@ -429,7 +442,7 @@ Written by Michael Mills, Rutgers University
                               control.config_dateRange_slider(slider.date_start, slider.date_end, date_start.val(), date_end.val());
                           });
 
-                          $("#track_profile_set_end").on("click",function(e){
+                          $("#track_profile_set_end").on("click",function (e) {
 
                             var date_start = $("#config-date_start-input"),
                                 date_end = $("#config-date_end-input");
@@ -476,9 +489,9 @@ Written by Michael Mills, Rutgers University
                       var date_compare = iso_format(location.properties.time.substring(0,10));
 
                       // if its the currently selected dataset in the configuration, use configuraiton dates, otherwise use full dataset dates
-                      if(config.dataset_id == dataset_val){
+                      if (config.dataset_id == dataset_val) {
 
-                        if((date_compare >= date_start_config ) && (date_compare <= date_end_config)){
+                        if ((date_compare >= date_start_config ) && (date_compare <= date_end_config)) {
                           poly_coords_selected.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
                         }
 
@@ -499,7 +512,7 @@ Written by Michael Mills, Rutgers University
                   // track mouse over and mouse out
                   // config_mapObj.poly_line_track.on({
                   //
-                  //   "mouseover" : function(){
+                  //   "mouseover" : function () {
                   //
                   //      config_mapObj.track_full_L_geoJson
                   //     // set the opacity, fill, and radius
@@ -509,7 +522,7 @@ Written by Michael Mills, Rutgers University
                   //       "radius":3
                   //     });
                   //   },
-                  //   "mouseout" : function(){
+                  //   "mouseout" : function () {
                   //
                   //      config_mapObj.track_full_L_geoJson
                   //     // set the opacity, fill, and radius
@@ -527,7 +540,7 @@ Written by Michael Mills, Rutgers University
 
                   // zoom the bounds of the track
                   config_mapObj.map.fitBounds(config_mapObj.poly_line_track.getBounds());
-              })
+              });
 
             })
           )
@@ -573,7 +586,7 @@ Written by Michael Mills, Rutgers University
                         "dateFormat": "yy-mm-dd",
                         "changeMonth": true,
                         "changeYear": true,
-                        "onClose" : function(d,i){
+                        "onClose" : function (d,i) {
                           var el_end_date = $("#config-date_end-input");
                           el_end_date.datepicker("option","minDate", d);
 
@@ -603,7 +616,7 @@ Written by Michael Mills, Rutgers University
                         "dateFormat": "yy-mm-dd",
                         "changeMonth": true,
                         "changeYear": true,
-                        "onClose" : function(d,i){
+                        "onClose" : function (d,i) {
                           var el_start_date = $("#config-date_start-input");
                           el_start_date.datepicker("option", "maxDate", d);
                           control.config_dateRange_slider(slider.date_start, slider.date_end, el_start_date.val(), d);
@@ -623,7 +636,7 @@ Written by Michael Mills, Rutgers University
                   .addClass("btn btn-medium")
                   .html("Apply")
                   .css({"margin-top":"20px"})
-                  .on("click",function(){
+                  .on("click",function () {
                     // update the parameter configuration value
 
                     parent_tool.configuration.date_start = $("#config-date_start-input").val();
@@ -655,9 +668,9 @@ Written by Michael Mills, Rutgers University
         //datasetID,institution,minLongitude,maxLongitude,minLatitude,maxLatitude,minTime,maxTime&institution=%22OOI%22
 
         // request erddap dataset listing
-        $.getJSON('http://erddap.marine.rutgers.edu/erddap/tabledap/allDatasets.json?' +
-            erddap_variables.join(',') +'&institution="OOI"',
-          function(json) {
+        $.getJSON('http://erddap.marine.rutgers.edu/erddap/tabledap/allDatasets.json?' + erddap_variables.join(',') +'&institution="OOI"',
+
+          function (json) {
 
             var ds = json, datasets = [],
               ci = 0,
@@ -692,7 +705,7 @@ Written by Michael Mills, Rutgers University
             $("#config-dataset_id-select").children().remove();
 
             // use lookup table to build structured dataset based on array / station source
-            $.each(datasets, function(i,dset){
+            $.each(datasets, function (i,dset) {
 
               // grab dataset ID
               // first two chars or two chars after.. compare lowercase in all instances
@@ -779,16 +792,16 @@ Written by Michael Mills, Rutgers University
             // add event handlers to the map
             control.config_controls.leaflet_map.map.on({
 
-              "zoomend":function(e){
+              "zoomend" : function (e) {
 
               /*
                 When zoom level changes set the style of the profile markers
 
               */
 
-              if(this.getZoom() >= 10){
+              if (this.getZoom() >= 10) {
 
-                if(typeof control.config_controls.leaflet_map.track_full_L_geoJson !== "undefined"){
+                if (typeof control.config_controls.leaflet_map.track_full_L_geoJson !== "undefined") {
 
                   // set the opacity, fill, and radius
                   control.config_controls.leaflet_map.track_full_L_geoJson
@@ -801,7 +814,7 @@ Written by Michael Mills, Rutgers University
               }
               else{
 
-                if(typeof control.config_controls.leaflet_map.track_full_L_geoJson !== "undefined"){
+                if (typeof control.config_controls.leaflet_map.track_full_L_geoJson !== "undefined") {
 
                   control.config_controls.leaflet_map.track_full_L_geoJson
                     .setStyle({
@@ -809,7 +822,7 @@ Written by Michael Mills, Rutgers University
                       "opacity":0,
                       "radius":3
                     });
-                };
+                }
               }
             }});
 

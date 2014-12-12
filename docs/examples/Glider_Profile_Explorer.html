@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>EV Framework Standalone Tool Loading</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="../resources/css/EduVis.css">
+  <style type="text/css">
+
+  </style>
+</head>
+<body>
+<div id="vistool"></div>
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="../../EduVis.js"></script>
+<script>
+(function(){
+
+  EduVis.Environment.setPaths("", "tools/", "resources/");
+
+  EduVis.tool.load({
+    "name" : "Glider_Profile_Explorer_OOI",
+    "tool_container_div": "vistool"
+  });
+
+}());
+
+</script>
+
+</body>
+</html>

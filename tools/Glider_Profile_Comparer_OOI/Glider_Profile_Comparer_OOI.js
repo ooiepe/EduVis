@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Comparer OOI (GPC OOI)
- * Revised 12/3/2014
+ * Revised 12/12/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -16,7 +16,7 @@
         "description" : "Glider Profile Comparer",
         "url" : "",
 
-        "version" : "0.0.8",
+        "version" : "0.0.9",
         "authors" : [
           {
             "name" : "Michael Mills",
@@ -754,15 +754,6 @@
 
         chart3.labelY.text(column_selected_title);
 
-        //update points
-
-        //chart3 points
-        //
-        // chart3.pointsUpdate(data);
-        //   .data(data)
-        //   .transition()
-        //   .attr("cy", function(d) { return chart3.y(d[column_selected]); });
-
       }
 
       chart3.select("path.line")
@@ -1258,6 +1249,7 @@
         .x(function (d) { return chart3.x(d[erddap_params[config.var1].column]); })
         .y(function (d) { return chart3.y(d[erddap_params[config.var2].column]); });
 
+
       //chart3 points
 
       chart3.svgpoints = chart3.append("g")
@@ -1281,18 +1273,6 @@
         points.exit().remove();
 
       };
-
-
-      // chart3.points
-      //   .enter().append("circle")
-      //   .attr("cx", function(d) { return chart3.x(d[erddap_params[config.var1].column]); })
-      //   .attr("cy", function(d) { return chart3.y(d[erddap_params[config.var2].column]); })
-      //   .attr("r", 3.5)
-      //   .style("fill", "#FFFFFF")
-      //   .style("stroke", "orange")
-      //   .style("stroke-width", 1);
-      //
-      // chart3.points.exit().remove();
 
       chart3.tooltip = chart3.append("g")
         .attr("class", "tooltip3")
