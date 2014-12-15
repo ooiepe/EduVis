@@ -76,7 +76,7 @@
         },
         "graph" : {}
     };
-    
+
     /**
      * Initialize tool
      * Called automatically by EduVis
@@ -86,7 +86,7 @@
       this.draw();
       EduVis.tool.load_complete(this);
     };
-    
+
 
     /**
      * Initial setup of visualization tool
@@ -98,29 +98,30 @@
       g.margin = {top: 26, right: 25, bottom: 40, left: 60};
       g.width = 840 - g.margin.left - g.margin.right;
       g.height = 400 - g.margin.top - g.margin.bottom;
-      
+
       g.parseDate = d3.time.format.iso.parse;
       g.date_format = d3.time.format("%Y-%m-%d");
-      
+
       g.x = d3.time.scale.utc().range([0, g.width]);
       g.y = d3.scale.linear().range([g.height, 0]);
-      
+
       g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(12).tickSize(5,0,0);
       g.yAxis = d3.svg.axis().scale(g.y).orient("left").tickSize(-g.width,0,0);
-      
+
       g.svg = d3.select("#"+_target).append("svg")
+        .classed({"svg_export":true})
         .attr("id",_target+"_svggraph")
         .attr("width", g.width + g.margin.left + g.margin.right)
         .attr("height", g.height + g.margin.top + g.margin.bottom)
         .style("font-size","11px")
         .style("font-family","Tahoma, Geneva, sans-serif");
-      
+
       g.svg.append("defs").append("clipPath")
           .attr("id", _target+"_clip")
         .append("rect")
           .attr("width", g.width)
           .attr("height", g.height);
-      
+
       g.focus = g.svg.append("g")
           .attr("transform", "translate(" + g.margin.left + "," + g.margin.top + ")");
 
@@ -129,12 +130,12 @@
         .attr("class", "x axis")
         .attr("transform", "translate(0," + g.height + ")")
         .call(g.xAxis);
-        
+
       g.focus.append("g")
         .attr("id", _target+"_yAxis")
         .attr("class", "y axis")
         .call(g.yAxis);
-      
+
       g.focus.append("path")
         //.datum(data)
         .attr("class", "line")
@@ -162,13 +163,13 @@
         .style("fill", "none")
         .style("pointer-events", "all")
         .on("mouseover", function() { g.mouse_focus.style("display", null); })
-        .on("mouseout", function() { g.mouse_focus.style("display", "none"); })
+        .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
 
       g.line1 = d3.svg.line()
         .interpolate("monotone")
         .x(function(d) { return g.x(d.date); })
         .y(function(d) { return g.y(d.data); });
-      
+
       g.title = g.svg.append("text")
         .attr("class", "gtitle")
         .attr("text-anchor", "middle")
@@ -177,7 +178,7 @@
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
         .text( tool.configuration.title );
-      
+
       g.ylabel = g.svg.append("text")
         .attr("id", _target+"_ylabel")
         .attr("class", "glabel")
@@ -211,47 +212,47 @@
       tool.updateDropdown();
 
     };
-    
+
 
     /**
-     * Draw first dataset following initial tool setup 
+     * Draw first dataset following initial tool setup
      * Called by init_tool and graph_update_parameter
      */
     tool.draw = function() {
       if(typeof tool.configuration.dataset !== "undefined"){
-        tool.updategraph();  
+        tool.updategraph();
       } else {
         if(typeof error !== "undefined"){
           alert('Bad data! (draw)');
         }
       }
     };
-    
+
 
     /**
      * Update visualization with new data
      * Called by draw
-     */    
+     */
     tool.updategraph = function() {
-      var g = this.graph;  
+      var g = this.graph;
       var dataset = tool.configuration.dataset;
       var data = [];
       var bisectDate = d3.bisector(function(d) { return d.date; }).left;
-      
+
       if(dataset.length === 0){
         alert('Bad data! (updategraph)');
       } else {
-      
+
         // Parse data
         var cols = d3.entries(dataset[0]);
         dataset.forEach(function(d,k) {
           data[k] = { "date" : g.parseDate(d[cols[0].key]), "data" : +d[tool.configuration.parameter] };
-        }); 
+        });
 
         // Update x and y domains
         g.x.domain(d3.extent(data, (function(d) { return d.date; })));
         g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
-        
+
         // Update the graph
         g.svg.selectAll("path.line")
           .data([data])
@@ -260,18 +261,18 @@
           .ease("linear")
           .attr("d", g.line1)
           .style("stroke",tool.configuration.color);
-          
+
         g.title.text( this.configuration.title );
         g.ylabel.text( this.configuration.parameter );
         var datelimits = g.x.domain();
         g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
         var stats = tool.average(data);
         g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
-        
-        // Update x and y axis 
+
+        // Update x and y axis
         d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
         d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
-        
+
         d3.selectAll('.axis line, .axis path')
           //.style("shape-rendering","crispEdges")
           .style("fill","none")
@@ -304,7 +305,7 @@
      * Called by setup
      */
     tool.createDropdown = function(_target){
-     
+
       var tool_controls = $("<div/>")
         .css({
           "text-align" : "center",
@@ -363,7 +364,7 @@
       $("#"+tool.dom_target+"_select-parameters")
         .append(options);
 
-      // Select choosen parameter, if value isn't in list, choose first one      
+      // Select choosen parameter, if value isn't in list, choose first one
       if($("#"+tool.dom_target+"_select-parameters option[value='" + config.parameter + "']").val() === undefined){
         $("#"+tool.dom_target+"_select-parameters option:first")
         .prop("selected", "selected");
@@ -373,17 +374,17 @@
         .val(config.parameter);
       }
     };
-    
+
 
     /**
-     * Update graph and config when parameter pulldown is changed 
+     * Update graph and config when parameter pulldown is changed
      */
     tool.graph_update_parameter = function(parameter){
         tool.configuration.parameter = parameter;
         tool.draw();
     };
-    
-    
+
+
     /**
      * Calculates general statistics on data
      * Called by updategraph
@@ -405,13 +406,13 @@
      * Called automatically by EduVis when edit is enabled
      */
     tool.init_controls = function(){
-       
+
       var controlDom = $("<div/>",{"id": "control-panel"});
 
       var control_html = $("<div/>", {
         "id" : "controls"
       });
-      
+
       var control_title = $("<div/>", {
           "id":"control-title-div"
       })
@@ -460,7 +461,7 @@
         })
         .val(this.json2csv(tool.configuration.dataset))
       );
-      
+
 
       var control_delimiter = $("<div/>", {
           "id":"control-delimiter-div"
@@ -531,7 +532,7 @@
           var data=[];
           var tab = $("#control-delimiter").val();
           if (tab === "tab") {
-            data = d3.tsv.parse($("#control-dataset").val());          
+            data = d3.tsv.parse($("#control-dataset").val());
           } else if (tab === "comma") {
             data = d3.csv.parse($("#control-dataset").val());
           }
@@ -539,7 +540,7 @@
             alert('Your data array must contain less than 1,500 rows.');
           } else if (data.length>1) {
             config.title = $("#control-title").val();
-            config.dataset = data; 
+            config.dataset = data;
             config.delimiter = tab;
             config.color = $("#control-color").val();
           } else {
@@ -571,7 +572,7 @@
       var delim = (tool.configuration.delimiter==="tab") ? "\t" : ",";
       for (var index in array[0]) {
           line += index + delim;
-      }    
+      }
       line = line.slice(0, -1);
       str += line + '\r\n';
       for (var i = 0; i < array.length; i++) {
@@ -582,7 +583,7 @@
         line = line.slice(0, -1);
         str += line + '\r\n';
       }
-      return str;    
+      return str;
     }
 
 

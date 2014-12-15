@@ -201,6 +201,7 @@
       g.yAxis2 = d3.svg.axis().scale(g.y2).orient("right");//.tickSize(0,0,0);
 
       g.svg = d3.select("#"+_target).append("svg")
+        .classed({"svg_export":true})
         .attr("id",_target+"_svggraph")
         .attr("width", g.width + g.margin.left + g.margin.right)
         .attr("height", g.height + g.margin.top + g.margin.bottom)

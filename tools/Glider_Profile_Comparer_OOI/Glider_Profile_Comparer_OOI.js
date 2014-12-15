@@ -963,6 +963,7 @@
         });
 
       var svg = ui_container.append("svg")
+        .classed({"svg_export":true})
         .attr("id", "svg_container")
         //.attr("shape-rendering","crispEdges")
         .attr("width", 830)

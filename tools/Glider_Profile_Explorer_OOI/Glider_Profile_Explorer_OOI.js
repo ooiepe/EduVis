@@ -408,6 +408,7 @@
       g.yAxis = d3.svg.axis().scale(g.y).orient("left");//.tickSize(0,0,0);
 
       g.svg = d3.select("#"+_target + "-viz-container").append("svg")
+        .classed({"svg_export":true})
         .attr("id",_target+"_svggraph")
         .attr("width", g.width + g.margin.left + g.margin.right)
         .attr("height", g.height + g.margin.top + g.margin.bottom)
