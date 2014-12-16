@@ -708,17 +708,13 @@
         .call(chart.axisX);
 
       // if it is chart1, chart 3 x domain needs to be updated, otherwise it is the y domain
-      if ( chart_id == 1 ) {
+      if ( chart_id === 1 ) {
 
         chart3.extent_x = d3.extent(data, (function (d) { return d[column_selected]; }));
 
         chart3.x.domain(chart3.extent_x);
         // set the new tick values
         chart3.axisX.tickValues(tool.axisTicks(chart3.extent_x));
-
-        chart3.axis_x.transition()
-          //.ease("linear")
-          .call( chart.axisX );
 
         chart3.labelX
           .text(column_selected_title);
@@ -739,18 +735,6 @@
         chart3.y.domain(chart3_extent_y);
 
         chart3.axisY.tickValues(tool.axisTicks(chart3_extent_y));
-        chart3.axis_y
-          .transition()
-          //.ease("linear")
-          .call(chart3.axisY);
-
-          // .selectAll("text")
-          //   .style("text-anchor", "end")
-          //   //.attr("dx", "-.8em")
-          //   //.attr("dy", ".15em")
-          //   .attr("transform", function (d) {
-          //       return "rotate(45)";
-          //     });
 
         chart3.labelY.text(column_selected_title);
 
@@ -762,6 +746,10 @@
         //.duration(500)
         //.ease("linear")
         .attr("d", chart3.line);
+
+        // update the x and y axis for chart3
+      chart3.select(".x.axis").transition().ease("linear").call(chart3.axisX);
+      chart3.select(".y.axis").transition().ease("linear").call(chart3.axisY);
 
       chart3.pointsUpdate(data);
 
