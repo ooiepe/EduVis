@@ -352,8 +352,8 @@
       slider_svg.select(".background")
           .attr("height", height);
 
-      slider_svg.selectAll(".extent,.resize")
-          .remove();
+      //slider_svg.selectAll(".extent,.resize")
+      //    .remove();
 
       var handle_container = slider_svg.append("g")
           .attr("class", "profile_data")

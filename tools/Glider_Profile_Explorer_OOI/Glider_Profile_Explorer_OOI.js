@@ -1,7 +1,7 @@
 /*
 
  * Glider Profile Explorer OOI (GPE OOI)
- * Revised 10/20/2014
+ * Revised 12/17/2014
  * Written by Michael Mills, Rutgers University
 
 */
@@ -92,17 +92,128 @@
         },
 
         "configuration" : {
-          "dataset_id" : "CE05MOAS-ce_319-20140420T2200",
-          "profile_id" : "1",
+
           "parameter" : "temperature",
-          "date_start": "2014-04-24",
-          "date_end": "2014-04-26"
+
+          "dataset_id" : "CP05MOAS-cp_388-20141006T2010",
+          "glider_name" : "388",
+          "profile_id" : 286,
+          "profile_time" : "2014-10-12T17:53:17Z",
+
+          "observatory" : "Global Papa",
+
+          //"profile_time_start" : "2014-10-11T04:21:09Z",
+          //"profile_time_end" : "2014-10-13T02:03:56Z",
+
+          "date_start" : "2014-11-24",
+          "date_end" : "2014-12-01"
+
         },
 
         "data" : {},
         "target_div" : "",
         "tools" : {},
-        "settings" : {},
+        "settings" : {
+
+          "erddap" : {
+
+            "data_source" : {
+
+              // lookup info for available datasets.. add here to associate glider datasets with observatories
+              "ce" : {
+                //"website" : "http://www.whoi.edu/ooi_cgsn/pioneer-array",
+                "title" : "Coastal Endurance",
+                "datasets" : [ ]
+
+              },
+              "cp" :{
+                //"website" : "http://www.whoi.edu/ooi_cgsn/coastal-scale-nodes",
+                "title" : "Coastal Pioneer",
+                "datasets" : [ ]
+              },
+              "gp" : {
+                //"website" : "",
+                "title" : "Global Papa",
+                "datasets" : [ ]
+              },
+              "gi" : {
+
+                "title" : "Global Irminger",
+                "datasets" : [ ]
+              }
+            },
+            "parameter_metadata" : {
+              "profile_id" : {
+                "column": "profile_id (1)",
+                "units": "",
+                "title":"Profile ID"
+              },
+              "time" : {
+                "column" : "time (UTC)",
+                "units" : "UTC",
+                "title" :" Time (UTC)"
+              },
+              "latitude" : {
+                "column" : "latitude (degrees_north)",
+                "units" : "\u00B0N",
+                "title" : "Latitude"
+              },
+              "longitude" : {
+                "column" : "longitude (degrees_east)",
+                "units" : "\u00B0E",
+                "title" : "Longitude"
+              },
+              "depth" : {
+                "column" : "depth (m)",
+                "units" : "m",
+                "title" : "Depth (m)"
+              },
+              "salinity" : {
+                "column" : "salinity (1e-3)",
+                "units" : "1e-3",
+                "title" : "Salinity"
+              },
+              "temperature" : {
+                "column" : "temperature (Celsius)",
+                "units" : "\u00B0C",
+                "title" : "Sea Water Temperature"
+              },
+              "conductivity" : {
+                "column" : "conductivity (S m-1)",
+                "units" : "S m-1",
+                "title" : "Conductivity"
+              },
+              "density" : {
+                "column" : "density (kg m-3)",
+                "units" : "kg m-3",
+                "title" : "Density"
+              },
+              "chlorophyll_a" : {
+                "column" : "chlorophyll_a (ug L-1)",
+                "units" : "ug L-1",
+                "title" : "Chlorophyll A" // Chlorophyll a Concentration
+              },
+              "oxygen_concentration" : {
+                "column" : "oxygen_concentration (uMol L-1)",
+                "units" : "uMol L-1",
+                "title" : "Oxygen Concentration"
+              },
+              "oxygen_saturation" : {
+                "column" : "oxygen_saturation (%)",
+                "units" : "%",
+                "title" : "Oxygen Saturation" //Estimated Percentage Oxygen Saturation
+              },
+              "volumetric_backscatter" : {
+                "column" : "volumetric_backscatter_650nm (m-1 sr-1)",
+                "units" : "m-1 sr-1",
+                "title" : "Volumetric Backscatter 650nm"
+              },
+
+              //"parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
+              "parameters" : ["temperature", "salinity", "density", "conductivity"]
+            }
+          }
+        },
         "mapping": {
           "oceanBasemap_url" : 'http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
           "styles" : {
@@ -141,101 +252,21 @@
               fillOpacity: 0.8
             }
           },
-        "locations_query" : function(){
+          "locations_query" : function(){
 
             //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.geoJson?profile_id,time,latitude,longitude
             //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.geoJson?profile_id,time,latitude,longitude&time%3E=2014-06-10&time%3C=2014-06-10
             return "http://erddap.marine.rutgers.edu/erddap/tabledap/" + tool.configuration.dataset_id + ".geoJson?profile_id,time,latitude,longitude&time%3E="+tool.configuration.date_start + "&time%3C="+tool.configuration.date_end;
-         }
+          }
        }
 
     };
 
     tool.Glider_Profile_Explorer_OOI = function( _target ){
 
-      // parameters
 
-      // 0 profile_id (1)
-      // 1 time (UTC)
-      // 2 latitude (degrees_north) -- na
-      // 3 longitude (degrees_east)
-      // 4 depth (m)
-      // 5 salinity (1)
-      // 6 temperature (Celsius)
-      // 7 conductivity (S m-1)
-      // 8 density (kg m-3)
+      var c=this.configuration;
 
-      tool.settings.erddap_parameter_metadata = {
-        "profile_id" : {
-          "column": "profile_id (1)",
-          "units": "",
-          "title":"Profile ID"
-        },
-        "time" : {
-          "column" : "time (UTC)",
-          "units" : "UTC",
-          "title" :" Time (UTC)"
-        },
-        "latitude" : {
-          "column" : "latitude (degrees_north)",
-          "units" : "degrees north",
-          "title" : "Latitude"
-        },
-        "longitude" : {
-          "column" : "longitude (degrees_east)",
-          "units" : "degrees east",
-          "title" : "Longitude"
-        },
-        "depth" : {
-          "column" : "depth (m)",
-          "units" : "m",
-          "title" : "Depth (m)"
-        },
-        "salinity" : {
-          "column" : "salinity (1e-3)",
-          "units" : "",
-          "title" : "Salinity" // Sea Water Practical Salinity
-        },
-        "temperature" : {
-          "column" : "temperature (Celsius)",
-          "units" : "Degrees celsius",
-          "title" : "Sea Water Temperature"
-        },
-        "conductivity" : {
-          "column" : "conductivity (S m-1)",
-          "units" : "S m-1",
-          "title" : "Conductivity"
-        },
-        "density" : {
-          "column" : "density (kg m-3)",
-          "units" : "kg m-3",
-          "title" : "Density"
-        },
-        "chlorophyll_a" : {
-          "column" : "chlorophyll_a (ug L-1)",
-          "units" : "",
-          "title" : "Chlorophyll A" // Chlorophyll a Concentration
-        },
-        "oxygen_concentration" : {
-          "column" : "oxygen_concentration (uMol L-1)",
-          "units" : "uMol L-1",
-          "title" : "Oxygen Concentration"
-        },
-
-        "oxygen_saturation" : {
-          "column" : "oxygen_saturation (%)",
-          "units" : "%",
-          "title" : "Oxygen Saturation" //Estimated Percentage Oxygen Saturation
-        },
-        "volumetric_backscatter" : {
-          "column" : "volumetric_backscatter_650nm (m-1 sr-1)",
-          "units" : "m-1 sr-1",
-          "title" : "Volumetric Backscatter 650nm"
-        },
-
-        //"parameters" : ["temperature", "salinity", "conductivity", "chlorophyll_a", "oxygen_concentration", "oxygen_saturation", "volumetric_backscatter"]
-        "parameters" : ["temperature", "salinity", "density", "conductivity"]
-      };
 
 
       // setup UI
@@ -388,7 +419,7 @@
       var g = tool.graph = {},
         _target = tool.dom_target;
 
-      var erddap_ref = tool.settings.erddap_parameter_metadata,
+      var erddap_ref = tool.settings.erddap.parameter_metadata,
           column_depth = erddap_ref.depth.column,
           config = tool.configuration,
           column = erddap_ref[config.parameter],
@@ -484,7 +515,7 @@
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + 20) + "," + (0) + ") ")
-        .text(tool.configuration.dataset_id);
+        .text(tool.configuration.observatory + " " + tool.configuration.dataset_id);
         //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
 
       g.subtitle_datetime = g.svg.append("text")
@@ -583,7 +614,7 @@
       query = "&profile_id=" + profile_id + "&" + columns.join("!=NaN&") + "!=NaN&orderBy(%22depth%22)";
 
 //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.csv?profile_id,time,latitude,longitude
-      console.log("QUERY FOR CSV: ", query)
+      console.log("QUERY FOR CSV: ", query);
 // SALINITY: http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_312-20140420T2200.htmlTable?time,latitude,longitude,profile_id,salinity&salinity!=NaN
 //http://erddap.marine.rutgers.edu/erddap/tabledap/CE05MOAS-ce_319-20140420T2200.csvp?profile_id,time,depth,salinity,temperature,conductivity
 // &profile_id=1&time!=NaN&depth!=NaN&salinity!=NaN&temperature!=NaN&conductivity!=NaN!=NaN&orderBy(%22depth%22)
@@ -820,7 +851,7 @@
 
         //console.log(JSON.stringify(data));
 
-        var erddap_ref = tool.settings.erddap_parameter_metadata,
+        var erddap_ref = tool.settings.erddap.parameter_metadata,
             column_depth = erddap_ref.depth.column,
             config = tool.configuration,
             column = erddap_ref[config.parameter],
@@ -855,7 +886,7 @@
         profile_date = data[0]["time (UTC)"];
 
         g.title.text(
-          tool.configuration.dataset_id
+          tool.configuration.observatory + " " + tool.configuration.glider_name
         );
 
         g.subtitle_datetime.text(
@@ -1000,6 +1031,7 @@
       }
     };
 
+
     tool.init_tool = function() {
 
       this.Glider_Profile_Explorer_OOI(this.dom_target);
@@ -1012,7 +1044,7 @@
       tool.controls.Glider_Dataset_Browser_Control = EduVis.controls.Glider_Dataset_Browser_Control;
       tool.controls.Glider_Dataset_Browser_Control.init(tool);
 
-    }
+    };
 
     // extend base object with tool..
     EduVis.tool.tools[tool.name] = tool;

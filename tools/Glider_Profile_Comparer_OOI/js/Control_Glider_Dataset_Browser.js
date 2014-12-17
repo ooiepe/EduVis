@@ -237,6 +237,7 @@ Written by Michael Mills, Rutgers University
                     is_dataset = false;
 
                     config.observatory = observatory;
+                    config.glider_name = dataset_val.substring(dataset_val.indexOf("_")+1, dataset_val.lastIndexOf("-"));
 
                 // find dataset array and set start date and end date
                 do{
@@ -744,7 +745,8 @@ Written by Michael Mills, Rutgers University
                 var d = dset.datasetID,
                     t0 = dset.minTime,
                     t1 = dset.maxTime,
-                    d_id = d.substring( (1+d.indexOf("_") ),d.indexOf("_")+4),
+                    //d_id = d.substring( (1+d.indexOf("_") ),d.indexOf("_")+4),
+                    d_id = d.substring(d.indexOf("_")+1, d.indexOf("-",d.indexOf("_"))),
                     time_range = t0.substring(0,10) + " to " + t1.substring(0,10);
 
                 optGroup.append(
