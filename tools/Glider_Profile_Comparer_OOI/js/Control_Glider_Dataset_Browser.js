@@ -2,7 +2,7 @@
 OOI EPE - Glider Dataset Browser Control
 for use with Glider Profile Explorer
 
-Revised 12/04/2014
+Revised 12/17/2014
 Written by Michael Mills, Rutgers University
 
 */
@@ -14,7 +14,7 @@ Written by Michael Mills, Rutgers University
   var parent_tool,
     control = {
     "name":"Glider_Dataset_Browser_Control",
-    "version" : "0.1.5",
+    "version" : "0.1.6",
     "description" : "This controls allows the user to select Glider Datasets via Rutgers Marine Science ERDDAP server.",
     "authors" : [
       {
@@ -223,7 +223,9 @@ Written by Michael Mills, Rutgers University
 
                 //console.log("this ui_control_dataset_id change event", this);
 
-                var dataset_val = evt.target.value,
+                var selected = $("option:selected", this),
+                    observatory = selected.parent().attr("label"),
+                    dataset_val = selected.val(),
                     ds_obj,
                     date_start_config = iso_format(config.date_start),
                     date_end_config = iso_format(config.date_end),
@@ -233,6 +235,8 @@ Written by Michael Mills, Rutgers University
                     glider_datasets = control.config_controls.glider_datasets,
                     c=0,
                     is_dataset = false;
+
+                    config.observatory = observatory;
 
                 // find dataset array and set start date and end date
                 do{
@@ -260,7 +264,7 @@ Written by Michael Mills, Rutgers University
 
                 // now set the slider to the full range of the requested dataset
                 // if its the config dataset load the specific start and end dates
-                if (config.dataset_id == dataset_val) {
+                if (config.dataset_id === dataset_val) {
 
                   slider.date_range_start = config.date_start;
                   slider.date_range_end = config.date_end;
