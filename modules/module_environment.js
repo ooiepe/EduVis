@@ -29,7 +29,7 @@
 
     	_environment_path = (_path || "");
 
-    	console.log(".... P A T H .....", _path);
+    	//console.log(".... P A T H .....", _path);
     },
     
     _environment_get_path = function() {
@@ -90,7 +90,7 @@
     },
     _environment_get_webservice = function() {
 
-      	console.log("_environment_path_webservice", _environment_path_webservice);
+      	//console.log("_environment_path_webservice", _environment_path_webservice);
 
 		return _environment_path_webservice;
 

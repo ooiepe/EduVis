@@ -146,7 +146,7 @@
 */    
     _tool_notify = function ( _obj_notify ){
 
-        console.log("tool notify", _obj_notify);
+        //console.log("tool notify", _obj_notify);
         
     },
 
