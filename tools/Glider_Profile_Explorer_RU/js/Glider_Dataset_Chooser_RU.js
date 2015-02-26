@@ -13,11 +13,11 @@
     "description" : "This tool allows users to browse and select Glider Datasets from the Rutgers Erddap server.",
     "config_controls" : {
       'institution':'Rutgers University', 
-      'glider':'ru28', 
-      'dataset_id':'ru28-20140815T1405',
-      'date_start':'2014-08-15',
-      'date_end':'2014-09-05',
-      'title':'RU28 August 2014'
+      'glider':'ru01', 
+      'dataset_id':'ru01-20140104T1621',
+      'date_start':'2014-01-04',
+      'date_end':'2014-01-16',
+      'title':'RU01 January 2014'
     },
     "datasets":{}
   };
@@ -33,6 +33,9 @@
     $.get(EduVis.Environment.getPathTools() + control.parent_tool.name + "/templates/" + 'Glider_Dataset_Chooser_RU.mst', function(template) {
       var rendered = Mustache.render(template);
       $('#vistool-controls').html(rendered);
+  
+      // Merge in default configuration from parent tool (or instance)
+      $.extend(true,control.config_controls,control.parent_tool.configuration);
   
       control.setup_datepickers();
       control.load_datasets();
@@ -62,6 +65,10 @@
         "defaultDate": control.config_controls.date_end
       })
       .val(control.config_controls.date_end)
+
+    $("#config-apply")
+      .on('click', control.apply_button);
+
   }
 
 
@@ -231,6 +238,25 @@
     }
     
   }
+
+
+  /**
+   * apply_button
+   * Called by Apply button
+   */
+  control.apply_button = function () {
+    // Update the configurations value
+    control.parent_tool.configuration.institution = $("#config-institution").val();
+    control.parent_tool.configuration.glider = $("#config-glider").val();
+    control.parent_tool.configuration.dataset_id = $("#config-deployment").val();
+    control.parent_tool.configuration.date_start = $("#config-date_start").val();
+    control.parent_tool.configuration.date_end = $("#config-date_end").val();
+    control.parent_tool.configuration.graph_title = $("#config-title").val();
+    
+    // call the Tool's Apply callback
+    control.parent_tool.config_callback();
+  }
+
 
   // Ending code
   if ( 'object' !== typeof EduVis.controls ) {

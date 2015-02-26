@@ -951,36 +951,6 @@
     };
 
     /**
-     * Request Erddap dataset listing
-     * Called by Configuration tool
-     */
-    tool.erddap_dataset_query = function(params_obj){
-
-      var dataset_url = "http://erddap.marine.rutgers.edu/erddap/search/advanced.html?",
-        query_params = {
-          "cdm_data_type" : "trajectoryprofile",
-          "variableName":"",
-          "maxLat":"",
-          "minLon":"",
-          "maxLon":"",
-          "minLat":"",
-          "minTime":"",
-          "maxTime":""
-        };
-
-      $.extend(true, query_params, params_obj);
-
-      $.each(query_params,function(p,v){
-        if(v !== ""){
-          base_url += p + "=" + v + "&";
-        }
-      });
-
-      return dataset_url;
-
-    };
-
-    /**
      * Locations query
      * Called by Configuration tool
      */
