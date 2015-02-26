@@ -1,0 +1,57 @@
+<h4>Glider Dataset Explorer</h4>
+<div>
+  <p>Customize your glider profile explorer default view.</p>
+  <ol>
+    <li>Choose a Deployment Dataset</li>
+    <li>Refine the Date Range (optional)</li>
+    <li>Apply the Configuration</li>
+  </ol>    
+</div>
+
+<div>
+  <div style="display:inline-block; max-width: 30%;">
+    <label for="config-institution" style="font-weight: bold;">Institution</label>
+    <select id="config-institution">
+      <option>...loading...</option>
+    </select>
+  </div>
+  <div style="display:inline-block; max-width: 30%;">
+    <label for="config-glider" style="font-weight: bold;">Glider</label>
+    <select id="config-glider">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block; max-width: 30%;">
+    <label for="config-deployment" style="font-weight: bold;">Deployment</label>
+    <select id="config-deployment">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block">
+      <div id="config-mapbutton" class="btn btn-small">Map</div>
+  </div>
+</div>
+
+<div>
+  <div style="display:inline-block">
+    <label for="config-title" style="font-weight: bold;">Graph Title</label>
+    <input id="config-title" size="50">
+  </div>
+</div>
+
+<div id="ui-config-map" style="width:700px; height:350px"></div>
+
+<div id="ui-config-dateRange">
+  <div id="ui-config-dateRange-start" style="display:inline-block">
+    <label for="config-date_start" style="font-weight: bold;">Start Date</label>
+    <input id="config-date_start" class="datepicker">
+  </div>
+  <div id="ui-config-dateRange-end" style="display:inline-block">
+    <label for="config-date_end" style="font-weight: bold;">End Date</label>
+    <input id="config-date_end" class="datepicker">
+  </div>
+</div>
+
+<div id="ui-config-apply">
+  <div id="config-apply" class="btn btn-medium" style="margin-top:20px;">Apply</div>
+</div>
