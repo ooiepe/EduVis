@@ -61,15 +61,20 @@
                   "global_reference" : "mustache"
                 }
               ],
-              "stylesheets" : []
+              "stylesheets" : [
+              {
+                "name": "gpe-css",
+                "src": "css/Glider_Dataset_Chooser_RU.css"
+              },
+              ]
           }
         },
         "configuration" : {
           'institution':'Rutgers University', 
           'glider':'ru29', 
           'dataset_id':'ru29-20131110T1400',
-          'date_start':'2013-11-10',
-          'date_end':'2014-05-18',
+          'date_start':'2014-01-01',
+          'date_end':'2014-02-01',
           'graph_title':'RU29 - South Atlantic Leg 2',
           'parameter' : "temperature",
           'profile_id' : 1

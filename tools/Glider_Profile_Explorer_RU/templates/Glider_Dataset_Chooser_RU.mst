@@ -9,26 +9,23 @@
 </div>
 
 <div>
-  <div style="display:inline-block; max-width: 30%;">
+  <div style="display:inline-block; max-width: 33%;">
     <label for="config-institution" style="font-weight: bold;">Institution</label>
     <select id="config-institution">
       <option>...loading...</option>
     </select>
   </div>
-  <div style="display:inline-block; max-width: 30%;">
+  <div style="display:inline-block; max-width: 33%;">
     <label for="config-glider" style="font-weight: bold;">Glider</label>
     <select id="config-glider">
       <option>...loading...</option>
     </select>    
   </div>
-  <div style="display:inline-block; max-width: 30%;">
+  <div style="display:inline-block; max-width: 33%;">
     <label for="config-deployment" style="font-weight: bold;">Deployment</label>
     <select id="config-deployment">
       <option>...loading...</option>
     </select>    
-  </div>
-  <div style="display:inline-block">
-      <div id="config-mapbutton" class="btn btn-small">Map</div>
   </div>
 </div>
 
