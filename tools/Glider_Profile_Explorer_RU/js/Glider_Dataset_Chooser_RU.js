@@ -19,6 +19,7 @@
       'date_end':'2014-01-16',
       'title':'RU01 January 2014'
     },
+    "initial_config" : {},
     "datasets":{}
   };
 
@@ -36,11 +37,13 @@
   
       // Merge in default configuration from parent tool (or instance)
       $.extend(true,control.config_controls,control.parent_tool.configuration);
-  
+      $.extend(true,control.initial_config,control.parent_tool.configuration);
+
       control.iso_parse = d3.time.format.iso.parse;
       control.date_format_ymd = d3.time.format("%Y-%m-%d");
       control.date_range_format = d3.time.format("%Y-%m-%d-%H-%M-%S");
 
+      control.setup_apply();
       control.setup_datepickers();
       control.setup_map();
       control.load_datasets();
@@ -48,6 +51,28 @@
   };
 
 
+  /**
+   * setup_apply
+   * Called by init
+   */
+  control.setup_apply = function () {
+    // Add action to apply button
+    $("#apply-btn")
+      .on('click', control.apply_button_press);
+    
+    // Add hidden checkmark  
+    $("#ui-config-apply")
+      .append(
+        $('<img src="'+ EduVis.Environment.getPathTools() + control.parent_tool.name + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
+      );
+
+    // Add action to revert button
+    $("#revert-btn")
+      .on('click', control.revert_button_press);
+    
+  };
+  
+  
   /**
    * setup_datepickers
    * Called by init
@@ -62,6 +87,7 @@
         "defaultDate": control.config_controls.date_start,
         "onClose" : function (d,i) {
           control.update_slider();
+          control.apply_button_status('modified');
         }
       })
       .val(control.config_controls.date_start);
@@ -74,12 +100,10 @@
         "defaultDate": control.config_controls.date_end,
         "onClose" : function (d,i) {
           control.update_slider();
+          control.apply_button_status('modified');
         }
       })
       .val(control.config_controls.date_end);
-
-    $("#config-apply")
-      .on('click', control.apply_button);
   };
 
 
@@ -186,7 +210,7 @@
         datasets.push(dset);
       });
 
-      var datasets = d3.nest()
+      datasets = d3.nest()
         .key(function(d) { return d.institution; })
         .sortKeys(d3.ascending)
         .key(function(d) { return d.datasetID.substring(0,d.datasetID.lastIndexOf('-')); })
@@ -271,11 +295,17 @@
       var gliders = datasets.find(function(d) {return d.key==institution;});
       var deployments = gliders.values.find(function(d) {return d.key==glider;});
       $.each(deployments.values, function (i,dset) {
+        
+        var did = dset.datasetID.substring(dset.datasetID.lastIndexOf('-')+1),
+        date_format1 = d3.time.format("%Y%m%dT%H%M"),
+        date_format2 = d3.time.format("%Y-%m-%d %H:%M"),
+        ddate = date_format1.parse(did);
+        
         $("#config-deployment")
           .append(
             $("<option>")
               .attr("value",dset.datasetID)
-              .html(dset.datasetID.substring(dset.datasetID.lastIndexOf('-')+1))
+              .html(date_format2(ddate))
             );
       });
     }
@@ -300,21 +330,32 @@
     if (typeof deployment != 'undefined') {
       control.deployment = deployment;
       //console.log('deployment',deployment);
-      $("#config-title").val('Deployment: '+deployment.datasetID);
+
+      $("#config-title")
+        .val('Deployment: ' + deployment.datasetID)
+        .on('change',control.apply_button_status('modified'));
 
       var date_start_ds = control.iso_parse(deployment.minTime),
       date_end_ds = control.iso_parse(deployment.maxTime);
-      
+            
       // set the date picker start and end range restrictions
       $("#config-date_start")
-        .datepicker("option", {"minDate":control.date_format_ymd(date_start_ds),"maxDate":control.date_format_ymd(date_end_ds)})
-        .val(control.date_format_ymd(date_start_ds));  
+        .datepicker("option", {"minDate":control.date_format_ymd(date_start_ds),"maxDate":control.date_format_ymd(date_end_ds)});
       $("#config-date_end")
-        .datepicker("option", {"minDate":control.date_format_ymd(date_start_ds),"maxDate":control.date_format_ymd(date_end_ds)})
-        .val(control.date_format_ymd(date_end_ds));  
+        .datepicker("option", {"minDate":control.date_format_ymd(date_start_ds),"maxDate":control.date_format_ymd(date_end_ds)});
+        
+      // Update datepicker dates, only if this is a newly specified deployment
+      if (deployment.datasetID != control.config_controls.dataset_id) {
+        $("#config-date_start").val(control.date_format_ymd(date_start_ds));  
+        $("#config-date_end").val(control.date_format_ymd(date_end_ds));          
+      } else {
+        $("#config-date_start").val(control.config_controls.date_start);  
+        $("#config-date_end").val(control.config_controls.date_end);        
+      }
         
       control.update_slider();
       control.update_map();
+      control.apply_button_status('modified');
     }
   };
 
@@ -389,8 +430,8 @@
               });
             },
             "click": function (e) {
-              var start = control.date_format_ymd.parse($("#config-date_start").val()),
-              end = control.date_format_ymd.parse($("#config-date_end").val()),
+              var date_start = control.date_format_ymd.parse($("#config-date_start").val()),
+              date_end = control.date_format_ymd.parse($("#config-date_end").val()),
               props = e.target.feature.properties,
               profile_date = props.time.substring(0,10),
               profile_time = control.iso_parse(props.time),
@@ -402,9 +443,9 @@
               '</div><div style="padding:14px;">';
 
               // build button based on current selection and glider track date range
-              if (profile_time <= start) {
+              if (profile_time <= date_start) {
                 content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>';
-              } else if (profile_time <= end) {
+              } else if (profile_time <= date_end) {
                 content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>' + '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
               } else{
                 content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
@@ -418,19 +459,17 @@
               .openOn(config_mapObj.map);
 
               $("#track_profile_set_start").on("click",function (e) {
-                var date_start = $("#config-date_start"),
-                date_end = $("#config-date_end");
-                console.log('click start date',$(this).attr("data-attr-date"))
-                date_start.val($(this).attr("data-attr-date"));
+                //console.log('click start date',$(this).attr("data-attr-date"))
+                $("#config-date_start").val($(this).attr("data-attr-date"));
                 control.update_slider();
+                control.apply_button_status('modified');
               });
 
               $("#track_profile_set_end").on("click",function (e) {
-                var date_start = $("#config-date_start"),
-                date_end = $("#config-date_end");
-                console.log('click end date',$(this).attr("data-attr-date"))
-                date_end.val($(this).attr("data-attr-date"));
+                //console.log('click end date',$(this).attr("data-attr-date"))
+                $("#config-date_end").val($(this).attr("data-attr-date"));
                 control.update_slider();
+                control.apply_button_status('modified');
               });
             }
           });
@@ -456,12 +495,15 @@
 
       // set the selected L geoJson in the control map object for later reference
       // can be set to local value for memory savings if necessary
+      var date_start = control.date_format_ymd.parse($("#config-date_start").val()),
+      date_end = control.date_format_ymd.parse($("#config-date_end").val());
+
       config_mapObj.track_selected_L_geoJson = L.geoJson(geodata,{
         onEachFeature: function (location, location_feature) {
           var date_compare = control.iso_parse(location.properties.time.substring(0,10));
-          //if ((date_compare >= control.config_controls.date_start ) && (date_compare <= control.config_controls.date_end)) {
+          if ((date_compare >= date_start ) && (date_compare <= date_end)) {
             poly_coords_selected.push(L.latLng(location.geometry.coordinates[1],location.geometry.coordinates[0]));
-          //}
+          }
         }
       });
 
@@ -498,14 +540,8 @@
     range_end      = control.date_format_ymd.parse($("#config-date_end").val());
     //console.log("Dates: ", date_start, date_end, range_start, range_end);
 
-    //start = control.date_format_ymd.parse(date_start),
-    //start = date_range_format.parse(date_start + "-00-01-01"),
-    //end = control.date_format_ymd.parse(date_end);
-    //end = date_range_format.parse(date_end + "-23-59-59");
-
     var range_date_start = range_start || date_start,
     range_date_end = range_end || date_end;
-
     //console.log("Ranges: ", range_date_start, range_date_end);
 
     var x = d3.time.scale.utc()
@@ -515,7 +551,6 @@
     // set the extent to the selected range within the full range
     var brush = d3.svg.brush()
     .x(x)
-    //.extent([date_format_ymd.parse(range_date_start), date_format_ymd.parse(range_date_end)])
     .extent([range_date_start, range_date_end])
     .on("brushstart", brushstart)
     .on("brush", brushmove)
@@ -575,11 +610,12 @@
       $("#config-date_start").val(control.date_format_ymd(s[0]));
       $("#config-date_end").val(control.date_format_ymd(s[1]));
       // limit execution does not seem to have an effect
-      L.Util.limitExecByInterval (control.poly_track_selected_update(s[0],s[1]), 1000, this);
+      L.Util.limitExecByInterval(control.poly_track_selected_update(s[0], s[1]), 1000, this);
     }
 
     function brushend () {
       svg.classed ("selecting", !d3.event.target.empty());
+      control.apply_button_status('modified');
     }
 
   };
@@ -610,22 +646,72 @@
 
 
   /**
-   * apply_button
+   * apply_button_press
    * Called by Apply button
    */
-  control.apply_button = function () {
-    // Update the configurations value
-    control.parent_tool.configuration.institution = $("#config-institution").val();
-    control.parent_tool.configuration.glider = $("#config-glider").val();
-    control.parent_tool.configuration.dataset_id = $("#config-deployment").val();
-    control.parent_tool.configuration.date_start = $("#config-date_start").val();
-    control.parent_tool.configuration.date_end = $("#config-date_end").val();
-    control.parent_tool.configuration.graph_title = $("#config-title").val();
+  control.apply_button_press = function (evt) {
+    var btn_apply = $(evt.target);
     
-    // call the Tool's Apply callback
-    control.parent_tool.config_callback();
+    // check to see if button is disabled, if not, apply changes
+    if (!btn_apply.hasClass('disabled')) {
+    
+      // Update the configurations value
+      control.parent_tool.configuration.institution = $("#config-institution").val();
+      control.parent_tool.configuration.glider = $("#config-glider").val();
+      control.parent_tool.configuration.dataset_id = $("#config-deployment").val();
+      control.parent_tool.configuration.date_start = $("#config-date_start").val();
+      control.parent_tool.configuration.date_end = $("#config-date_end").val();
+      control.parent_tool.configuration.graph_title = $("#config-title").val();
+      
+      // Call the parent tool's Apply callback
+      control.parent_tool.config_callback();
+
+      // Disable the apply button
+      control.apply_button_status("updated");
+    }
   };
 
+
+  /**
+   * apply_button_status
+   * Update the Apply button by enabling or disabling the class
+   */
+  control.apply_button_status = function(status){
+    if(status == "modified"){
+      $("#apply-btn")
+        .attr('class', 'btn btn-medium');
+      $("#revert-btn")
+        .attr('class', 'btn btn-medium');
+    } else if (status == "updated") {
+      $("#apply-btn")
+        .attr('class', 'btn btn-medium disabled');
+      $("#apply-check").show().fadeOut(3000);
+    }
+  };
+
+
+  /**
+   * revert_button_press
+   * Called by Revert button
+   */
+  control.revert_button_press = function (evt) {
+    var btn_apply = $(evt.target);
+    
+    // check to see if button is disabled, if not, apply changes
+    if (!btn_apply.hasClass('disabled')) {
+    
+      // Merge in default configuration from parent tool (or instance)
+      $.extend(true, control.config_controls, control.initial_config);
+            
+      // Update the dataset browser
+      control.populate_arrays();
+
+      // Enable the apply button to save changes
+      control.apply_button_status("modified");
+    }
+  };
+  
+  
   // Ending code
   if ( 'object' !== typeof EduVis.controls ) {
     EduVis.controls = {};

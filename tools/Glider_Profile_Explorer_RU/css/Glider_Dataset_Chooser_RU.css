@@ -1,32 +1,33 @@
 svg {
-    font: 10px sans-serif;
+  font: 10px sans-serif;
 }
 
 .resize path {
-    fill: #666;
-    fill-opacity: .8;
-    stroke: #000;
-    stroke-width: 1.5px;
+  fill: #666;
+  fill-opacity: .8;
+  stroke: #000;
+  stroke-width: 1.5px;
 }
+
 .axis path, .axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
+
 .brush .extent {
-    fill-opacity: .125;
-    shape-rendering: crispEdges;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
 }
 
 .template{
-
-	font-size: 18px;
+  font-size: 18px;
 }
 
 .circle {
-    fill: #222;
+  fill: #222;
 }
 
-#vistool-controls label{
-    font-weight:bold;
+#vistool-controls label {
+  font-weight: bold;
 }

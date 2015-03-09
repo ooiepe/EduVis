@@ -10,19 +10,19 @@
 
 <div>
   <div style="display:inline-block; max-width: 33%;">
-    <label for="config-institution" style="font-weight: bold;">Institution</label>
+    <label for="config-institution">Institution</label>
     <select id="config-institution">
       <option>...loading...</option>
     </select>
   </div>
   <div style="display:inline-block; max-width: 33%;">
-    <label for="config-glider" style="font-weight: bold;">Glider</label>
+    <label for="config-glider">Glider</label>
     <select id="config-glider">
       <option>...loading...</option>
     </select>    
   </div>
   <div style="display:inline-block; max-width: 33%;">
-    <label for="config-deployment" style="font-weight: bold;">Deployment</label>
+    <label for="config-deployment">Deployment</label>
     <select id="config-deployment">
       <option>...loading...</option>
     </select>    
@@ -30,8 +30,8 @@
 </div>
 
 <div>
-  <div style="display:inline-block">
-    <label for="config-title" style="font-weight: bold;">Graph Title</label>
+  <div style="display:inline-block; margin: 10px 0 10px 0;">
+    <label for="config-title">Graph Title</label>
     <input id="config-title" size="50">
   </div>
 </div>
@@ -40,15 +40,16 @@
 
 <div id="ui-config-dateRange">
   <div id="ui-config-dateRange-start" style="display:inline-block">
-    <label for="config-date_start" style="font-weight: bold;">Start Date</label>
+    <label for="config-date_start">Start Date</label>
     <input id="config-date_start" class="datepicker">
   </div>
   <div id="ui-config-dateRange-end" style="display:inline-block">
-    <label for="config-date_end" style="font-weight: bold;">End Date</label>
+    <label for="config-date_end">End Date</label>
     <input id="config-date_end" class="datepicker">
   </div>
 </div>
 
 <div id="ui-config-apply">
-  <div id="config-apply" class="btn btn-medium" style="margin-top:20px;">Apply</div>
+  <div id="revert-btn" class="btn btn-medium disabled">Revert</div>
+  <div id="apply-btn" class="btn btn-medium disabled">Apply</div>
 </div>
