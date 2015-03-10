@@ -443,33 +443,32 @@
 
       g.title = g.svg.append("text")
         .attr("class", "gtitle_dataset")
-        .attr("text-anchor", "left")
-        .style("font-size", "12px")
+        .attr("text-anchor", "start")
+        .style("font-size", "14px")
+        .style("font-weight", "bold")
         .attr("y", 0)
         .attr("dy", ".75em")
-        .attr("transform", "translate(" + (g.margin.left + 20) + "," + (0) + ") ")
+        .attr("transform", "translate(" + (g.margin.left + 0) + "," + (0) + ") ")
         .text(tool.configuration.graph_title);
         //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
 
       g.subtitle_datetime = g.svg.append("text")
         .attr("class", "gsubtitle_datetime")
-        .attr("text-anchor", "left")
+        .attr("text-anchor", "start")
         .style("font-size", "11px")
         .attr("y", 0)
         .attr("dy", ".75em")
-        .attr("transform", "translate(" + (g.margin.left + 20) + "," + (18) + ") ")
+        .attr("transform", "translate(" + (g.margin.left + 0) + "," + (18) + ") ")
         .text("");
 
-      g.subtitle_profileID = g.svg.append("text")
+      /*g.subtitle_profileID = g.svg.append("text")
         .attr("class", "gsubtitle_profileID")
-        .attr("text-anchor", "right")
+        .attr("text-anchor", "end")
         .style("font-size", "11px")
         .attr("y", 0)
         .attr("dy", ".75em")
-        .attr("transform", "translate(" + (g.margin.left + 280) + "," + (18) + ") ")
-        .text(
-          "Profile: "+ config.profile_id
-        );
+        .attr("transform", "translate(" + (g.margin.left + g.width) + "," + (18) + ") ")
+        .text("Profile #"+ config.profile_id); */
 
       // g.stats = g.svg.append("text")
       //   .attr("id", _target+"_stats1")
@@ -790,14 +789,17 @@
         g.title.text(
           tool.configuration.graph_title
         );
-
+        
+        var date_format = d3.time.format.utc("%B %e, %Y %H:%M UTC"),
+        iso_format = d3.time.format.iso.parse;
+        
         g.subtitle_datetime.text(
-          profile_date
+          "Profile #"+ pid + ' - ' + date_format(iso_format(profile_date))
         );
 
-        g.subtitle_profileID.text(
-         " Profile: "+ pid
-       );
+        /* g.subtitle_profileID.text(
+         "Profile #"+ pid
+        ); */
 
         g.xlabel.text(
           column_selected_title +
@@ -850,7 +852,7 @@
       //console.log(min, max, date_start, date_end, "slider");
 
       var iso_format = d3.time.format.iso.parse,
-          date_format = d3.time.format("%m/%d/%Y"),
+          date_format = d3.time.format.utc("%B %e, %Y"),
           start = iso_format(date_start),
           end = iso_format(date_end);
 

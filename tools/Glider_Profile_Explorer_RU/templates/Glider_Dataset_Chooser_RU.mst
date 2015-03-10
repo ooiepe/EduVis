@@ -1,11 +1,6 @@
-<h4>Glider Dataset Explorer</h4>
 <div>
-  <p>Customize your glider profile explorer default view.</p>
-  <ol>
-    <li>Choose a Deployment Dataset</li>
-    <li>Refine the Date Range (optional)</li>
-    <li>Apply the Configuration</li>
-  </ol>    
+  <h4>Glider Dataset Explorer</h4>
+  <p><strong>Instructions:</strong> Use the pulldowns to choose a specific glider deployment you are interested in.  Next narrow the date range of the deployment that you would like to focus on.  Optionally, you can also modify the graph title that will appear on your tool.  Once you've selected your desired glider dataset, click "Apply" and switch to the "Preview" tab to check out your customized tool.</p>
 </div>
 
 <div>

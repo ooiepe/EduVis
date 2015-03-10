@@ -40,8 +40,8 @@
       $.extend(true,control.initial_config,control.parent_tool.configuration);
 
       control.iso_parse = d3.time.format.iso.parse;
-      control.date_format_ymd = d3.time.format("%Y-%m-%d");
-      control.date_range_format = d3.time.format("%Y-%m-%d-%H-%M-%S");
+      control.date_format_ymd = d3.time.format.utc("%Y-%m-%d");
+      control.date_range_format = d3.time.format.utc("%Y-%m-%d-%H-%M-%S");
 
       control.setup_apply();
       control.setup_datepickers();
@@ -297,8 +297,8 @@
       $.each(deployments.values, function (i,dset) {
         
         var did = dset.datasetID.substring(dset.datasetID.lastIndexOf('-')+1),
-        date_format1 = d3.time.format("%Y%m%dT%H%M"),
-        date_format2 = d3.time.format("%Y-%m-%d %H:%M"),
+        date_format1 = d3.time.format.utc("%Y%m%dT%H%M"),
+        date_format2 = d3.time.format.utc("%Y-%m-%d %H:%M"),
         ddate = date_format1.parse(did);
         
         $("#config-deployment")
@@ -571,7 +571,7 @@
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var tick_interpolate = d3.interpolate(date_start, date_end);
-    var dd = [0, 0.25, 0.5, 0.75, 1].map(function (a) {
+    var dd = [0, .2, .4, .6, .8, 1].map(function (a) {
       return control.iso_parse(tick_interpolate(a));
     });
 
