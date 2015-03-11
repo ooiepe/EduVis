@@ -567,7 +567,7 @@
         // set esri tile service url for ocean basemap
         // set leaflet layer of esri ocean basmap
         tool.leaflet_map.oceanBasemap_layer = new L.TileLayer(tool.mapping.oceanBasemap_url,{
-          maxZoom: 19,
+          maxZoom: 12,
           attribution: 'Tile Layer: &copy; Esri'
         }).addTo(tool.leaflet_map.map);
 

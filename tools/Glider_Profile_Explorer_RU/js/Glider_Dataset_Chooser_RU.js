@@ -86,6 +86,12 @@
         "changeYear": true,
         "defaultDate": control.config_controls.date_start,
         "onClose" : function (d,i) {
+          var sdate = $("#config-date_start").datepicker('getDate'),
+          edate = $("#config-date_end").datepicker('getDate');
+          if ( sdate >= edate ){
+            sdate.setDate(sdate.getDate()+1);
+            $("#config-date_end").datepicker('setDate',sdate);
+          }
           control.update_slider();
           control.apply_button_status('modified');
         }
@@ -99,6 +105,12 @@
         "changeYear": true,
         "defaultDate": control.config_controls.date_end,
         "onClose" : function (d,i) {
+          var sdate = $("#config-date_start").datepicker('getDate'),
+          edate = $("#config-date_end").datepicker('getDate');
+          if ( sdate >= edate ){
+            edate.setDate(edate.getDate()-1);
+            $("#config-date_start").datepicker('setDate',edate);
+          }
           control.update_slider();
           control.apply_button_status('modified');
         }
@@ -123,7 +135,7 @@
   
     // define the ocean basemap layer and add it ot the map tool control
     control.leaflet_map.oceanBasemap_layer = new L.TileLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",{
-      maxZoom: 19,
+      maxZoom: 12,
       attribution: 'Tile Layer: &copy; Esri'
     }).addTo(control.leaflet_map.map);
   
@@ -145,7 +157,7 @@
     control.leaflet_map.map.on({
       "zoomend" : function (e) {
         // When zoom level changes set the style of the profile markers
-        if (this.getZoom() >= 10) {
+        if (this.getZoom() >= 9) {
           if (typeof control.leaflet_map.track_full_L_geoJson !== "undefined") {
             // set the opacity, fill, and radius
             control.leaflet_map.track_full_L_geoJson
@@ -334,20 +346,19 @@
       $("#config-title")
         .val('Deployment: ' + deployment.datasetID)
         .on('change',control.apply_button_status('modified'));
-
-      var date_start_ds = control.iso_parse(deployment.minTime),
-      date_end_ds = control.iso_parse(deployment.maxTime);
+        
+      var range = control.deployment_date_range();
             
       // set the date picker start and end range restrictions
       $("#config-date_start")
-        .datepicker("option", {"minDate":control.date_format_ymd(date_start_ds),"maxDate":control.date_format_ymd(date_end_ds)});
+        .datepicker("option", {"minDate":control.date_format_ymd(range.start),"maxDate":control.date_format_ymd(range.end)});
       $("#config-date_end")
-        .datepicker("option", {"minDate":control.date_format_ymd(date_start_ds),"maxDate":control.date_format_ymd(date_end_ds)});
+        .datepicker("option", {"minDate":control.date_format_ymd(range.start),"maxDate":control.date_format_ymd(range.end)});
         
       // Update datepicker dates, only if this is a newly specified deployment
       if (deployment.datasetID != control.config_controls.dataset_id) {
-        $("#config-date_start").val(control.date_format_ymd(date_start_ds));  
-        $("#config-date_end").val(control.date_format_ymd(date_end_ds));          
+        $("#config-date_start").val(control.date_format_ymd(range.start));  
+        $("#config-date_end").val(control.date_format_ymd(range.end));          
       } else {
         $("#config-date_start").val(control.config_controls.date_start);  
         $("#config-date_end").val(control.config_controls.date_end);        
@@ -358,6 +369,26 @@
       control.apply_button_status('modified');
     }
   };
+
+
+  /**
+   * deployment_date_range
+   * Rounds the date range limits for the current deployment
+   */
+  control.deployment_date_range = function () {
+    var date_start = control.iso_parse(control.deployment.minTime),
+    date_end       = control.iso_parse(control.deployment.maxTime),
+    range = {}; 
+
+    date_start = control.date_format_ymd.parse(control.date_format_ymd(date_start));
+    date_end   = control.date_format_ymd.parse(control.date_format_ymd(date_end));
+    date_end.setDate(date_end.getDate()+1);
+
+    range.start = date_start;
+    range.end = date_end;
+    return range;
+  };
+
 
 
   /**
@@ -534,8 +565,9 @@
     width = 700 - margin.left - margin.right,
     height = 58 - margin.top - margin.bottom;
 
-    var date_start = control.iso_parse(control.deployment.minTime),
-    date_end       = control.iso_parse(control.deployment.maxTime), 
+    var range = control.deployment_date_range(),
+    date_start = range.start,
+    date_end       = range.end, 
     range_start    = control.date_format_ymd.parse($("#config-date_start").val()), 
     range_end      = control.date_format_ymd.parse($("#config-date_end").val());
     //console.log("Dates: ", date_start, date_end, range_start, range_end);
