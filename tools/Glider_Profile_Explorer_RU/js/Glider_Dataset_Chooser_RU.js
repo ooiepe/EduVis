@@ -461,25 +461,29 @@
               });
             },
             "click": function (e) {
-              var date_start = control.date_format_ymd.parse($("#config-date_start").val()),
+              var date_format = d3.time.format.utc("%B %e, %Y %H:%M UTC"),
+              iso_format = d3.time.format.iso.parse,
+              date_start = control.date_format_ymd.parse($("#config-date_start").val()),
               date_end = control.date_format_ymd.parse($("#config-date_end").val()),
               props = e.target.feature.properties,
               profile_date = props.time.substring(0,10),
               profile_time = control.iso_parse(props.time),
               latlng = this.getLatLng(),
-              content = '<div style="margin:8px; min-width:240px">' +
-              '<div style="float:left;">' + props.time +"</div>" +
-              '<div style="text-align:right">Profile #: ' + props.profile_id +"</div>" +
-              "<div>Location: " + d3.round(latlng.lat,3) + " N " + d3.round(latlng.lng,3)+" W</div>"+
-              '</div><div style="padding:14px;">';
-
-              // build button based on current selection and glider track date range
+              content = '<div style="margin:0px; min-width:220px">' + 
+              '<strong>' + date_format(iso_format(props.time)) +'</strong><br>' + 
+              'Profile #' + props.profile_id +"<br>" + 
+              'Location: ' + 
+                Math.abs(d3.round(latlng.lat,4)) + (latlng.lat>0 ? '&deg;N ' : '&deg;S ') + 
+                Math.abs(d3.round(latlng.lng,4)) + (latlng.lng>0 ? '&deg;E ' : '&deg;W ') + 
+              '</div><div style="padding:0px;">';
+              // Build buttons based on selected point and glider track
               if (profile_time <= date_start) {
-                content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>';
+                content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn btn-small">Set as <b>Start Date</b></a>';
               } else if (profile_time <= date_end) {
-                content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn">Set as <b>Start Date</b></a>' + '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
-              } else{
-                content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn">Set as <b>End Date</b>.</a>';
+                content += '<a id="track_profile_set_start" data-attr-date="'+ profile_date +'" class="btn btn-small">Set as <b>Start Date</b></a>';
+                content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn btn-small">Set as <b>End Date</b>.</a>';
+              } else {
+                content += '<a id="track_profile_set_end" data-attr-date="'+ profile_date +'" class="btn btn-small">Set as <b>End Date</b>.</a>';
               }
               content += "</div>";
 
@@ -494,6 +498,7 @@
                 $("#config-date_start").val($(this).attr("data-attr-date"));
                 control.update_slider();
                 control.apply_button_status('modified');
+                config_mapObj.map.closePopup();
               });
 
               $("#track_profile_set_end").on("click",function (e) {
@@ -501,6 +506,7 @@
                 $("#config-date_end").val($(this).attr("data-attr-date"));
                 control.update_slider();
                 control.apply_button_status('modified');
+                config_mapObj.map.closePopup();
               });
             }
           });

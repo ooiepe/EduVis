@@ -452,8 +452,8 @@
         .text(tool.configuration.graph_title);
         //.attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (0) + ") ")
 
-      g.subtitle_datetime = g.svg.append("text")
-        .attr("class", "gsubtitle_datetime")
+      g.subtitle1 = g.svg.append("text")
+        .attr("class", "gsubtitle1")
         .attr("text-anchor", "start")
         .style("font-size", "11px")
         .attr("y", 0)
@@ -461,14 +461,14 @@
         .attr("transform", "translate(" + (g.margin.left + 0) + "," + (18) + ") ")
         .text("");
 
-      /*g.subtitle_profileID = g.svg.append("text")
-        .attr("class", "gsubtitle_profileID")
+      g.subtitle2 = g.svg.append("text")
+        .attr("class", "gsubtitle2")
         .attr("text-anchor", "end")
         .style("font-size", "11px")
         .attr("y", 0)
         .attr("dy", ".75em")
         .attr("transform", "translate(" + (g.margin.left + g.width) + "," + (18) + ") ")
-        .text("Profile #"+ config.profile_id); */
+        .text(""); 
 
       // g.stats = g.svg.append("text")
       //   .attr("id", _target+"_stats1")
@@ -532,7 +532,7 @@
         .on("change", function(a){
 
           tool.configuration.parameter = $(this).val();
-          tool.update_graph(tool.configuration.profile_id);
+          tool.update_graph(tool.configuration.profile_id,tool.configuration.profile_lat,tool.configuration.profile_lng);
         });
 
     };
@@ -793,13 +793,14 @@
         var date_format = d3.time.format.utc("%B %e, %Y %H:%M UTC"),
         iso_format = d3.time.format.iso.parse;
         
-        g.subtitle_datetime.text(
+        g.subtitle1.text(
           "Profile #"+ pid + ' - ' + date_format(iso_format(profile_date))
         );
 
-        /* g.subtitle_profileID.text(
-         "Profile #"+ pid
-        ); */
+        g.subtitle2.text(
+          Math.abs(d3.round(lat,4)) + (lat>0 ? '&deg;N ' : '\xBAS ') + 
+          Math.abs(d3.round(lng,4)) + (lng>0 ? '&deg;E ' : '\xBAW ')
+        ); 
 
         g.xlabel.text(
           column_selected_title +
@@ -908,9 +909,9 @@
               if (feature.properties.profile_id == profile_id) {
                 lng = d3.round(feature.geometry.coordinates[0],4);
                 lat = d3.round(feature.geometry.coordinates[1],4);
-
+                tool.configuration.profile_lat = lat;  //Save coordinates for later use
+                tool.configuration.profile_lng = lng;
                 tool.leaflet_map.map.panTo([lat,lng]);
-
                 return tool.mapping.styles.profile_click;
               }
               return tool.mapping.styles.profile;
