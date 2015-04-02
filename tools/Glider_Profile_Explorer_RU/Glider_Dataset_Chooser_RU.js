@@ -1,7 +1,7 @@
 /**
  * Glider Dataset Chooser - Rutgers Version
  *   for use with the Glider Profile Explorer (GPE) - Rutgers Version
- * Revised 2/10/2015
+ * Revised 4/2/2015
  * Written by Michael Mills and Sage Lichtenwalner
 */
 (function (eduVis) {
@@ -31,7 +31,7 @@
   control.init = function (_parent_tool) {
     control.parent_tool = _parent_tool;
      
-    $.get(EduVis.Environment.getPathTools() + control.parent_tool.name + "/templates/" + 'Glider_Dataset_Chooser_RU.mst', function(template) {
+    $.get(EduVis.Environment.getPathTools() + control.parent_tool.name + '/Glider_Dataset_Chooser_RU.mst', function(template) {
       var rendered = Mustache.render(template);
       $('#vistool-controls').html(rendered);
   
@@ -63,7 +63,7 @@
     // Add hidden checkmark  
     $("#ui-config-apply")
       .append(
-        $('<img src="'+ EduVis.Environment.getPathTools() + control.parent_tool.name + '/img/check_green.png"' + ' id="apply-check" style="display:none" />')
+        $('<img src="'+ EduVis.Environment.getPathTools() + control.parent_tool.name + '/check_green.png"' + ' id="apply-check" style="display:none" />')
       );
 
     // Add action to revert button
@@ -345,7 +345,7 @@
 
       $("#config-title")
         .val('Deployment: ' + deployment.datasetID)
-        .on('change',control.apply_button_status('modified'));
+        .on('change keyup',control.apply_button_status('modified'));
         
       var range = control.deployment_date_range();
             

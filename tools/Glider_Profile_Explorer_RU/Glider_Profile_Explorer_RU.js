@@ -7,8 +7,8 @@
     "use strict";
     var tool = {
         "name" : "Glider_Profile_Explorer_RU",
-        "description" : "Rutgers Glider Profile Explorer",
         "version" : "0.1",
+        "description" : "Rutgers Glider Profile Explorer",
         "resources" : {
           "tool": {
             "scripts" : [
@@ -51,20 +51,20 @@
                 {
                   "resource_type" : "tool",
                   "name": "Glider_Dataset_Chooser_RU",
-                  "url" : "js/Glider_Dataset_Chooser_RU.js",
+                  "url" : "Glider_Dataset_Chooser_RU.js",
                   "attributes":{}
                 },
                 {
                   "resource_type" : "tool",
                   "name" : "mustache",
-                  "url" : "js/mustache.js",
+                  "url" : "mustache.js",
                   "global_reference" : "mustache"
                 }
               ],
               "stylesheets" : [
               {
                 "name": "gpe-css",
-                "src": "css/Glider_Dataset_Chooser_RU.css"
+                "src": "Glider_Dataset_Chooser_RU.css"
               },
               ]
           }
