@@ -43,26 +43,33 @@
     // Default tool configuration
     "configuration" : {
       "title" : "Example Data",
-      "dataset" : [
-        {"date":"2013-01-01T00:00:00Z","air temperature":"27.4","water temperature":"16.4"},
-        {"date":"2013-01-10T00:06:00Z","air temperature":"27.3","water temperature":"16.6"},
-        {"date":"2013-01-20T00:12:00Z","air temperature":"27.2","water temperature":"16.8"},
-        {"date":"2013-02-01T00:18:00Z","air temperature":"27.2","water temperature":"16.9"},
-        {"date":"2013-02-10T00:24:00Z","air temperature":"27.1","water temperature":"17"},
-        {"date":"2013-02-20T00:30:00Z","air temperature":"27.1","water temperature":"17.1"},
-        {"date":"2013-03-01T00:36:00Z","air temperature":"27","water temperature":"17.1"},
-        {"date":"2013-03-10T00:42:00Z","air temperature":"26.9","water temperature":"17.2"},
-        {"date":"2013-03-20T00:48:00Z","air temperature":"26.8","water temperature":"17.2"},
-        {"date":"2013-04-01T00:54:00Z","air temperature":"26.6","water temperature":"17.3"},
-        {"date":"2013-04-10T01:00:00Z","air temperature":"26.4","water temperature":"17.4"}
-      ],
+      "url" : "",
+      "dataset" : "date\tair temperature\twater temperature\n2013-01-01T00:00:00Z\t27.4\t16.4\n2013-01-10T00:06:00Z\t27.3\t16.6\n2013-01-20T00:12:00Z\t27.2\t16.8\n2013-02-01T00:18:00Z\t27.2\t16.9\n2013-02-10T00:24:00Z\t27.1\t17.0\n2013-02-20T00:30:00Z\t27.1\t17.1\n2013-03-01T00:36:00Z\t27.0\t17.1\n2013-03-10T00:42:00Z\t26.9\t17.2\n2013-03-20T00:48:00Z\t26.8\t17.2\n2013-04-01T00:54:00Z\t26.6\t17.3\n2013-04-10T01:00:00Z\t26.4\t17.4\n",
       "parameter" : "water temperature",
       "color" : "#a33333",
       "delimiter":"tab"
     },
     "initial_config" : {},
-    "graph" : {}
+    "graph" : {},
+    "data" : {}
   };
+
+/* Old JSON dataset array
+[
+  {"date":"2013-01-01T00:00:00Z","air temperature":"27.4","water temperature":"16.4"},
+  {"date":"2013-01-10T00:06:00Z","air temperature":"27.3","water temperature":"16.6"},
+  {"date":"2013-01-20T00:12:00Z","air temperature":"27.2","water temperature":"16.8"},
+  {"date":"2013-02-01T00:18:00Z","air temperature":"27.2","water temperature":"16.9"},
+  {"date":"2013-02-10T00:24:00Z","air temperature":"27.1","water temperature":"17.0"},
+  {"date":"2013-02-20T00:30:00Z","air temperature":"27.1","water temperature":"17.1"},
+  {"date":"2013-03-01T00:36:00Z","air temperature":"27.0","water temperature":"17.1"},
+  {"date":"2013-03-10T00:42:00Z","air temperature":"26.9","water temperature":"17.2"},
+  {"date":"2013-03-20T00:48:00Z","air temperature":"26.8","water temperature":"17.2"},
+  {"date":"2013-04-01T00:54:00Z","air temperature":"26.6","water temperature":"17.3"},
+  {"date":"2013-04-10T01:00:00Z","air temperature":"26.4","water temperature":"17.4"}
+]
+*/
+
 
   /**
    * Initialize tool
@@ -87,7 +94,7 @@
     g.height = 400 - g.margin.top - g.margin.bottom;
 
     g.parseDate = d3.time.format.iso.parse;
-    g.date_format = d3.time.format("%Y-%m-%d");
+    g.date_format = d3.time.format.utc("%Y-%m-%d");
 
     g.x = d3.time.scale.utc().range([0, g.width]);
     g.y = d3.scale.linear().range([g.height, 0]);
@@ -153,9 +160,10 @@
       .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
 
     g.line1 = d3.svg.line()
-      .interpolate("monotone")
+      //.interpolate("linear")
       .x(function(d) { return g.x(d.date); })
-      .y(function(d) { return g.y(d.data); });
+      .y(function(d) { return g.y(d.data); })
+      .defined(function(d) { return !isNaN(d.data); });
 
     g.title = g.svg.append("text")
       .attr("class", "gtitle")
@@ -196,8 +204,6 @@
       .text( "Statistics");
 
     tool.create_dropdown(_target);
-    tool.update_dropdown();
-
   };
 
 
@@ -206,15 +212,32 @@
    * Called by init_tool and graph_update_parameter
    */
   tool.draw = function() {
-    if(typeof tool.configuration.dataset !== "undefined"){
+    var url = tool.configuration.url,
+    tab = tool.configuration.delimiter,
+    dataset = tool.configuration.dataset;
+
+    if (url) {
+      d3.csv(url).get(function(error, rows) { 
+        if (rows !== undefined) {
+          tool.data = rows; 
+          tool.update_dropdown();
+          tool.updategraph();
+        } else {
+          $("#config-url-error")
+            .show()
+            .html('The specified CSV file was not found.  Please check the URL and try again.');          
+        }
+      });      
+    } else if (tab === "tab") {
+      tool.data = d3.tsv.parse(dataset);
+      tool.update_dropdown();
       tool.updategraph();
-    } else {
-      if(typeof error !== "undefined"){
-        alert('Bad data! (draw)');
-      }
+    } else if (tab === "comma") {
+      tool.data = d3.csv.parse(dataset);
+      tool.update_dropdown();
+      tool.updategraph();
     }
   };
-
 
   /**
    * Update visualization with new data
@@ -222,12 +245,14 @@
    */
   tool.updategraph = function() {
     var g = this.graph;
-    var dataset = tool.configuration.dataset;
+    var dataset = tool.data;
     var data = [];
     var bisectDate = d3.bisector(function(d) { return d.date; }).left;
 
     if(dataset.length === 0){
-      alert('Bad data! (updategraph)');
+      $("#config-url-error")
+        .show()
+        .html('This is an invalid datafile.  Please try again.');
     } else {
 
       // Parse data
@@ -243,9 +268,9 @@
       // Update the graph
       g.svg.selectAll("path.line")
         .data([data])
-        .transition()
-        .duration(500)
-        .ease("linear")
+        //.transition()
+        //.duration(500)
+        //.ease("linear")
         .attr("d", g.line1)
         .style("stroke",tool.configuration.color);
 
@@ -269,7 +294,6 @@
         .style("stroke-opacity",".4");
 
       g.mousemover.on("mousemove", function(){
-        
         var mouseX = d3.mouse(this)[0],
           x0 = g.x.invert(mouseX),
           i = bisectDate(data, x0, 1),
@@ -328,7 +352,7 @@
 
     var config = tool.configuration,
         options = [],
-        cols = d3.entries(config.dataset[0]);
+        cols = d3.entries(tool.data[0]);
 
     // Clear the current list
     $("#"+tool.dom_target+"_select-parameters").empty();
@@ -380,7 +404,7 @@
   tool.average = function(data) {
     var a = [];
     data.forEach(function(d) {
-      a.push(d.data);
+      if(!isNaN(d.data)) {a.push(d.data);};
     });
     var r = {mean: 0, variance: 0, deviation: 0}, t = a.length;
     for(var m, s = 0, l = t; l--; s += a[l]);
@@ -394,7 +418,7 @@
    * Called automatically by EduVis when edit is enabled
    */
   tool.init_controls = function(){     
-    $.get(EduVis.Environment.getPathTools() + tool.name + '/cts_config.mst', function(template) {
+    $.get(EduVis.Environment.getPathTools() + tool.name + '/Custom_Time_Series_config.mst', function(template) {
       var rendered = Mustache.render(template);
       $('#vistool-controls').html(rendered);
   
@@ -413,16 +437,25 @@
  */
   tool.populate_fields = function () {
     //$("#config-deployment").children().remove();
-    $("#config-title").val(tool.configuration.title)
-      .on("change keyup",function () {tool.apply_button_status('modified')});
-    $("#config-dataset").val(this.json2csv(tool.configuration.dataset))
-      .on("change keyup",function () {tool.apply_button_status('modified')});
+    $("#config-url").val(tool.configuration.url)
+      .on("change keyup",function () { tool.apply_button_status('modified'); });
+    if(!tool.configuration.url) {
+      $('#dataOptionOne').collapse('hide');
+      $('#dataOptionTwo').collapse('show');
+    } 
+    $("#clear-url")
+      .on("click", function() { $("#config-url").val(''); tool.apply_button_status('modified'); });
+    //$("#config-dataset").val(this.json2csv(tool.configuration.dataset))
+    $("#config-dataset").val(tool.configuration.dataset)
+      .on("change keyup",function () { tool.apply_button_status('modified'); });
     $("#config-delimiter").val(tool.configuration.delimiter)
-      .on("change",function () {tool.apply_button_status('modified')});
+      .on("change",function () { tool.apply_button_status('modified'); });
+    $("#config-title").val(tool.configuration.title)
+      .on("change keyup",function () { tool.apply_button_status('modified'); });
     $("#config-color").val(tool.configuration.color)
       .colorpicker()
-      .on('changeColor.colorpicker', function () {tool.apply_button_status('modified')});
-  }
+      .on('changeColor.colorpicker', function () { tool.apply_button_status('modified'); });
+  };
 
 /**
  * json2csv
@@ -445,8 +478,8 @@
     line = line.slice(0, -delim.length);      
     str += line + '\r\n';
     for (var i = 0; i < array.length; i++) {
-      var line = '';
-      for (var index in array[i]) {
+      line = '';
+      for (index in array[i]) {
         line += array[i][index] + delim;
       }
       line = line.slice(0, -delim.length);
@@ -486,37 +519,89 @@
     
     // check to see if button is disabled, if not, apply changes
     if (!btn_apply.hasClass('disabled')) {
-    
-      // Update the configuration values
-      var config = tool.configuration;
-      var data=[];
-      var tab = $("#config-delimiter").val();
-      if (tab === "tab") {
-        data = d3.tsv.parse($("#config-dataset").val());
-      } else if (tab === "comma") {
-        data = d3.csv.parse($("#config-dataset").val());
-      }
-      if (data.length>1500) {
-        alert('Your data array must contain less than 1,500 rows.');
-      } else if (data.length>1) {
-        config.title = $("#config-title").val();
-        config.dataset = data;
-        config.delimiter = tab;
-        config.color = $("#config-color").val();
+      var url = $("#config-url").val(),
+      status = false;
+
+      if (url) {
+        status = tool.validate_url(url);
       } else {
-        alert('There was an problem processing your data. Please make sure to include a header row and at least 2 rows of data.');
+        status = tool.validate_dataset();      
       }
-      
-      //a=$('#control-dataset').val().trim()
-      //b=a.split(/\r|\r\n|\n/);
 
-      // Update the tool frontend
-      tool.update_dropdown();
-      tool.draw();
+      if  (status) {
+        // Update the configuration values
+        var config = tool.configuration;
+        config.title = $("#config-title").val();
+        config.url = $("#config-url").val();
+        config.dataset = $("#config-dataset").val();
+        config.delimiter = $("#config-delimiter").val();
+        config.color = $("#config-color").val();
 
-      // Disable the apply button
-      tool.apply_button_status("updated");
+        // Update the tool frontend
+        tool.draw();
+        
+        // Disable the apply button
+        tool.apply_button_status("updated"); 
+      }
     }
+  };
+
+  /**
+   * validate_url
+   * Validate url field
+   */
+  tool.validate_url = function(url){
+    //http://stackoverflow.com/questions/2723140/validating-url-with-jquery-without-the-validate-plugin
+    if(/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(url)){
+    // Use the following line to support localhost
+    //if(/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.?[a-z]{2,5}?(:[0-9]{1,5})?(\/.*)?$/i.test(url)){ 
+      $("#config-url-error")
+        .hide();
+      return true;
+    } else {
+      $("#config-url-error")
+        .show()
+        .html('This is an invalid URL.  Please try again.');
+    }
+    // Default return false
+    return false;
+  };
+
+
+  /**
+   * validate_dataset
+   * Validate dataset field
+   */
+  tool.validate_dataset = function(){
+    var data=[];
+    var tab = $("#config-delimiter").val();
+    if (tab === "tab") {
+      data = d3.tsv.parse($("#config-dataset").val());
+    } else if (tab === "comma") {
+      data = d3.csv.parse($("#config-dataset").val());
+    }
+    var data_field = $('#config-dataset').val().trim();
+    data_field = data_field.split(/\r|\r\n|\n/);
+    
+    if (data.length<2) {
+      $("#config-dataset-error")
+        .show()
+        .html('There is a problem with this dataset.  Please include a header row and at least 2 rows of data.');
+    } else if (data.length>250) {
+      $("#config-dataset-error")
+        .show()
+        .html('Your data array must contain less than 250 rows.');
+    } else if ((data.length>1) && (data.length==data_field.length-1)) {
+      $("#config-dataset-error")
+        .hide();
+      return true;
+    } else {
+      $("#config-dataset-error")
+        .show()
+        .html('There was an problem processing your data. Please make sure to include a header row and at least 2 rows of data.  If you have a larger dataset, please use the CSV file option.');
+    }
+    // Default return false
+    return false;
   };
 
 
