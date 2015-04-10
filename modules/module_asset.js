@@ -182,7 +182,7 @@
       } else {  // other browsers
           sheet.onload = function(){
 
-              console.log(".....sheet onload......")
+              //console.log(".....sheet onload......")
               //_resource_queue_remove(_obj_stylesheet);
 
               // setTimeout( "_resource_queue_remove(_obj_stylesheet)");
@@ -241,7 +241,7 @@
 
   _asset_queue_scripts = function( scripts, _tool_name){
 
-    console.log("ASSET QUEUE RESOURCES -> resources", scripts);
+    //console.log("ASSET QUEUE RESOURCES -> resources", scripts);
 
     // script asset object
     $.each(scripts, function(si, sao){
@@ -259,11 +259,11 @@
 
   _asset_queue_stylesheets = function(stylesheets, _tool_name){
 
-    console.log("ASSET QUEUE STYLESHEETS -> stylesheets", stylesheets);
+    //console.log("ASSET QUEUE STYLESHEETS -> stylesheets", stylesheets);
 
     $.each(stylesheets, function(i,v){
 
-      console.log(".. load the stylesheet", i, v);
+      //console.log(".. load the stylesheet", i, v);
       _asset_load_stylesheet( v, _tool_name );
 
     });

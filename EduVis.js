@@ -1,4 +1,4 @@
-//Date Compiled: April 02 2014 07:51:55
+//Date Compiled: 2015-02-23 12:46:45
 /*  *  *  *  *  *  *  *
 *
 * EduVis - Educational Visualition Framework
@@ -211,7 +211,7 @@ var EduVis = (function () {
       } else {  // other browsers
           sheet.onload = function(){
 
-              console.log(".....sheet onload......")
+              //console.log(".....sheet onload......")
               //_resource_queue_remove(_obj_stylesheet);
 
               // setTimeout( "_resource_queue_remove(_obj_stylesheet)");
@@ -270,7 +270,7 @@ var EduVis = (function () {
 
   _asset_queue_scripts = function( scripts, _tool_name){
 
-    console.log("ASSET QUEUE RESOURCES -> resources", scripts);
+    //console.log("ASSET QUEUE RESOURCES -> resources", scripts);
 
     // script asset object
     $.each(scripts, function(si, sao){
@@ -288,11 +288,11 @@ var EduVis = (function () {
 
   _asset_queue_stylesheets = function(stylesheets, _tool_name){
 
-    console.log("ASSET QUEUE STYLESHEETS -> stylesheets", stylesheets);
+    //console.log("ASSET QUEUE STYLESHEETS -> stylesheets", stylesheets);
 
     $.each(stylesheets, function(i,v){
 
-      console.log(".. load the stylesheet", i, v);
+      //console.log(".. load the stylesheet", i, v);
       _asset_load_stylesheet( v, _tool_name );
 
     });
@@ -373,7 +373,7 @@ var EduVis = (function () {
 
     	_environment_path = (_path || "");
 
-    	console.log(".... P A T H .....", _path);
+    	//console.log(".... P A T H .....", _path);
     },
     
     _environment_get_path = function() {
@@ -434,7 +434,7 @@ var EduVis = (function () {
     },
     _environment_get_webservice = function() {
 
-      	console.log("_environment_path_webservice", _environment_path_webservice);
+      	//console.log("_environment_path_webservice", _environment_path_webservice);
 
 		return _environment_path_webservice;
 
@@ -742,7 +742,7 @@ var EduVis = (function () {
 */    
     _tool_notify = function ( _obj_notify ){
 
-        console.log("tool notify", _obj_notify);
+        //console.log("tool notify", _obj_notify);
         
     },
 

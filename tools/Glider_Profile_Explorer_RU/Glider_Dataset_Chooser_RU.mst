@@ -1,0 +1,50 @@
+<div>
+  <h4>Glider Dataset Explorer</h4>
+  <p><strong>Instructions:</strong> Use the pulldowns to choose a specific glider deployment you are interested in.  Next narrow the date range of the deployment that you would like to focus on.  Optionally, you can also modify the graph title that will appear on your tool.  Once you've selected your desired glider dataset, click "Apply" and switch to the "Preview" tab to check out your customized tool.</p>
+</div>
+
+<div>
+  <div style="display:inline-block; max-width: 33%;">
+    <label for="config-institution">Institution</label>
+    <select id="config-institution">
+      <option>...loading...</option>
+    </select>
+  </div>
+  <div style="display:inline-block; max-width: 33%;">
+    <label for="config-glider">Glider</label>
+    <select id="config-glider">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block; max-width: 33%;">
+    <label for="config-deployment">Deployment</label>
+    <select id="config-deployment">
+      <option>...loading...</option>
+    </select>    
+  </div>
+</div>
+
+<div>
+  <div style="display:inline-block; margin: 10px 0 10px 0;">
+    <label for="config-title">Graph Title</label>
+    <input id="config-title" size="50">
+  </div>
+</div>
+
+<div id="ui-config-map" style="width:700px; height:350px"></div>
+
+<div id="ui-config-dateRange">
+  <div id="ui-config-dateRange-start" style="display:inline-block">
+    <label for="config-date_start">Start Date</label>
+    <input id="config-date_start" class="datepicker">
+  </div>
+  <div id="ui-config-dateRange-end" style="display:inline-block">
+    <label for="config-date_end">End Date</label>
+    <input id="config-date_end" class="datepicker">
+  </div>
+</div>
+
+<div id="ui-config-apply">
+  <div id="revert-btn" class="btn btn-medium disabled">Revert</div>
+  <div id="apply-btn" class="btn btn-medium disabled">Apply</div>
+</div>

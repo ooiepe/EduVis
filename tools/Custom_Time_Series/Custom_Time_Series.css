@@ -27,3 +27,7 @@ path {
   stroke-opacity: .4;
 }
 */
+
+#vistool-controls label {
+  font-weight: bold;
+}
