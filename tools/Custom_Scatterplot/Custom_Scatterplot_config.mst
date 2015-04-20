@@ -1,6 +1,7 @@
 <form class="form-horizontal">
 
 <p><strong>Step 1: Which kind of custom dataset do you want to use?</strong></p>
+<p><em>Your dataset must include a header row with the names of each column.  You can use NaN to specify unavailable data points, empty strings will be interpreted as 0.  Note, if your dataset is longer than 250 rows, you will need to use the URL option.</em></p>
 
 <div class="accordion" id="dataOption">
   <div class="accordion-group">
@@ -38,7 +39,7 @@
       <div class="accordion-inner">
 
         <div id="ui-config-dataset" class="control-group">
-          <p><em>Please enter your own timeseries data here, using either a comma (csv) or tab (tsv) separated format, selecting the appropriate delimiter below.  Your dataset must include date/time as the first column in the format yyyy-mm-dd or yyyy-mm-ddThh:mm:ssZ.  In Excel, you can use these date strings as custom cell formats. You must also include a header row with the names of each column.  You can use NaN to specify unavailable data points, empty strings will be interpreted as 0.  Note, if your dataset is longer than 250 rows, you will need to use the URL option above.</em></p>
+          <p><em>Please enter your own timeseries data here, using either a comma (csv) or tab (tsv) separated format, selecting the appropriate delimiter below.</em></p>
           <textarea id="config-dataset" cols="100" rows="15"></textarea>
           <div id="config-dataset-error" style="color: red; display: none;"></div>
         </div>    

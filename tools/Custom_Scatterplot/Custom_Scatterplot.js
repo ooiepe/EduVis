@@ -1,14 +1,14 @@
 /**
- * Custom Time Series (CTS)
- * Revised 4/2/2015
+ * Custom Scatterplot (CS)
+ * Revised 4/20/2015
  * Written by Sage Lichtenwalner
 */
 (function (eduVis) {
   "use strict";
   var tool = {
-    "name" : "Custom_Time_Series",
+    "name" : "Custom_Scatterplot",
     "version" : "0.1",
-    "description" : "This tool allows you to create an interactive time series graph of your own CSV data.",
+    "description" : "This tool allows you to create an interactive scatterplot of your own CSV data.",
     "resources" : {
       "tool":{
         "scripts" : [
@@ -44,8 +44,9 @@
     "configuration" : {
       "title" : "Example Data",
       "url" : "",
-      "dataset" : "date\tair temperature\twater temperature\n2013-01-01T00:00:00Z\t27.4\t16.4\n2013-01-10T00:06:00Z\t27.3\t16.6\n2013-01-20T00:12:00Z\t27.2\t16.8\n2013-02-01T00:18:00Z\t27.2\t16.9\n2013-02-10T00:24:00Z\t27.1\t17.0\n2013-02-20T00:30:00Z\t27.1\t17.1\n2013-03-01T00:36:00Z\t27.0\t17.1\n2013-03-10T00:42:00Z\t26.9\t17.2\n2013-03-20T00:48:00Z\t26.8\t17.2\n2013-04-01T00:54:00Z\t26.6\t17.3\n2013-04-10T01:00:00Z\t26.4\t17.4\n",
-      "parameter" : "water temperature",
+      "dataset" : "Depth\tTemperature\tSalinity (g/kg)\tDensity (kg/m^3)\tNitrate (kg/m^3)\tOxygen Saturation (%)\n-1\t19.986\t9.8375\t1005.8\tNaN\tNaN\n-1.5\t19.851\t10.564\t1006.4\t75.39\t69.13\n-2\t19.884\t12.727\t1008\t72.75\t66.47\n-2.5\t19.988\t13.254\t1008.4\t67.46\t63.566\n-3\t20.034\t14.661\t1009.4\t63.127\t61.373\n-3.5\t19.989\t16.651\t1010.9\t60.795\t59.891\n-4\t19.962\t17.635\t1011.7\t53.14\t57.57\n-4.5\t19.939\t17.856\t1011.8\t45.295\t56.683\n-5\t19.931\t18.034\t1012\t44\t54.95\n-5.5\t19.921\t18.197\t1012.1\t41.143\t54.223\n-6\t19.906\t18.26\t1012.1\t38.703\t53.478\n-6.5\t19.906\t18.333\t1012.2\t36.68\t52.715\n-7\t19.902\t18.45\t1012.3\t39.07\t49.88\n-7.5\t19.896\t18.976\t1012.7\t39.325\t48.907\n-8\t19.834\t19.066\t1012.8\t37.96\t47.933\n-8.5\t19.79\t19.804\t1013.3\t35.35\t47.138\n-9\t19.58\t20.802\t1014.1\t27.739\t45.557\n-9.5\t19.51\t20.972\t1014.3\t21.627\t43.263",
+      "parameter_x" : "Temperature",
+      "parameter_y" : "Depth",
       "color" : "#a33333",
       "delimiter":"tab"
     },
@@ -53,22 +54,6 @@
     "graph" : {},
     "data" : {}
   };
-
-/* Old JSON dataset array
-[
-  {"date":"2013-01-01T00:00:00Z","air temperature":"27.4","water temperature":"16.4"},
-  {"date":"2013-01-10T00:06:00Z","air temperature":"27.3","water temperature":"16.6"},
-  {"date":"2013-01-20T00:12:00Z","air temperature":"27.2","water temperature":"16.8"},
-  {"date":"2013-02-01T00:18:00Z","air temperature":"27.2","water temperature":"16.9"},
-  {"date":"2013-02-10T00:24:00Z","air temperature":"27.1","water temperature":"17.0"},
-  {"date":"2013-02-20T00:30:00Z","air temperature":"27.1","water temperature":"17.1"},
-  {"date":"2013-03-01T00:36:00Z","air temperature":"27.0","water temperature":"17.1"},
-  {"date":"2013-03-10T00:42:00Z","air temperature":"26.9","water temperature":"17.2"},
-  {"date":"2013-03-20T00:48:00Z","air temperature":"26.8","water temperature":"17.2"},
-  {"date":"2013-04-01T00:54:00Z","air temperature":"26.6","water temperature":"17.3"},
-  {"date":"2013-04-10T01:00:00Z","air temperature":"26.4","water temperature":"17.4"}
-]
-*/
 
 
   /**
@@ -93,10 +78,7 @@
     g.width = 840 - g.margin.left - g.margin.right;
     g.height = 400 - g.margin.top - g.margin.bottom;
 
-    g.parseDate = d3.time.format.iso.parse;
-    g.date_format = d3.time.format.utc("%Y-%m-%d");
-
-    g.x = d3.time.scale.utc().range([0, g.width]);
+    g.x = d3.scale.linear().range([0, g.width]);
     g.y = d3.scale.linear().range([g.height, 0]);
 
     g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(12).tickSize(5,0,0);
@@ -130,40 +112,13 @@
       .attr("class", "y axis")
       .call(g.yAxis);
 
-    g.focus.append("path")
-      //.datum(data)
-      .attr("class", "line")
-      .attr("d", g.line1)
-      .style("fill","none")
-      .style("stroke",tool.configuration.color)
-      .style("stroke-width","2px");
-
-    //mouse move
-    g.mouse_focus = g.focus.append("g")
-      .attr("class", "focus")
+    g.tooltip = g.focus.append("g")
+      .attr("class", "tooltip")
       .style("display", "none");
 
-    g.mouse_focus.append("circle")
-      .attr("r", 4.5);
-
-    g.mouse_focus.append("text")
+    g.tooltip.append("text")
       .attr("x", 9)
       .attr("dy", ".35em");
-
-    g.mousemover = g.focus.append("rect")
-      .attr("class", "overlay")
-      .attr("width", g.width)
-      .attr("height", g.height)
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .on("mouseover", function() { g.mouse_focus.style("display", null); })
-      .on("mouseout", function() { g.mouse_focus.style("display", "none"); });
-
-    g.line1 = d3.svg.line()
-      //.interpolate("linear")
-      .x(function(d) { return g.x(d.date); })
-      .y(function(d) { return g.y(d.data); })
-      .defined(function(d) { return !isNaN(d.data); });
 
     g.title = g.svg.append("text")
       .attr("class", "gtitle")
@@ -183,7 +138,7 @@
       .attr("y", 0)
       .attr("dy", "1em")
       .attr("transform", "translate(" + (0) + "," + (g.height/2+g.margin.top) + "), rotate(-90)")
-      .text( tool.configuration.parameter);
+      .text( tool.configuration.parameter_y);
 
     g.xlabel = g.svg.append("text")
       .attr("id", _target+"_xlabel")
@@ -192,7 +147,7 @@
       .style("font-size", "11px")
       .attr("dy", "-6px")
       .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
-      .text( "Date Range");
+      .text( tool.configuration.parameter_x);
 
     g.stats = g.svg.append("text")
       .attr("id", _target+"_stats")
@@ -258,32 +213,73 @@
       // Parse data
       var cols = d3.entries(dataset[0]);
       dataset.forEach(function(d,k) {
-        data[k] = { "date" : g.parseDate(d[cols[0].key]), "data" : +d[tool.configuration.parameter] };
+        data[k] = { 
+          "data_x" : +d[tool.configuration.parameter_x], 
+          "data_y" : +d[tool.configuration.parameter_y] };
       });
-
+      
       // Update x and y domains
-      g.x.domain(d3.extent(data, (function(d) { return d.date; })));
-      g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
+      g.x.domain(d3.extent(data, (function(d) { return d.data_x; }))).nice();
+      g.y.domain(d3.extent(data, (function(d) { return d.data_y; }))).nice();
 
+      // Setup the initial points
+      g.focus.selectAll(".dot")
+          .data(data)
+        .enter().append("circle")
+          .attr("class", "dot");
+                
       // Update the graph
-      g.svg.selectAll("path.line")
-        .data([data])
-        //.transition()
-        //.duration(500)
-        //.ease("linear")
-        .attr("d", g.line1)
-        .style("stroke",tool.configuration.color);
+      // See transition notes http://bl.ocks.org/WilliamQLiu/bd12f73d0b79d70bfbae
+      // Also mouseover at http://bl.ocks.org/weiglemc/6185069
+      g.focus.selectAll(".dot")
+        .filter(function(d) { return (isNaN(d.data_x) || isNaN(d.data_y)) })
+          .style("opacity",0);
+
+      g.focus.selectAll(".dot")
+        .filter(function(d) { return (!isNaN(d.data_x) && !isNaN(d.data_y)) })
+        .attr("r", 4.5)
+        .style("stroke", "#000")
+        .style("fill", tool.configuration.color)
+        .transition()
+        .duration(1000)
+        .attr("cx", function(d) { return (!isNaN(d.data_x) ? g.x(d.data_x) : 0); })
+        .attr("cy", function(d) { return (!isNaN(d.data_y) ? g.y(d.data_y) : 0); })
+        .style("opacity",1);
+        
+/*
+          .on("mouseover", function(d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", .9);
+            tooltip.html(d["Cereal Name"] + "<br/> (" + xValue(d) + ", " + yValue(d) + ")")
+              .style("left", (d3.event.pageX + 5) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+          })
+          .on("mouseout", function(d) {
+            tooltip.transition()
+              .duration(500)
+              .style("opacity", 0);
+          });
+*/
+
+      //.on("mouseover", function() { g.mouse_focus.style("display", null); })
+      //.on("mouseout", function() { g.mouse_focus.style("display", "none"); });
 
       g.title.text( this.configuration.title );
-      g.ylabel.text( this.configuration.parameter );
-      var datelimits = g.x.domain();
-      g.xlabel.text(d3.time.format.utc("%B %e, %Y")(datelimits[0]) + " to " + d3.time.format.utc("%B %e, %Y")(datelimits[1]));
-      var stats = tool.average(data);
-      g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
+      g.ylabel.text( this.configuration.parameter_y );
+      g.xlabel.text( this.configuration.parameter_x );
+      //var stats = tool.average(data);
+      //g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
 
       // Update x and y axis
-      d3.select("#"+tool.dom_target+"_yAxis").call(g.yAxis);
-      d3.select("#"+tool.dom_target+"_xAxis").call(g.xAxis);
+      d3.select("#"+tool.dom_target+"_yAxis")
+        .transition()
+        .duration(500)
+        .call(g.yAxis);
+      d3.select("#"+tool.dom_target+"_xAxis")
+        .transition()
+        .duration(500)
+        .call(g.xAxis);
 
       d3.selectAll('.axis line, .axis path')
         //.style("shape-rendering","crispEdges")
@@ -292,22 +288,7 @@
         .style("stroke-width","1px");
       d3.selectAll('.y.axis line')
         .style("stroke-opacity",".4");
-
-      g.mousemover.on("mousemove", function(){
-        var mouseX = d3.mouse(this)[0],
-          x0 = g.x.invert(mouseX),
-          i = bisectDate(data, x0, 1),
-          d0 = data[i - 1],
-          d1 = data[i],
-          d = x0 - d0.date > d1.date - x0 ? d1 : d0,
-          xMax = g.x(g.x.domain()[1]),
-          xPosition = g.x(x0)>(xMax/2) ? -110:0;
-
-        g.mouse_focus.attr("transform", "translate(" + g.x(d.date) + "," + g.y(d.data) + ")");
-        g.mouse_focus.select("text").text(g.date_format(d.date) + " - " + d3.round(d.data,4))
-          .attr("transform", "translate(" + xPosition + "," + 0 + ")");
-
-      });
+     
     }
   };
 
@@ -327,14 +308,25 @@
           .attr({
             "id": _target+"_tool-dropdowns"
           })
-          .append("Select a Parameter: ")
+          .append("Y Axis: ")
           .append(
             $("<select></select>")
             .attr({
-              "id" : _target + "_select-parameters"
+              "id" : _target + "_select-parameters_y"
             })
             .on("change", function(evt){
-              tool.graph_update_parameter(evt.target.value);
+              tool.graph_update_parameter(evt.target.value,'y');
+            })
+          )
+          .append(" &nbsp;&nbsp;&nbsp; ")
+          .append("X Axis: ")
+          .append(
+            $("<select></select>")
+            .attr({
+              "id" : _target + "_select-parameters_x"
+            })
+            .on("change", function(evt){
+              tool.graph_update_parameter(evt.target.value,'x');
             })
           )
       )
@@ -355,44 +347,47 @@
         cols = d3.entries(tool.data[0]);
 
     // Clear the current list
-    $("#"+tool.dom_target+"_select-parameters").empty();
-
-    // Build a new list of parameters
-    $.each(cols, function(k,d){
-      var option = $("<option/>")
-        .attr({
-          "value": d.key
-        })
-        .html(
-          d.key
-        );
-      if(k>0) {
-        options.push(option);
-      }
-    });
+    $("#"+tool.dom_target+"_select-parameters_x").empty();
+    $("#"+tool.dom_target+"_select-parameters_y").empty();
 
     // Add all the options from the options array to the select
-    $("#"+tool.dom_target+"_select-parameters")
-      .append(options);
+    $.each(cols, function(k,d){
+        $("#"+tool.dom_target+"_select-parameters_x").append($("<option/>", {"value": d.key, "text" : d.key}))
+        $("#"+tool.dom_target+"_select-parameters_y").append($("<option/>", {"value": d.key, "text" : d.key}))
+    });    
 
     // Select choosen parameter, if value isn't in list, choose first one
-    if($("#"+tool.dom_target+"_select-parameters option[value='" + config.parameter + "']").val() === undefined){
-      $("#"+tool.dom_target+"_select-parameters option:first")
+    if($("#"+tool.dom_target+"_select-parameters_x option[value='" + config.parameter_x + "']").val() === undefined){
+      $("#"+tool.dom_target+"_select-parameters_x option:first")
       .prop("selected", "selected");
-      config.parameter = $("#"+tool.dom_target+"_select-parameters").val();
+      config.parameter_x = $("#"+tool.dom_target+"_select-parameters_x").val();
     } else {
-      $("#"+tool.dom_target+"_select-parameters")
-      .val(config.parameter);
+      $("#"+tool.dom_target+"_select-parameters_x")
+      .val(config.parameter_x);
     }
+    
+    if($("#"+tool.dom_target+"_select-parameters_y option[value='" + config.parameter_y + "']").val() === undefined){
+      $("#"+tool.dom_target+"_select-parameters_y option:first")
+      .prop("selected", "selected");
+      config.parameter_y = $("#"+tool.dom_target+"_select-parameters_y").val();
+    } else {
+      $("#"+tool.dom_target+"_select-parameters_y")
+      .val(config.parameter_y);
+    }
+    
   };
 
 
   /**
    * Update graph and config when parameter pulldown is changed
    */
-  tool.graph_update_parameter = function(parameter){
-      tool.configuration.parameter = parameter;
-      tool.draw();
+  tool.graph_update_parameter = function(parameter, axis){
+    if (axis=='y') {
+      tool.configuration.parameter_y = parameter;      
+    } else {
+      tool.configuration.parameter_x = parameter;            
+    }
+      tool.updategraph();
   };
 
 
@@ -418,7 +413,7 @@
    * Called automatically by EduVis when edit is enabled
    */
   tool.init_controls = function(){     
-    $.get(EduVis.Environment.getPathTools() + tool.name + '/Custom_Time_Series_config.mst', function(template) {
+    $.get(EduVis.Environment.getPathTools() + tool.name + '/Custom_Scatterplot_config.mst', function(template) {
       var rendered = Mustache.render(template);
       $('#vistool-controls').html(rendered);
   
