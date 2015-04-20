@@ -1,0 +1,81 @@
+<form class="form-horizontal">
+
+<p><strong>Step 1: Which kind of custom dataset do you want to use?</strong></p>
+
+<div class="accordion" id="dataOption">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#dataOption" href="#collapseOne">
+        Option A - CSV file from a URL
+      </a>
+    </div>
+    <div id="collapseOne" class="accordion-body collapse in">
+      <div class="accordion-inner">
+
+        <p>Please enter the full web address of your CSV file, including the http://...  Note, you can upload your CSV file as a resource in the Ocean Education Portal, and then you can enter the web address for that resource here.</p>
+
+        <div id="ui-config-url" class="control-group">
+          <label class="control-label" for="config-url" title="Web Address"><strong>Web Address</strong></label>
+          <div class="controls">
+            <div class="input-append">
+              <input id="config-url" type="text" size="100"  placeholder="http://">
+              <button class="btn" type="button" id="clear-url"><i class="icon-remove"></i></button>
+            </div>
+          </div>
+          <div id="config-url-error" style="color: red; display: none;"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#dataOption" href="#collapseTwo">
+        Option B - Cut & paste a tab or comma separated dataset
+      </a>
+    </div>
+    <div id="collapseTwo" class="accordion-body collapse">
+      <div class="accordion-inner">
+
+        <div id="ui-config-dataset" class="control-group">
+          <p><em>Please enter your own timeseries data here, using either a comma (csv) or tab (tsv) separated format, selecting the appropriate delimiter below.  Your dataset must include date/time as the first column in the format yyyy-mm-dd or yyyy-mm-ddThh:mm:ssZ.  In Excel, you can use these date strings as custom cell formats. You must also include a header row with the names of each column.  You can use NaN to specify unavailable data points, empty strings will be interpreted as 0.  Note, if your dataset is longer than 250 rows, you will need to use the URL option above.</em></p>
+          <textarea id="config-dataset" cols="100" rows="15"></textarea>
+          <div id="config-dataset-error" style="color: red; display: none;"></div>
+        </div>    
+        <div id="ui-config-delimiter" class="control-group">
+          <label class="control-label" for="config-delimiter" title="Delimiter"><strong>Delimiter</strong></label>
+          <div class="controls">
+            <select id="config-delimiter">
+              <option value="comma">Comma (csv)</option>
+              <option value="tab">Tab (tsv)</option>
+            </select>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<p><strong>Step 2: Finally, specify some basic graph options.</strong></p>
+
+<div id="ui-config-title" class="control-group">
+  <label class="control-label" for="config-title" title="Graph Title"><strong>Graph Title</strong></label>
+  <div class="controls">
+    <input id="config-title" type="text" size="50">
+  </div>
+</div>
+
+<div id="ui-config-color" class="control-group">
+  <label class="control-label" for="config-color" title="Graph Line Color"><strong>Graph Line Color</strong></label>
+  <div class="controls">
+    <input id="config-color" type="text" >
+  </div>
+</div>
+
+<div id="ui-config-apply" style="margin-top: 10px">
+  <div id="revert-btn" class="btn btn-medium disabled">Revert</div>
+  <div id="apply-btn" class="btn btn-medium disabled">Apply</div>
+</div>
+
+</form>
