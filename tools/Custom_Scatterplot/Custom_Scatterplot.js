@@ -112,12 +112,14 @@
       .attr("class", "y axis")
       .call(g.yAxis);
 
-    g.tooltip = g.focus.append("g")
-      .attr("class", "tooltip")
+    g.mouse_focus = g.focus.append("g")
+      .attr("class", "focus")
       .style("display", "none");
 
-    g.tooltip.append("text")
-      .attr("x", 9)
+    g.mouse_focus.append("circle")
+      .attr("r", 6.5);
+
+    g.mouse_focus.append("text")
       .attr("dy", ".35em");
 
     g.title = g.svg.append("text")
@@ -223,47 +225,49 @@
       g.y.domain(d3.extent(data, (function(d) { return d.data_y; }))).nice();
 
       // Setup the initial points
+      // See mouseover example at http://bl.ocks.org/weiglemc/6185069
       g.focus.selectAll(".dot")
           .data(data)
         .enter().append("circle")
-          .attr("class", "dot");
-                
+          .attr("class", "dot")
+          .attr("r", 4.5)
+          .style("stroke", "#000")
+          .style("fill", tool.configuration.color)
+          .on("mouseover", function (d) {
+            g.mouse_focus
+              .attr("transform", "translate(" + g.x(d.data_x) + "," + g.y(d.data_y) + ")")
+              .style("display", null);
+            g.mouse_focus.select("text")
+              .text(d.data_x + ", " + d.data_y)
+              .attr("x", 10)
+              .attr("text-anchor","start");
+            if (d.data_x > (g.x.domain()[1] + g.x.domain()[0])/2 ) {
+              g.mouse_focus.select("text")
+                .attr("x", -10)
+                .attr("text-anchor","end");             
+            }
+          })
+          .on("mouseout", function (d) {
+            g.mouse_focus
+              .style("display", "none");
+          });
+
       // Update the graph
-      // See transition notes http://bl.ocks.org/WilliamQLiu/bd12f73d0b79d70bfbae
-      // Also mouseover at http://bl.ocks.org/weiglemc/6185069
+      // See transition example at http://bl.ocks.org/WilliamQLiu/bd12f73d0b79d70bfbae
+      
+      // Hide NaN points
       g.focus.selectAll(".dot")
-        .filter(function(d) { return (isNaN(d.data_x) || isNaN(d.data_y)) })
+        .filter(function(d) { return (isNaN(d.data_x) || isNaN(d.data_y)); })
           .style("opacity",0);
 
+      // Update other points
       g.focus.selectAll(".dot")
-        .filter(function(d) { return (!isNaN(d.data_x) && !isNaN(d.data_y)) })
-        .attr("r", 4.5)
-        .style("stroke", "#000")
-        .style("fill", tool.configuration.color)
+        .filter(function(d) { return (!isNaN(d.data_x) && !isNaN(d.data_y)); })
         .transition()
-        .duration(1000)
-        .attr("cx", function(d) { return (!isNaN(d.data_x) ? g.x(d.data_x) : 0); })
-        .attr("cy", function(d) { return (!isNaN(d.data_y) ? g.y(d.data_y) : 0); })
-        .style("opacity",1);
-        
-/*
-          .on("mouseover", function(d) {
-            tooltip.transition()
-              .duration(200)
-              .style("opacity", .9);
-            tooltip.html(d["Cereal Name"] + "<br/> (" + xValue(d) + ", " + yValue(d) + ")")
-              .style("left", (d3.event.pageX + 5) + "px")
-              .style("top", (d3.event.pageY - 28) + "px");
-          })
-          .on("mouseout", function(d) {
-            tooltip.transition()
-              .duration(500)
-              .style("opacity", 0);
-          });
-*/
-
-      //.on("mouseover", function() { g.mouse_focus.style("display", null); })
-      //.on("mouseout", function() { g.mouse_focus.style("display", "none"); });
+          .duration(1000)
+          .attr("cx", function(d) { return (!isNaN(d.data_x) ? g.x(d.data_x) : 0); })
+          .attr("cy", function(d) { return (!isNaN(d.data_y) ? g.y(d.data_y) : 0); })
+          .style("opacity",1);
 
       g.title.text( this.configuration.title );
       g.ylabel.text( this.configuration.parameter_y );
@@ -352,8 +356,8 @@
 
     // Add all the options from the options array to the select
     $.each(cols, function(k,d){
-        $("#"+tool.dom_target+"_select-parameters_x").append($("<option/>", {"value": d.key, "text" : d.key}))
-        $("#"+tool.dom_target+"_select-parameters_y").append($("<option/>", {"value": d.key, "text" : d.key}))
+        $("#"+tool.dom_target+"_select-parameters_x").append($("<option/>", {"value": d.key, "text" : d.key}));
+        $("#"+tool.dom_target+"_select-parameters_y").append($("<option/>", {"value": d.key, "text" : d.key}));
     });    
 
     // Select choosen parameter, if value isn't in list, choose first one
@@ -399,7 +403,7 @@
   tool.average = function(data) {
     var a = [];
     data.forEach(function(d) {
-      if(!isNaN(d.data)) {a.push(d.data);};
+      if(!isNaN(d.data)) { a.push(d.data); }
     });
     var r = {mean: 0, variance: 0, deviation: 0}, t = a.length;
     for(var m, s = 0, l = t; l--; s += a[l]);
