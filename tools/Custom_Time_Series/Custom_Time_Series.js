@@ -392,7 +392,7 @@
    */
   tool.graph_update_parameter = function(parameter){
       tool.configuration.parameter = parameter;
-      tool.draw();
+      tool.updategraph();
   };
 
 
