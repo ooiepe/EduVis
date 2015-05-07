@@ -22,19 +22,19 @@
                 "url": "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"
               },
               {
-                "name" : "jquery_1.11",
-                "url" : "http://code.jquery.com/jquery-1.11.1.min.js",
+                "name" : "jquery_1.11.1",
+                "url" : "https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js",
               },
               {
-                "name" : "jquery_ui_js",
-                "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
-                "dependsOn":["jquery_1.11"]
+                "name" : "jquery_ui_1.11.0",
+                "url" : "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js",
+                "dependsOn":["jquery_1.11.1"]
               }
             ],
             "stylesheets" : [
               {
                 "name": "jquery-smoothness",
-                "src": "http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css"
+                "src": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css"
               },
               {
                 "name": "leaflet-css",
