@@ -146,19 +146,32 @@
       .attr("id", _target+"_xlabel")
       .attr("class", "glabel")
       .attr("text-anchor", "middle")
-      .style("font-size", "11px")
+      .style("font-size", "14px")
       .attr("dy", "-6px")
       .attr("transform", "translate(" + (g.width/2+g.margin.left) + "," + (g.height+g.margin.top+g.margin.bottom) + "), rotate(0)")
       .text( tool.configuration.parameter_x);
 
-    g.stats = g.svg.append("text")
-      .attr("id", _target+"_stats")
-      .attr("class", "glabel")
+    g.stats1 = g.svg.append("text")
+      .attr("class", "gstats")
       .attr("text-anchor", "end")
       .style("font-size", "11px")
-      .attr("dy", "-6px")
-      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
-      .text( "Statistics");
+      .attr("y", -(3+14*2))
+      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top+g.height) + "), rotate(0)")
+      .text( "X Statistics");
+    g.stats2 = g.svg.append("text")
+      .attr("class", "gstats")
+      .attr("text-anchor", "end")
+      .style("font-size", "11px")
+      .attr("y", -(3+14))
+      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top+g.height) + "), rotate(0)")
+      .text( "Y Statistics");
+    g.stats3 = g.svg.append("text")
+      .attr("class", "gstats")
+      .attr("text-anchor", "end")
+      .style("font-size", "11px")
+      .attr("y", -3)
+      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top+g.height) + "), rotate(0)")
+      .text( "r Statistics");
 
     tool.create_dropdown(_target);
   };
@@ -272,9 +285,17 @@
       g.title.text( this.configuration.title );
       g.ylabel.text( this.configuration.parameter_y );
       g.xlabel.text( this.configuration.parameter_x );
-      //var stats = tool.average(data);
-      //g.stats.text("Mean: " + d3.round(stats.mean,2) + " / StDev: " + d3.round(stats.deviation,2) );
 
+      // Update statistics
+      g.stats1.text( this.configuration.parameter_y  + 
+        " \u03BC=" + d3.round(d3.mean(data, function(d) { return d.data_x; }) ,3) + 
+        " \u03C3=" + d3.round(d3.deviation(data, function(d) { return d.data_x; }) ,3) );
+      g.stats2.text( this.configuration.parameter_x + 
+        " \u03BC=" + d3.round(d3.mean(data, function(d) { return d.data_y; }) ,3) + 
+        " \u03C3=" + d3.round(d3.deviation(data, function(d) { return d.data_y; }) ,3)  );
+      g.stats3.text( "r=" + 
+        d3.round(tool.corrcoef(data, data, function(d) { return d.data_x; }, function(d) { return d.data_y; }) ,4) );
+      
       // Update x and y axis
       d3.select("#"+tool.dom_target+"_yAxis")
         .transition()
@@ -410,6 +431,56 @@
     for(m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
     return r.deviation = Math.sqrt(r.variance = s / (t-1)), r;
   };
+
+  
+  /**
+   * Calculates the correlation coefficient
+   */
+  tool.d3_number = function (x) {
+    return x === null ? NaN : +x;
+  }
+  
+  tool.d3_numeric = function (x) {
+    return !isNaN(x);
+  }
+  tool.corrcoef = function(array1, array2, f1, f2) {
+  	if (array1.length != array2.length) {return false;}
+  	var n = array1.length,
+  	x, y, 
+  	sum_x = 0, sum_y = 0,
+  	sum_xx = 0, sum_yy = 0,
+  	sum_xy = 0,
+  	i=-1,
+  	j=0;  
+  	if (arguments.length ===2) {
+    	while(++i < n) {
+    		x = tool.d3_number(array1[i]);
+    		y = tool.d3_number(array2[i]);
+    		if (tool.d3_numeric(x) && tool.d3_numeric(y)) {
+    		 sum_x += x;
+    		 sum_y += y;
+    		 sum_xx += x*x;
+    		 sum_yy += y*y;
+    		 sum_xy += x*y;
+    		 ++j;
+    		}
+    	}
+    } else {
+    	while(++i < n) {
+    		x = tool.d3_number(f1.call(array1, array1[i], i));
+    		y = tool.d3_number(f2.call(array2, array2[i], i));
+    		if (tool.d3_numeric(x) && tool.d3_numeric(y)) {
+    		 sum_x += x;
+    		 sum_y += y;
+    		 sum_xx += x*x;
+    		 sum_yy += y*y;
+    		 sum_xy += x*y;
+    		 ++j;
+    		}
+    	}      
+    }
+  	if (j>1) return (j * sum_xy - sum_x*sum_y) / Math.sqrt((j*sum_xx-sum_x*sum_x)*(j*sum_yy-sum_y*sum_y));
+  }
 
 
   /**
