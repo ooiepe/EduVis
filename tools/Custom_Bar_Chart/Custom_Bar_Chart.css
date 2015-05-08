@@ -1,0 +1,42 @@
+/*
+svg {
+  font: 11px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+path {
+}
+
+.axis, .label {
+  fill: #333333;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.refline {
+  stroke: #930000 ;
+  shape-rendering: crispEdges;
+}
+
+.y.axis line {
+  stroke-opacity: .4;
+}
+*/
+
+#vistool-controls label {
+  font-weight: bold;
+}
+
+/*
+.tooltip {
+  position: absolute;
+  width: 200px;
+  height: 28px;
+  pointer-events: none;
+}
+*/

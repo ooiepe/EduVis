@@ -1,0 +1,54 @@
+<form class="form-horizontal">
+
+<p><strong>Step 1: Cut & paste a tab or comma separated dataset</strong></p>
+<p><em>Your dataset must include a header row with the names for each column, and the first column must be used for the data labels.  You can use NaN to specify unavailable data points.  Empty strings will be interpreted as 0.  Note, your dataset cannot be longer that 50 rows.</em></p>
+  
+<div id="ui-config-dataset" class="control-group">
+  <p><em>Please enter your own data here, using either a comma (csv) or tab (tsv) separated format, selecting the appropriate delimiter below.</em></p>
+  <textarea id="config-dataset" cols="100" rows="15"></textarea>
+  <div id="config-dataset-error" style="color: red; display: none;"></div>
+</div>    
+<div id="config-error" style="color: red; display: none;"></div>
+
+<div id="ui-config-delimiter" class="control-group">
+  <label class="control-label" for="config-delimiter" title="Delimiter"><strong>Delimiter</strong></label>
+  <div class="controls">
+    <select id="config-delimiter">
+      <option value="comma">Comma (csv)</option>
+      <option value="tab">Tab (tsv)</option>
+    </select>
+  </div>
+</div>  
+
+<p><strong>Step 2: Finally, specify some basic graph options.</strong></p>
+
+<div id="ui-config-direction" class="control-group">
+  <label class="control-label" for="config-direction" title="Delimiter"><strong>Bar Direction</strong></label>
+  <div class="controls">
+    <select id="config-direction">
+      <option value="vertical">Vertical</option>
+      <option value="horizontal">Horizontal</option>
+    </select>
+  </div>
+</div>  
+
+<div id="ui-config-title" class="control-group">
+  <label class="control-label" for="config-title" title="Graph Title"><strong>Graph Title</strong></label>
+  <div class="controls">
+    <input id="config-title" type="text" size="50">
+  </div>
+</div>
+
+<div id="ui-config-color" class="control-group">
+  <label class="control-label" for="config-color" title="Graph Line Color"><strong>Graph Line Color</strong></label>
+  <div class="controls">
+    <input id="config-color" type="text" >
+  </div>
+</div>
+
+<div id="ui-config-apply" style="margin-top: 10px">
+  <div id="revert-btn" class="btn btn-medium disabled">Revert</div>
+  <div id="apply-btn" class="btn btn-medium disabled">Apply</div>
+</div>
+
+</form>
