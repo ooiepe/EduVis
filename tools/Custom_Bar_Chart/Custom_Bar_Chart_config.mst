@@ -23,11 +23,21 @@
 <p><strong>Step 2: Finally, specify some basic graph options.</strong></p>
 
 <div id="ui-config-direction" class="control-group">
-  <label class="control-label" for="config-direction" title="Delimiter"><strong>Bar Direction</strong></label>
+  <label class="control-label" for="config-direction" title="Bar Direction"><strong>Bar Direction</strong></label>
   <div class="controls">
     <select id="config-direction">
       <option value="vertical">Vertical</option>
       <option value="horizontal">Horizontal</option>
+    </select>
+  </div>
+</div>  
+
+<div id="ui-config-meantoggle" class="control-group">
+  <label class="control-label" for="config-meantoggle" title="Allow Mean Substraction?"><strong>Allow Mean Subtraction?</strong></label>
+  <div class="controls">
+    <select id="config-meantoggle">
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
     </select>
   </div>
 </div>  

@@ -46,6 +46,7 @@
       "dataset" : "Depth\tTemperature\tSalinity (g/kg)\tDensity (kg/m^3)\tNitrate (kg/m^3)\tOxygen Saturation (%)\n-1\t19.986\t9.8375\t1005.8\tNaN\tNaN\n-1.5\t19.851\t10.564\t1006.4\t75.39\t69.13\n-2\t19.884\t12.727\t1008\t72.75\t66.47\n-2.5\t19.988\t13.254\t1008.4\t67.46\t63.566\n-3\t20.034\t14.661\t1009.4\t63.127\t61.373\n-3.5\t19.989\t16.651\t1010.9\t60.795\t59.891\n-4\t19.962\t17.635\t1011.7\t53.14\t57.57\n-4.5\t19.939\t17.856\t1011.8\t45.295\t56.683\n-5\t19.931\t18.034\t1012\t44\t54.95\n-5.5\t19.921\t18.197\t1012.1\t41.143\t54.223\n-6\t19.906\t18.26\t1012.1\t38.703\t53.478\n-6.5\t19.906\t18.333\t1012.2\t36.68\t52.715\n-7\t19.902\t18.45\t1012.3\t39.07\t49.88\n-7.5\t19.896\t18.976\t1012.7\t39.325\t48.907\n-8\t19.834\t19.066\t1012.8\t37.96\t47.933\n-8.5\t19.79\t19.804\t1013.3\t35.35\t47.138\n-9\t19.58\t20.802\t1014.1\t27.739\t45.557\n-9.5\t19.51\t20.972\t1014.3\t21.627\t43.263",
       "delimiter":"tab",
       "direction":"vertical",
+      "meantoggle":"yes",
       "color" : "#a33333",
       "parameter" : "Temperature",
       "subtractmean" : false
@@ -79,12 +80,6 @@
     g.width = 840 - g.margin.left - g.margin.right;
     g.height = 400 - g.margin.top - g.margin.bottom;
 
-    g.x = d3.scale.ordinal().rangeRoundBands([0, g.width], .1);
-    g.y = d3.scale.linear().range([g.height, 0]);
-
-    g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").tickSize(5,0,0);
-    g.yAxis = d3.svg.axis().scale(g.y).orient("left").ticks(10).tickSize(-g.width,0,0);
-
     // Create SVG
     g.svg = d3.select("#"+_target).append("svg")
       .classed({"svg_export":true})
@@ -106,25 +101,13 @@
     g.focus.append("g")
       .attr("id", _target+"_xAxis")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + g.height + ")")
-      .call(g.xAxis);
+      .attr("transform", "translate(0," + g.height + ")");
+      //.call(g.xAxis);
 
     g.focus.append("g")
       .attr("id", _target+"_yAxis")
-      .attr("class", "y axis")
-      .call(g.yAxis);
-
-/*
-    g.mouse_focus = g.focus.append("g")
-      .attr("class", "focus")
-      .style("display", "none");
-
-    g.mouse_focus.append("circle")
-      .attr("r", 6.5);
-
-    g.mouse_focus.append("text")
-      .attr("dy", ".35em");
-*/
+      .attr("class", "y axis");
+      //.call(g.yAxis);
 
     g.title = g.svg.append("text")
       .attr("class", "gtitle")
@@ -170,13 +153,11 @@
 
     if (tab === "tab") {
       tool.data = d3.tsv.parse(dataset);
-      tool.update_dropdown();
-      tool.update_graph();
     } else if (tab === "comma") {
       tool.data = d3.csv.parse(dataset);
-      tool.update_dropdown();
-      tool.update_graph();
     }
+    tool.update_graph_controls();
+    tool.update_graph();
     
   };
 
@@ -209,92 +190,125 @@
           d.data = d.data-mean;
         });
       }
-      
-      // Update x and y domains
-      g.x.domain(data.map(function(d) { return d.label; }));
-      var yrange = d3.extent(data, (function(d) { return d.data; }));
-      yrange.push(0);
-      g.y.domain(d3.extent(yrange)).nice();
-      //g.y.domain(d3.extent(data, (function(d) { return d.data; }))).nice();
-      
-      // Setup the initial graph
-      g.focus.selectAll(".bar")
-          .data(data)
-        .enter().append("rect")
-          .attr("class", "bar")
-          .attr("x", function(d, i) { return g.x(d.label); })
-          .attr("width", g.x.rangeBand())
-          .attr("y", function(d) { return Math.max(g.y(d.data),g.y(0)); })
-          .attr("height", function(d) { return g.height - Math.abs(g.y(d.data) - g.y(0)); })
-          .attr("style","fill:" + tool.configuration.color);
-      
-      // Update the graph
-      g.focus.selectAll(".bar")
-        .transition()
-          .duration(1000)
-          .attr("x", function(d, i) { return g.x(d.label); })
-          .attr("width", g.x.rangeBand())
-          .attr("y", function(d) { return g.y(Math.max(0,d.data)); })
-          .attr("height", function(d) { return Math.abs(g.y(d.data)-g.y(0)); })
-          .style("opacity",1)
-          .attr("style","fill:" + tool.configuration.color);
 
-/*
-      // Setup the initial points
-      // See mouseover example at http://bl.ocks.org/weiglemc/6185069
-      g.focus.selectAll(".dot")
-          .data(data)
-        .enter().append("circle")
-          .attr("class", "dot")
-          .attr("r", 4.5)
-          .style("stroke", "#000")
-          .style("fill", tool.configuration.color)
-          .on("mouseover", function (d) {
-            g.mouse_focus
-              .attr("transform", "translate(" + g.x(d.data_x) + "," + g.y(d.data_y) + ")")
-              .style("display", null);
-            g.mouse_focus.select("text")
-              .text(d.data_x + ", " + d.data_y)
-              .attr("x", 10)
-              .attr("text-anchor","start");
-            if (d.data_x > (g.x.domain()[1] + g.x.domain()[0])/2 ) {
-              g.mouse_focus.select("text")
-                .attr("x", -10)
-                .attr("text-anchor","end");             
-            }
+      if (tool.configuration.direction == "vertical") {
+
+        // ---------- VERTICAL GRAPH ----------
+        g.x = d3.scale.ordinal().rangeRoundBands([0, g.width], 0.1);
+        g.y = d3.scale.linear().range([g.height, 0]);
+        g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10).tickSize(5,0,0);
+        g.yAxis = d3.svg.axis().scale(g.y).orient("left").ticks(10).tickSize(-g.width,0,0);
+
+        // Update x and y domains
+        g.x.domain(data.map(function(d) { return d.label; }));
+        var yrange = d3.extent(data, (function(d) { return d.data; }));
+        yrange.push(0);
+        g.y.domain(d3.extent(yrange)).nice();
+
+        // Setup the initial graph
+        g.focus.selectAll(".bar")
+            .data(data)
+          .enter().append("rect")
+            .attr("class", "bar");
+
+        // Update the graph
+        g.focus.selectAll(".bar")
+          .on("mouseover", function(d) {
+            var xPos = parseFloat(d3.select(this).attr("x")) + g.x.rangeBand()/2;
+            var yPos = parseFloat(d3.select(this).attr("y"));
+            if (yPos < g.y(0)) { yPos = g.y(d.data) - 4; } else { yPos = g.y(d.data) + 13; }
+            g.focus.append("text")
+              .attr("id", "tooltip")
+              .attr("x", xPos)
+              .attr("y", yPos)
+              .attr("text-anchor","middle")
+              .attr("font-family", "sans-serif")
+              .attr("font-size","11px")
+              .attr("font-weight","bold")
+              .attr("fill","black")
+              .text(d3.round(d.data,3));
           })
-          .on("mouseout", function (d) {
-            g.mouse_focus
-              .style("display", "none");
-          });
+          .on("mouseout", function() {
+            d3.select("#tooltip").remove();
+          })
+          .transition()
+            .duration(1000)
+            .attr("x", function(d, i) { return g.x(d.label); })
+            .attr("width", g.x.rangeBand())
+            .attr("y", function(d) { return g.y(Math.max(0,d.data)); })
+            .attr("height", function(d) { return Math.abs(g.y(d.data)-g.y(0)); })
+            .attr("style","fill:" + tool.configuration.color);
 
-      // Update the graph
-      // See transition example at http://bl.ocks.org/WilliamQLiu/bd12f73d0b79d70bfbae
-      
-      // Hide NaN points
-      g.focus.selectAll(".dot")
-        .filter(function(d) { return (isNaN(d.data_x) || isNaN(d.data_y)); })
-          .style("opacity",0);
+      } else {
 
-      // Update other points
-      g.focus.selectAll(".dot")
-        .filter(function(d) { return (!isNaN(d.data_x) && !isNaN(d.data_y)); })
-        .transition()
-          .duration(1000)
-          .attr("cx", function(d) { return (!isNaN(d.data_x) ? g.x(d.data_x) : 0); })
-          .attr("cy", function(d) { return (!isNaN(d.data_y) ? g.y(d.data_y) : 0); })
-          .style("opacity",1);
-*/
+        // ---------- HORIZONTAL GRAPH ----------
+        g.x = d3.scale.linear().range([0, g.width]);
+        g.y = d3.scale.ordinal().rangeRoundBands([g.height, 0], 0.1);
+        g.xAxis = d3.svg.axis().scale(g.x).orient("bottom").ticks(10).tickSize(-g.height,0,0);
+        g.yAxis = d3.svg.axis().scale(g.y).orient("left").ticks(10).tickSize(5,0,0);
+
+        // Update x and y domains
+        var xrange = d3.extent(data, (function(d) { return d.data; }));
+        xrange.push(0);
+        g.x.domain(d3.extent(xrange)).nice();
+        g.y.domain(data.map(function(d) { return d.label; }));
+
+        // Setup the initial graph
+        g.focus.selectAll(".bar")
+            .data(data)
+          .enter().append("rect")
+            .attr("class", "bar");
+
+        // Update the graph
+        g.focus.selectAll(".bar")
+          .on("mouseover", function(d) {
+            var xPos = parseFloat(d3.select(this).attr("x"));
+            var xAlign = "start";
+            if (xPos < g.x(0)) { xPos = g.x(d.data) - 3; xAlign = "end"; } else { xPos = g.x(d.data) + 3; }
+            var yPos = parseFloat(d3.select(this).attr("y")) + g.y.rangeBand()/2;
+            g.focus.append("text")
+              .attr("id", "tooltip")
+              .attr("x", xPos)
+              .attr("y", yPos)
+              .attr("text-anchor",xAlign)
+              .attr("alignment-baseline","middle")
+              .attr("font-family", "sans-serif")
+              .attr("font-size","11px")
+              .attr("font-weight","bold")
+              .attr("fill","black")
+              .text(d3.round(d.data,3));
+          })
+          .on("mouseout", function() {
+            d3.select("#tooltip").remove();
+          })
+         .transition()
+            .duration(1000)
+            .attr("x", function(d) { return g.x(Math.min(d.data,0)); })
+            .attr("width", function(d) { return Math.abs(g.x(d.data) - g.x(0)); })
+            .attr("y", function(d, i) { return g.y(d.label); })
+            .attr("height", g.y.rangeBand())
+            .attr("style","fill:" + tool.configuration.color);
+
+      }
 
       // Update title and labels
       g.title.text( this.configuration.title );
-      if (tool.configuration.subtractmean) {
-        g.ylabel.text( this.configuration.parameter + ' - ' + d3.round(mean,3) + ' (mean)');
+      if (tool.configuration.direction == "vertical") {
+        if (tool.configuration.subtractmean) {
+          g.ylabel.text( this.configuration.parameter + ' - ' + d3.round(mean,3) + ' (mean)');
+        } else {
+          g.ylabel.text( this.configuration.parameter );
+        }
+        g.xlabel.text( cols[0].key );
       } else {
-        g.ylabel.text( this.configuration.parameter );        
+        if (tool.configuration.subtractmean) {
+          g.xlabel.text( this.configuration.parameter + ' - ' + d3.round(mean,3) + ' (mean)');
+        } else {
+          g.xlabel.text( this.configuration.parameter );
+        }
+        g.ylabel.text( cols[0].key );
       }
-      g.xlabel.text( cols[0].key );
-      
+
       // Update x and y axis
       d3.select("#"+tool.dom_target+"_yAxis")
         .transition()
@@ -303,10 +317,8 @@
       d3.select("#"+tool.dom_target+"_xAxis")
         .transition()
         .duration(500)
-        .call(g.xAxis)
-        //.selectAll("text")
-        //  .text(function(d) { return barlabels[d]; });
-      
+        .call(g.xAxis);
+
       // Specify inline styles
       d3.selectAll('.axis line, .axis path')
         //.style("shape-rendering","crispEdges")
@@ -315,7 +327,6 @@
         .style("stroke-width","1px");
       d3.selectAll('.y.axis line')
         .style("stroke-opacity",".4");
-     
     }
   };
 
@@ -324,44 +335,50 @@
    * Called by setup
    */
   tool.create_dropdown = function(_target){
+    $("#"+_target+"_tool-dropdowns").remove();
 
     var tool_controls = $("<div/>")
       .css({
-        "text-align" : "center",
-        "height" : "50px"
+        "text-align": "center",
+        "height": "50px"
       })
+      .attr({
+        "id": _target+"_tool-dropdowns"
+      });
+    tool_controls.append($("<div/>")
+      .css({"display":"inline-block"})
+      .append("Parameter: ")
       .append(
-        $("<div/>")
-          .attr({
-            "id": _target+"_tool-dropdowns"
-          })
-          .append("Parameter: ")
-          .append(
-            $("<select />")
-            .attr({
-              "id" : _target + "_select-parameters"
-            })
-            .on("change", function(evt){
-              tool.graph_update_parameter(evt.target.value);
-            })
-          )
-          .append(" &nbsp;&nbsp;&nbsp; ")
-          .append("Subtract Mean: ")
-          .append(
-            $("<input />")
-            .attr({
-              "type" : 'checkbox',
-              "id" : _target + "_select-subtractmean",
-              "label" : 'Subtract Mean'
-            })
-            .on("click", function(evt){
-              tool.graph_update_subtractmean(this.checked);
-            })
-          )
-      )
-      .appendTo(
-        $("#"+_target)
-      );
+        $("<select />")
+        .attr({
+          "id": _target + "_select-parameters"
+        })
+        .on("change", function(evt){
+          tool.graph_update_parameter(evt.target.value);
+        })
+      ));
+    tool_controls.append($("<div/>")
+      .css({"display":"inline-block"})
+      .attr({
+        "id": _target+"_tool-subtractmean"
+      })
+      .append(" &nbsp;&nbsp;&nbsp; ")
+      .append("Subtract Mean: ")
+      .append(
+        $("<input />")
+        .attr({
+          "type": 'checkbox',
+          "id": _target + "_select-subtractmean",
+          "label": 'Subtract Mean'
+        })
+        .on("click", function(evt){
+          tool.graph_update_subtractmean(this.checked);
+        })
+      ));
+
+    tool_controls.appendTo(
+      $("#"+_target)
+    );
 
   };
 
@@ -369,7 +386,7 @@
    * Update pulldown to match config
    * Called by setup
    */
-  tool.update_dropdown = function(){
+  tool.update_graph_controls = function(){
 
     var config = tool.configuration,
         options = [],
@@ -383,7 +400,7 @@
       if(k>0) {
         $("#"+tool.dom_target+"_select-parameters").append($("<option/>", {"value": d.key, "text" : d.key}));
       }
-    });    
+    });
 
     // Select choosen parameter, if value isn't in list, choose first one
     if($("#"+tool.dom_target+"_select-parameters option[value='" + config.parameter + "']").val() === undefined){
@@ -394,12 +411,19 @@
       $("#"+tool.dom_target+"_select-parameters")
       .val(config.parameter);
     }
-    
+
+    // Update checkbox visibility
+    if(config.meantoggle=='yes') {
+      $("#"+tool.dom_target+"_tool-subtractmean").show();
+    } else {
+      $("#"+tool.dom_target+"_tool-subtractmean").hide();      
+    }
+
     // Update checkbox
     if (config.subtractmean) {
       $("#"+tool.dom_target+"_select-subtractmean").prop('checked',true);
     }
-    
+
   };
 
 
@@ -416,7 +440,6 @@
    * Update graph and config when parameter pulldown is changed
    */
   tool.graph_update_subtractmean = function(value){
-    console.log(value);
     tool.configuration.subtractmean = value;            
     tool.update_graph();
   };
@@ -452,6 +475,8 @@
     $("#config-delimiter").val(tool.configuration.delimiter)
       .on("change",function () { tool.apply_button_status('modified'); });
     $("#config-direction").val(tool.configuration.direction)
+      .on("change",function () { tool.apply_button_status('modified'); });
+    $("#config-meantoggle").val(tool.configuration.meantoggle)
       .on("change",function () { tool.apply_button_status('modified'); });
     $("#config-color").val(tool.configuration.color)
       .colorpicker()
@@ -489,15 +514,16 @@
     
     // check to see if button is disabled, if not, apply changes
     if (!btn_apply.hasClass('disabled')) {
-      status = false;
+      var status = false;
       status = tool.validate_dataset();      
       if  (status) {
         // Update the configuration values
         var config = tool.configuration;
-        config.title = $("#config-title").val();
         config.dataset = $("#config-dataset").val();
         config.delimiter = $("#config-delimiter").val();
         config.direction = $("#config-direction").val();
+        config.meantoggle = $("#config-meantoggle").val();
+        config.title = $("#config-title").val();
         config.color = $("#config-color").val();
 
         // Update the tool frontend
