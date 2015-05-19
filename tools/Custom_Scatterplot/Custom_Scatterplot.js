@@ -47,7 +47,7 @@
       "dataset" : "Depth\tTemperature\tSalinity (g/kg)\tDensity (kg/m^3)\tNitrate (kg/m^3)\tOxygen Saturation (%)\n-1\t19.986\t9.8375\t1005.8\tNaN\tNaN\n-1.5\t19.851\t10.564\t1006.4\t75.39\t69.13\n-2\t19.884\t12.727\t1008\t72.75\t66.47\n-2.5\t19.988\t13.254\t1008.4\t67.46\t63.566\n-3\t20.034\t14.661\t1009.4\t63.127\t61.373\n-3.5\t19.989\t16.651\t1010.9\t60.795\t59.891\n-4\t19.962\t17.635\t1011.7\t53.14\t57.57\n-4.5\t19.939\t17.856\t1011.8\t45.295\t56.683\n-5\t19.931\t18.034\t1012\t44\t54.95\n-5.5\t19.921\t18.197\t1012.1\t41.143\t54.223\n-6\t19.906\t18.26\t1012.1\t38.703\t53.478\n-6.5\t19.906\t18.333\t1012.2\t36.68\t52.715\n-7\t19.902\t18.45\t1012.3\t39.07\t49.88\n-7.5\t19.896\t18.976\t1012.7\t39.325\t48.907\n-8\t19.834\t19.066\t1012.8\t37.96\t47.933\n-8.5\t19.79\t19.804\t1013.3\t35.35\t47.138\n-9\t19.58\t20.802\t1014.1\t27.739\t45.557\n-9.5\t19.51\t20.972\t1014.3\t21.627\t43.263",
       "parameter_x" : "Temperature",
       "parameter_y" : "Depth",
-      "color" : "#a33333",
+      "color" : "#00457c",
       "delimiter":"tab"
     },
     "initial_config" : {},
@@ -243,9 +243,8 @@
           .data(data)
         .enter().append("circle")
           .attr("class", "dot")
-          .attr("r", 4.5)
-          .style("stroke", "#000")
-          .style("fill", tool.configuration.color)
+          .attr("r", 5.5)
+          //.style("stroke", "#000")
           .on("mouseover", function (d) {
             g.mouse_focus
               .attr("transform", "translate(" + g.x(d.data_x) + "," + g.y(d.data_y) + ")")
@@ -276,6 +275,7 @@
       // Update other points
       g.focus.selectAll(".dot")
         .filter(function(d) { return (!isNaN(d.data_x) && !isNaN(d.data_y)); })
+        .style("fill", tool.configuration.color)
         .transition()
           .duration(1000)
           .attr("cx", function(d) { return (!isNaN(d.data_x) ? g.x(d.data_x) : 0); })

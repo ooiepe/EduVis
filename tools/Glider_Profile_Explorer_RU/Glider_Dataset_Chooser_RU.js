@@ -149,7 +149,7 @@
     // define the selected portion polyline and add it to the map
     control.leaflet_map.poly_line_selected = L.polyline(
       [],
-      {color: 'blue'} // /todo: add transparancy
+      {color: '#00457c'} // /todo: add transparancy
     )
     .addTo(control.leaflet_map.map);
   
@@ -520,7 +520,7 @@
             {
               radius: 3,
               //fillColor: "#ff0000",
-              fillColor: "#ff0000",
+              fillColor: "#008100",
               color: "#000",
               weight: 1,
               opacity: 0,

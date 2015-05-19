@@ -47,7 +47,7 @@
       "delimiter":"tab",
       "direction":"vertical",
       "meantoggle":"yes",
-      "color" : "#a33333",
+      "color" : "#00457c",
       "parameter" : "Temperature",
       "subtractmean" : false
     },
@@ -228,6 +228,7 @@
               .attr("fill","black")
               .text(d3.round(d.data,3));
           })
+          .attr("style","fill:" + tool.configuration.color)
           .on("mouseout", function() {
             d3.select("#tooltip").remove();
           })
@@ -236,8 +237,7 @@
             .attr("x", function(d, i) { return g.x(d.label); })
             .attr("width", g.x.rangeBand())
             .attr("y", function(d) { return g.y(Math.max(0,d.data)); })
-            .attr("height", function(d) { return Math.abs(g.y(d.data)-g.y(0)); })
-            .attr("style","fill:" + tool.configuration.color);
+            .attr("height", function(d) { return Math.abs(g.y(d.data)-g.y(0)); });
 
       } else {
 

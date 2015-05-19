@@ -155,7 +155,7 @@
 
             "profile" : {
               radius: 3,
-              fillColor: "#ff0000",
+              fillColor: "#008100",
               color: "#000",
               weight: 1,
               opacity: 1,
@@ -164,7 +164,7 @@
 
             "profile_selected" : {
               radius: 7,
-              fillColor: "#ff7800",
+              fillColor: "#00457c",
               color: "#000",
               weight: 1,
               opacity: 1,
@@ -413,7 +413,7 @@
         .attr("class", "line")
         .attr("d", g.line)
         .style("fill","none")
-        .style("stroke","#999999")
+        .style("stroke","#00457c")
         .style("stroke-width","2px");
 
       g.mouse_focus = g.chart.append("g")
