@@ -349,6 +349,19 @@
                       .attr("id", _target + "-control-parameter-dropdown")
                 )
             )
+            .append(
+              $("<div />")
+                .attr("id", _target + "-viz-download")
+                .css({
+                  "text-align":"right",
+                  "cursor": "pointer"
+                })
+                .append('Download Profile <span class="glyphicon glyphicon-download"></span>')
+                .on("click", function(){ 
+                  window.open(tool.data_url, 'glider profile');
+                  return false;
+                })
+            )
         )
         .appendTo("#"+_target);
     };
@@ -744,8 +757,10 @@
       var g = tool.graph,
       profile_id = typeof pid === "undefined" ? tool.configuration.profile_id : pid,
       dataset_id = tool.configuration.dataset_id;
+      
+      tool.data_url = tool.erddap_request_profile(dataset_id, profile_id);
 
-      d3.csv( tool.erddap_request_profile(dataset_id, profile_id), function(error,data){
+      d3.csv( tool.data_url, function(error,data){
 
         //console.log("error", error, data);
 
