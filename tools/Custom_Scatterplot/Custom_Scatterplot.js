@@ -74,7 +74,7 @@
   tool.setup = function( _target ){
     var g = this.graph;
 
-    g.margin = {top: 26, right: 25, bottom: 40, left: 60};
+    g.margin = {top: 40, right: 25, bottom: 40, left: 60};
     g.width = 840 - g.margin.left - g.margin.right;
     g.height = 400 - g.margin.top - g.margin.bottom;
 
@@ -156,21 +156,21 @@
       .attr("text-anchor", "end")
       .style("font-size", "11px")
       .attr("y", -(3+14*2))
-      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top+g.height) + "), rotate(0)")
+      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
       .text( "X Statistics");
     g.stats2 = g.svg.append("text")
       .attr("class", "gstats")
       .attr("text-anchor", "end")
       .style("font-size", "11px")
       .attr("y", -(3+14))
-      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top+g.height) + "), rotate(0)")
+      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
       .text( "Y Statistics");
     g.stats3 = g.svg.append("text")
       .attr("class", "gstats")
       .attr("text-anchor", "end")
       .style("font-size", "11px")
       .attr("y", -3)
-      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top+g.height) + "), rotate(0)")
+      .attr("transform", "translate(" + (g.width+g.margin.left) + "," + (g.margin.top) + "), rotate(0)")
       .text( "r Statistics");
 
     tool.create_dropdown(_target);
