@@ -356,11 +356,7 @@
                   "text-align":"right",
                   "cursor": "pointer"
                 })
-                .append('Download Profile <span class="glyphicon glyphicon-download"></span>')
-                .on("click", function(){ 
-                  window.open(tool.data_url, 'glider profile');
-                  return false;
-                })
+                .append('<a id="profile-download-link"> Download Profile <span class="glyphicon glyphicon-download"></span></a>')
             )
         )
         .appendTo("#"+_target);
@@ -759,6 +755,7 @@
       dataset_id = tool.configuration.dataset_id;
       
       tool.data_url = tool.erddap_request_profile(dataset_id, profile_id);
+      $('#profile-download-link').attr('href',tool.data_url);
 
       d3.csv( tool.data_url, function(error,data){
 
