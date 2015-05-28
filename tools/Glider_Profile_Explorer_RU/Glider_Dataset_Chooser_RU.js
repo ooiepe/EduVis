@@ -1,7 +1,7 @@
 /**
  * Glider Dataset Chooser - Rutgers Version
  *   for use with the Glider Profile Explorer (GPE) - Rutgers Version
- * Revised 4/2/2015
+ * Revised 5/28/2015
  * Written by Michael Mills and Sage Lichtenwalner
 */
 (function (eduVis) {
@@ -9,7 +9,7 @@
   var parent_tool,
   control = {
     "name":"Glider_Dataset_Chooser_RU",
-    "version" : "0.1",
+    "version" : "0.2",
     "description" : "This tool allows users to browse and select Glider Datasets from the Rutgers Erddap server.",
     "config_controls" : {
       'institution':'Rutgers University', 
@@ -278,8 +278,8 @@
     $("#config-glider").children().remove();
     $("#config-glider").append($("<option>").attr("value",'').html('(choose one)'));   
     var datasets = control.datasets;
-    var gliders = datasets.find(function(d) {return d.key==$("#config-institution").val();});
-    $.each(gliders.values, function (i,dset) {
+    var gliders = datasets.filter(function(d) {return d.key==$("#config-institution").val();});
+    $.each(gliders[0].values, function (i,dset) {
       $("#config-glider")
         .append(
           $("<option>")
@@ -304,9 +304,9 @@
     var institution = $("#config-institution").val();
     var glider = $("#config-glider").val();
     if (institution.length>0 && glider.length>0) {
-      var gliders = datasets.find(function(d) {return d.key==institution;});
-      var deployments = gliders.values.find(function(d) {return d.key==glider;});
-      $.each(deployments.values, function (i,dset) {
+      var gliders = datasets.filter(function(d) {return d.key==institution;});
+      var deployments = gliders[0].values.filter(function(d) {return d.key==glider;});
+      $.each(deployments[0].values, function (i,dset) {
         
         var did = dset.datasetID.substring(dset.datasetID.lastIndexOf('-')+1),
         date_format1 = d3.time.format.utc("%Y%m%dT%H%M"),
@@ -335,16 +335,16 @@
     var glider = $("#config-glider").val();
     var deployment_id = $("#config-deployment").val();
     if (institution.length>0 && glider.length>0 && deployment_id.length>0) {
-      var gliders = datasets.find(function(d) {return d.key==institution;});
-      var deployments = gliders.values.find(function(d) {return d.key==glider;});
-      var deployment = deployments.values.find(function(d) {return d.datasetID==deployment_id;});
+      var gliders = datasets.filter(function(d) {return d.key==institution;});
+      var deployments = gliders[0].values.filter(function(d) {return d.key==glider;});
+      var deployment = deployments[0].values.filter(function(d) {return d.datasetID==deployment_id;});
     }
     if (typeof deployment != 'undefined') {
-      control.deployment = deployment;
+      control.deployment = deployment[0];
       //console.log('deployment',deployment);
 
       $("#config-title")
-        .val('Deployment: ' + deployment.datasetID)
+        .val('Deployment: ' + control.deployment.datasetID)
         .on('change keyup',control.apply_button_status('modified'));
         
       var range = control.deployment_date_range();
