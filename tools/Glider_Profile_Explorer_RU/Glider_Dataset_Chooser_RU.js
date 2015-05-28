@@ -700,6 +700,7 @@
       control.parent_tool.configuration.date_start = $("#config-date_start").val();
       control.parent_tool.configuration.date_end = $("#config-date_end").val();
       control.parent_tool.configuration.graph_title = $("#config-title").val();
+      control.parent_tool.configuration.profile_id = '';
       
       // Call the parent tool's Apply callback
       control.parent_tool.config_callback();
