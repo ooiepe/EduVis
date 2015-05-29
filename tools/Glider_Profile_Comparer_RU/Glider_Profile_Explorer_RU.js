@@ -77,7 +77,7 @@
           'date_end':'2014-02-01',
           'graph_title':'RU29 - South Atlantic Leg 2',
           'parameter' : "temperature",
-          'profile_id' : 1
+          'profile_id' : ''
         },
         "tools" : {},
         "parameter_metadata" : {
@@ -711,7 +711,12 @@
         map.fitBounds(mapObj.layer_locations.getBounds());
 
         // initialize map with first profile
-        tool.init_graph(mapObj.profile_ids.keys()[0]);
+        console.log(tool.configuration.profile_id)
+        if (tool.configuration.profile_id=='') {
+          tool.init_graph(mapObj.profile_ids.keys()[0]);
+        } else {
+          tool.init_graph(tool.configuration.profile_id);
+        }
 
       }); // end get json
 
@@ -938,7 +943,7 @@
 
     /**
      * Update the slider
-     * Called by update_map and init_graph
+     * Called by init_graph and also via map marker
      */
     tool.update_slider = function(profile_id){
 
