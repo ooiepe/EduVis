@@ -2,14 +2,14 @@
  * OOI Timeseries Choose
  *   for use with the Simple Time Series OOI Version
  * Written by Sage Lichtenwalner
- * Revised 10/27/15
+ * Revised 10/29/15
  */
 (function (eduVis) {
   "use strict";
   var parent_tool,
   control = {
     "name":"OOI_Timeseries_Chooser",
-    "version" : "0.1",
+    "version" : "0.2",
     "description" : "This tool allows users to browse and select OOI timeseries datasets from the OOI uframe server.",
     "config_controls" : {
       'reference_designator': 'GP03FLMA-RIM01-02-CTDMOG047',
@@ -124,7 +124,7 @@
    * Called by init
    */
   control.load_catalog = function () {
-    var url = EduVis.Environment.getPathTools() + control.parent_tool.name + '/epe-catalog.json';
+    var url = EduVis.Environment.getPathTools() + control.parent_tool.name + '/epe_catalog.json';
     $.getJSON(url, function (response) {
       control.datasets = response;  
       control.populate_arrays();
@@ -140,6 +140,7 @@
     var refdef = control.config_controls.reference_designator;
     control.config_controls.array = refdef.substring(0,2);
     control.config_controls.site = refdef.substring(0,8);
+    control.config_controls.subsite = refdef.substring(9,14);
     control.config_controls.instrument = refdef.substring(15);    
     
     $("#config-array").children().remove();
@@ -162,6 +163,11 @@
       .val(control.config_controls.site)
       .on('change', control.select_site);
     control.select_site();
+    
+    $("#config-subsite")
+      .val(control.config_controls.subsite)
+      .on('change', control.select_subsite);
+    control.select_subsite();
     
     $("#config-instrument")
       .val(control.config_controls.instrument)
@@ -197,7 +203,7 @@
       $("#config-site")
         .append(
           $("<option>")
-            .attr("value",dset.i)
+            .attr("value",dset.id)
             .html(dset.name)
           );
     });
@@ -215,7 +221,31 @@
     var selected_array = $("#config-array").val();
     var selected_site = $("#config-site").val();
     var datasets = control.datasets;
-    var instruments = datasets[selected_array].children[selected_site].children;
+    var subsites = datasets[selected_array].children[selected_site].children;
+
+    $("#config-subsite").children().remove();
+    $("#config-subsite").append($("<option>").attr("value",'').html('(choose one)'));
+    $.each(subsites, function (i,dset) {
+      $("#config-subsite")
+        .append(
+          $("<option>")
+            .attr("value",dset.id)
+            .html(dset.name)
+          );
+    });
+  };
+
+
+  /**
+   * select_subsite
+   * Called by populate_arrays and when config-subsite is changed
+   */
+  control.select_subsite = function () {
+    var selected_array = $("#config-array").val();
+    var selected_site = $("#config-site").val();
+    var selected_subsite = $("#config-subsite").val();
+    var datasets = control.datasets;
+    var instruments = datasets[selected_array].children[selected_site].children[selected_subsite].children;
 
     $("#config-instrument").children().remove();
     $("#config-instrument").append($("<option>").attr("value",'').html('(choose one)'));
@@ -223,7 +253,7 @@
       $("#config-instrument")
         .append(
           $("<option>")
-            .attr("value",i)
+            .attr("value",dset.id)
             .html(dset.name)
           );
     });
@@ -237,9 +267,10 @@
   control.select_instrument = function () {
     var selected_array = $("#config-array").val();
     var selected_site = $("#config-site").val();
+    var selected_subsite = $("#config-subsite").val();
     var selected_instrument = $("#config-instrument").val();
     var datasets = control.datasets;
-    var streams = datasets[selected_array].children[selected_site].children[selected_instrument].children;
+    var streams = datasets[selected_array].children[selected_site].children[selected_subsite].children[selected_instrument].children;
 
     $("#config-stream").children().remove();
     $("#config-stream").append($("<option>").attr("value",'').html('(choose one)'));
@@ -247,7 +278,7 @@
       $("#config-stream")
         .append(
           $("<option>")
-            .attr("value",i)
+            .attr("value",dset.id)
             .html(dset.stream)
           );
     });
@@ -260,15 +291,16 @@
   control.select_stream = function () {
     var selected_array = $("#config-array").val();
     var selected_site = $("#config-site").val();
+    var selected_subsite = $("#config-subsite").val();
     var selected_instrument = $("#config-instrument").val();
     var selected_stream = $("#config-stream").val();
 
     var datasets = control.datasets,
-    stream = datasets[selected_array].children[selected_site].children[selected_instrument].children[selected_stream];
+    stream = datasets[selected_array].children[selected_site].children[selected_subsite].children[selected_instrument].children[selected_stream];
     
     control.config_controls.reference_designator = stream.reference_designator;
     control.config_controls.method = stream.method;
-    control.config_controls.stream = selected_stream;
+    control.config_controls.stream = stream.name;
     
     var start_date =  control.date_format_ymd(control.iso_parse(stream.beginTime)),
     end_date = control.date_format_ymd(control.iso_parse(stream.endTime));
@@ -281,6 +313,10 @@
 
     $("#config-title")
       //.val(control.config_controls['reference_designator'] )
+      .val( datasets[selected_array].name + ' ' + 
+        datasets[selected_array].children[selected_site].name + ' ' + 
+        datasets[selected_array].children[selected_site].children[selected_subsite].name + ' ' + 
+        datasets[selected_array].children[selected_site].children[selected_subsite].children[selected_instrument].name )
       .on('change keyup',control.apply_button_status('modified'));
       
     control.apply_button_status("modified");

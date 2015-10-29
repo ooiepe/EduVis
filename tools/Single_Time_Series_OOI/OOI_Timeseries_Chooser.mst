@@ -4,25 +4,31 @@
 </div>
 
 <div>
-  <div style="display:inline-block; max-width: 25%;">
+  <div style="display:inline-block; max-width: 20%;">
     <label for="config-array">Array</label>
     <select id="config-array">
       <option>...loading...</option>
     </select>
   </div>
-  <div style="display:inline-block; max-width: 25%;">
+  <div style="display:inline-block; max-width: 20%;">
     <label for="config-site">Site</label>
     <select id="config-site">
       <option>...loading...</option>
     </select>    
   </div>
-  <div style="display:inline-block; max-width: 25%;">
+  <div style="display:inline-block; max-width: 20%;">
+    <label for="config-subsite">Subsite</label>
+    <select id="config-subsite">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block; max-width: 20%;">
     <label for="config-instrument">Instrument</label>
     <select id="config-instrument">
       <option>...loading...</option>
     </select>    
   </div>
-  <div style="display:inline-block; max-width: 25%;">
+  <div style="display:inline-block; max-width: 20%;">
     <label for="config-stream">Stream</label>
     <select id="config-stream">
       <option>...loading...</option>
@@ -47,7 +53,7 @@
 <div>
   <div style="display:inline-block; margin: 10px 0 10px 0;">
     <label for="config-title">Graph Title</label>
-    <input id="config-title" size="50">
+    <input id="config-title" size="100">
   </div>
 </div>
 

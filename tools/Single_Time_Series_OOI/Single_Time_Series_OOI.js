@@ -473,6 +473,7 @@
     datef = d3.time.format.iso;
 
     var url = tool.uframe_url + '/' + site + '/' + subsite + '/' + instrument + '/' + method + '/' + stream + '?beginDT=' + datef(start_date) + '&endDT=' + datef(end_date) + '&execDPA=true&limit=1000';
+    console.log(url);
     return url; 
   };
 
