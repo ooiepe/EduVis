@@ -300,7 +300,7 @@
     
     control.config_controls.reference_designator = stream.reference_designator;
     control.config_controls.method = stream.method;
-    control.config_controls.stream = stream.name;
+    control.config_controls.stream = stream.stream;
     
     var start_date =  control.date_format_ymd(control.iso_parse(stream.beginTime)),
     end_date = control.date_format_ymd(control.iso_parse(stream.endTime));
