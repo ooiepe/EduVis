@@ -4,11 +4,15 @@
   <title>EV Framework Standalone Tool Configuration</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="utf-8" />
-  <link type="text/css" rel="stylesheet" href="resources/css/overrides.css" media="all" />
+  <link type="text/css" rel="stylesheet" href="overrides.css" media="all" />
 </head>
 <body>
 <form class="form-inline">
   <select id="tool_name">
+    <option value="Single_Time_Series_OOI">Single_Time_Series_OOI</option>
+    <option value="Glider_Profile_Comparer_RU">Glider_Profile_Comparer_RU</option>
+    <option value="Custom_Bar_Chart">Custom_Bar_Chart</option>
+    <option value="Custom_Scatterplot">Custom_Scatterplot</option>
     <option value="Custom_Time_Series">Custom_Time_Series</option>
     <option value="Glider_Profile_Explorer_RU">Glider_Profile_Explorer_RU</option>
     <option value="Glider_Profile_Explorer_OOI">Glider_Profile_Explorer_OOI</option>
@@ -77,8 +81,8 @@
 
 </div>
 
-<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.js"></script>
+<script src="resources/jquery/jquery-1.11.3.js"></script>
+<script src="resources/bootstrap/js/bootstrap.js"></script>
 <script src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
 <script src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
 <script src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
@@ -175,10 +179,20 @@
     }
 
     function canvasToImage(){
-      // save canvas image as data url (png format by default)
-        var canvas = document.getElementById("canvas"),
-          dataURL = canvas.toDataURL();
-          window.open(dataURL,"Tool Image","location=0");
+      var canvas = document.getElementById("canvas"),
+      w = canvas.width,
+      h = canvas.height;
+      
+      //create a rectangle with the desired background color
+      var destCtx = canvas.getContext('2d');
+      destCtx.globalCompositeOperation = "destination-over";
+      destCtx.fillStyle = "#FFFFFF";
+      destCtx.fillRect(0,0,w,h);
+      
+      dataURL = canvas.toDataURL('image/png');
+      dataURL.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+      
+      window.open(dataURL,"Tool Image","location=0");
     }
 
   }());

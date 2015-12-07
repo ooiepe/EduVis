@@ -1,0 +1,70 @@
+<div>
+  <h4>OOI Timeseries Chooser</h4>
+  <p><strong>Instructions:</strong> Use the pulldowns to choose specific variables you are interested in and add them to your curated list.  Next narrow the date range that you would like to focus on.  Optionally, you can also modify the graph title that will appear on your tool.  Once you've selected your desired datasets, click "Apply" and switch to the "Preview" tab to check out your customized tool.</p>
+</div>
+
+<div>
+  <div style="display:inline-block; max-width: 20%;">
+    <label for="config-array">Array</label>
+    <select id="config-array">
+      <option>...loading...</option>
+    </select>
+  </div>
+  <div style="display:inline-block; max-width: 20%;">
+    <label for="config-site">Site</label>
+    <select id="config-site">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block; max-width: 20%;">
+    <label for="config-subsite">Subsite</label>
+    <select id="config-subsite">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block; max-width: 20%;">
+    <label for="config-instrument">Instrument</label>
+    <select id="config-instrument">
+      <option>...loading...</option>
+    </select>    
+  </div>
+  <div style="display:inline-block; max-width: 20%;">
+    <label for="config-stream">Stream</label>
+    <select id="config-stream">
+      <option>...loading...</option>
+    </select>    
+  </div>
+<!--   <div id="add-btn" class="btn btn-medium">Add</div> -->
+</div>
+
+<!-- <div id="ui-selected-datasets"></div> -->
+
+<div id="ui-config-dateRange">
+  <div id="ui-config-dateRange-start" style="display:inline-block">
+    <label for="config-date_start">Start Date</label>
+    <input id="config-date_start" class="datepicker">
+  </div>
+  <div id="ui-config-dateRange-end" style="display:inline-block">
+    <label for="config-date_end">End Date</label>
+    <input id="config-date_end" class="datepicker">
+  </div>
+</div>
+
+<div>
+  <div style="display:inline-block; margin: 10px 0 10px 0;">
+    <label for="config-title">Graph Title</label>
+    <input id="config-title" size="100">
+  </div>
+</div>
+
+<div id="ui-config-color" class="control-group">
+  <label class="control-label" for="config-color" title="Graph Line Color"><strong>Graph Line Color</strong></label>
+  <div class="controls">
+    <input id="config-color" type="text" >
+  </div>
+</div>
+
+<div id="ui-config-apply">
+  <div id="revert-btn" class="btn btn-medium disabled">Revert</div>
+  <div id="apply-btn" class="btn btn-medium disabled">Apply</div>
+</div>

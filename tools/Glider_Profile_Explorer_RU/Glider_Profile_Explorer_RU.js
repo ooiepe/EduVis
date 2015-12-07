@@ -22,19 +22,19 @@
                 "url": "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"
               },
               {
-                "name" : "jquery_1.11",
-                "url" : "http://code.jquery.com/jquery-1.11.1.min.js",
+                "name" : "jquery_1.11.1",
+                "url" : "https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js",
               },
               {
-                "name" : "jquery_ui_js",
-                "url" : "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js",
-                "dependsOn":["jquery_1.11"]
+                "name" : "jquery_ui_1.11.0",
+                "url" : "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js",
+                "dependsOn":["jquery_1.11.1"]
               }
             ],
             "stylesheets" : [
               {
                 "name": "jquery-smoothness",
-                "src": "http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css"
+                "src": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css"
               },
               {
                 "name": "leaflet-css",
@@ -77,7 +77,7 @@
           'date_end':'2014-02-01',
           'graph_title':'RU29 - South Atlantic Leg 2',
           'parameter' : "temperature",
-          'profile_id' : 1
+          'profile_id' : ''
         },
         "tools" : {},
         "parameter_metadata" : {
@@ -155,7 +155,7 @@
 
             "profile" : {
               radius: 3,
-              fillColor: "#ff0000",
+              fillColor: "#008100",
               color: "#000",
               weight: 1,
               opacity: 1,
@@ -164,7 +164,7 @@
 
             "profile_selected" : {
               radius: 7,
-              fillColor: "#ff7800",
+              fillColor: "#00457c",
               color: "#000",
               weight: 1,
               opacity: 1,
@@ -349,6 +349,15 @@
                       .attr("id", _target + "-control-parameter-dropdown")
                 )
             )
+            .append(
+              $("<div />")
+                .attr("id", _target + "-viz-download")
+                .css({
+                  "text-align":"right",
+                  "cursor": "pointer"
+                })
+                .append('<a id="profile-download-link"> Download Profile <span class="glyphicon glyphicon-download"></span></a>')
+            )
         )
         .appendTo("#"+_target);
     };
@@ -413,7 +422,7 @@
         .attr("class", "line")
         .attr("d", g.line)
         .style("fill","none")
-        .style("stroke","#999999")
+        .style("stroke","#00457c")
         .style("stroke-width","2px");
 
       g.mouse_focus = g.chart.append("g")
@@ -702,7 +711,12 @@
         map.fitBounds(mapObj.layer_locations.getBounds());
 
         // initialize map with first profile
-        tool.init_graph(mapObj.profile_ids.keys()[0]);
+        console.log(tool.configuration.profile_id)
+        if (tool.configuration.profile_id=='') {
+          tool.init_graph(mapObj.profile_ids.keys()[0]);
+        } else {
+          tool.init_graph(tool.configuration.profile_id);
+        }
 
       }); // end get json
 
@@ -744,8 +758,11 @@
       var g = tool.graph,
       profile_id = typeof pid === "undefined" ? tool.configuration.profile_id : pid,
       dataset_id = tool.configuration.dataset_id;
+      
+      tool.data_url = tool.erddap_request_profile(dataset_id, profile_id);
+      $('#profile-download-link').attr('href',tool.data_url);
 
-      d3.csv( tool.erddap_request_profile(dataset_id, profile_id), function(error,data){
+      d3.csv( tool.data_url, function(error,data){
 
         //console.log("error", error, data);
 
@@ -926,7 +943,7 @@
 
     /**
      * Update the slider
-     * Called by update_map and init_graph
+     * Called by init_graph and also via map marker
      */
     tool.update_slider = function(profile_id){
 

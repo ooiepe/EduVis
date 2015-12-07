@@ -7,12 +7,14 @@
 *
 */
 
+$ = $ || jQuery;
+
 var EduVis = (function () {
 
   "use strict";
 
 	var eduVis = {
-		"version" : "1.0.6",
+		"version" : "1.1",
 	};
 
 	return eduVis;
@@ -20,9 +22,6 @@ var EduVis = (function () {
 }());
 
 /* 
-* Last Revision: 03/20/2014
-* Version 1.0.6
-* Notes:
-*
-*
+* Last Revision: 6/15/2015
+* Version 1.1
 */
